@@ -1,0 +1,161 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1771406899219,
+  "projectRoot": "/Users/hansw/Desktop/WorkingSpace/a_and_i_admin_web_serivce",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "lib",
+      "test"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "android": {
+      "path": "android",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1771406899205,
+      "keyFiles": [
+        "a_and_i_admin_web_serivce_android.iml",
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat"
+      ]
+    },
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 2,
+      "lastAccessed": 1771406899205,
+      "keyFiles": [
+        "6ab642d2d29d49c7c5f5a6d85fcef46b.cache.dill.track.dill",
+        "ef30a4173a31b88e9199d5b6fae178a3.cache.dill.track.dill"
+      ]
+    },
+    "ios": {
+      "path": "ios",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1771406899206,
+      "keyFiles": [
+        "Podfile"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 2,
+      "lastAccessed": 1771406899206,
+      "keyFiles": [
+        "firebase_options.dart",
+        "main.dart"
+      ]
+    },
+    "linux": {
+      "path": "linux",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1771406899206,
+      "keyFiles": [
+        "CMakeLists.txt"
+      ]
+    },
+    "macos": {
+      "path": "macos",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1771406899206,
+      "keyFiles": [
+        "Podfile"
+      ]
+    },
+    "packages": {
+      "path": "packages",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1771406899207,
+      "keyFiles": []
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 1,
+      "lastAccessed": 1771406899207,
+      "keyFiles": [
+        "widget_test.dart"
+      ]
+    },
+    "web": {
+      "path": "web",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1771406899207,
+      "keyFiles": [
+        "favicon.png",
+        "index.html",
+        "manifest.json"
+      ]
+    },
+    "windows": {
+      "path": "windows",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1771406899207,
+      "keyFiles": [
+        "CMakeLists.txt"
+      ]
+    },
+    "android/app": {
+      "path": "android/app",
+      "purpose": "Application code",
+      "fileCount": 1,
+      "lastAccessed": 1771406899208,
+      "keyFiles": [
+        "build.gradle.kts"
+      ]
+    },
+    "lib/app": {
+      "path": "lib/app",
+      "purpose": "Application code",
+      "fileCount": 3,
+      "lastAccessed": 1771406899208,
+      "keyFiles": [
+        "app.dart",
+        "env.dart",
+        "session_controller.dart"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "firebase.json",
+      "accessCount": 2,
+      "lastAccessed": 1771407179644,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
