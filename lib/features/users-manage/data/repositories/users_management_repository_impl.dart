@@ -28,7 +28,7 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
   }
 
   @override
-  Future<void> createUser({
+  Future<AdminUser> createUser({
     required AuthRole role,
     required AdminUserProvisionType provisionType,
   }) async {
@@ -38,10 +38,11 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
       throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    await _apiClient.createUser(
+    final dto = await _apiClient.createUser(
       accessToken: accessToken,
       role: role,
       provisionType: provisionType,
     );
+    return dto.toDomain();
   }
 }

@@ -14,11 +14,13 @@ class _FakeUsersManagementRepository implements UsersManagementRepository {
   ].toList();
 
   @override
-  Future<void> createUser({
+  Future<AdminUser> createUser({
     required AuthRole role,
     required AdminUserProvisionType provisionType,
   }) async {
-    _users.add(AdminUser(id: 'u-2', username: 'new-admin', role: role));
+    final created = AdminUser(id: 'u-2', username: 'new-admin', role: role);
+    _users.add(created);
+    return created;
   }
 
   @override

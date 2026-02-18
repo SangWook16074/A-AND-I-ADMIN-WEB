@@ -27,7 +27,7 @@ void main() {
         client: client,
       );
 
-      await apiClient.createUser(
+      final created = await apiClient.createUser(
         accessToken: 'access-token',
         role: AuthRole.admin,
         provisionType: AdminUserProvisionType.invite,
@@ -41,6 +41,7 @@ void main() {
       final body = jsonDecode(captured.body) as Map<String, dynamic>;
       expect(body['role'], 'ADMIN');
       expect(body['provisionType'], 'INVITE');
+      expect(created.id, 'u-1');
     });
   });
 }

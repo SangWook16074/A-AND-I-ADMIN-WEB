@@ -74,7 +74,7 @@ class UsersManagementApiClient {
         .toList();
   }
 
-  Future<void> createUser({
+  Future<AdminUserDto> createUser({
     required String accessToken,
     required AuthRole role,
     required AdminUserProvisionType provisionType,
@@ -116,5 +116,15 @@ class UsersManagementApiClient {
         code: code,
       );
     }
+
+    final data = decoded['data'];
+    if (data is! Map<String, dynamic>) {
+      throw UsersManagementApiException(
+        'Response data is missing',
+        statusCode: response.statusCode,
+      );
+    }
+
+    return AdminUserDto.fromJson(data);
   }
 }

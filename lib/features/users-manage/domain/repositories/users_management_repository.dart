@@ -5,7 +5,7 @@ import '../entities/admin_user.dart';
 
 abstract interface class UsersManagementRepository {
   Future<List<AdminUser>> getUsers();
-  Future<void> createUser({
+  Future<AdminUser> createUser({
     required AuthRole role,
     required AdminUserProvisionType provisionType,
   });
