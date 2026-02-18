@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 
-import 'domain/entities/admin_user_provision_type.dart';
-import 'models/users_management_user_row.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
+import 'domain/entities/admin_user.dart';
 import 'presentation/bloc/users_management_bloc.dart';
 import 'presentation/bloc/users_management_event.dart';
 import 'presentation/bloc/users_management_state.dart';
@@ -22,10 +23,10 @@ class UsersManagementView extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<UsersManagementView> createState() =>
-      _UsersManagementViewState();
+      UsersManagementViewState();
 }
 
-class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
+class UsersManagementViewState extends ConsumerState<UsersManagementView> {
   @override
   void initState() {
     super.initState();
@@ -36,7 +37,7 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
     });
   }
 
-  Future<void> _onCreateUserPressed() async {
+  Future<void> onCreateUserPressed() async {
     await ref
         .read(usersManagementBlocProvider.notifier)
         .onEvent(
@@ -62,22 +63,92 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
     );
   }
 
+  Future<void> showUserDetailDialog(AdminUser user) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('사용자 상세'),
+          content: SizedBox(
+            width: 460,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DetailItem(label: 'ID', value: user.id),
+                  DetailItem(label: '아이디', value: user.username),
+                  DetailItem(
+                    label: '권한',
+                    value: switch (user.role) {
+                      AuthRole.admin => 'ADMIN',
+                      AuthRole.organizer => 'ORGANIZER',
+                      AuthRole.user => 'USER',
+                    },
+                  ),
+                  DetailItem(
+                    label: '활성화',
+                    value: user.active == null
+                        ? '-'
+                        : (user.active! ? 'Y' : 'N'),
+                  ),
+                  DetailItem(
+                    label: '비밀번호 변경 필요',
+                    value: user.forcePasswordChange == null
+                        ? '-'
+                        : (user.forcePasswordChange! ? 'Y' : 'N'),
+                  ),
+                  DetailItem(
+                    label: '초대 만료일',
+                    value: user.inviteExpiresAt ?? '-',
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '초대 링크',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 6),
+                  SelectableText(
+                    user.inviteLink ?? '없음',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF555555),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('닫기'),
+            ),
+            FilledButton.icon(
+              onPressed: user.inviteLink == null
+                  ? null
+                  : () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: user.inviteLink!),
+                      );
+                      if (!mounted) return;
+                      Navigator.of(dialogContext).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('초대 링크를 복사했습니다.')),
+                      );
+                    },
+              icon: const Icon(Icons.copy_rounded, size: 16),
+              label: const Text('링크 복사'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(usersManagementBlocProvider);
-    final rows = state.users
-        .map(
-          (user) => UsersManagementUserRow(
-            user.username,
-            user.username,
-            switch (user.role) {
-              AuthRole.admin => '관리자',
-              AuthRole.organizer => '멘토',
-              AuthRole.user => '일반',
-            },
-          ),
-        )
-        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
@@ -135,7 +206,7 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
                     ),
                   ),
                   FilledButton.icon(
-                    onPressed: state.isCreating ? null : _onCreateUserPressed,
+                    onPressed: state.isCreating ? null : onCreateUserPressed,
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFF1A1A1A),
                       foregroundColor: Colors.white,
@@ -195,8 +266,9 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
                 )
               else
                 UsersManagementTableView(
-                  users: rows,
+                  users: state.users,
                   minWidth: constraints.maxWidth,
+                  onUserTap: showUserDetailDialog,
                 ),
               const SizedBox(height: 20),
               const Center(child: UsersManagementPaginationView()),
@@ -227,6 +299,44 @@ class _UsersManagementViewState extends ConsumerState<UsersManagementView> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class DetailItem extends StatelessWidget {
+  const DetailItem({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF6F6F6F),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Color(0xFF1A1A1A),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

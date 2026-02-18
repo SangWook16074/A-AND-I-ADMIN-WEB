@@ -1,0 +1,15 @@
+name: aandi_admin_api
+description: Admin APIs package for AANDI admin service
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  aandi_auth:
+    path: ../auth
+  http: ^1.2.2
+
+dev_dependencies:
+  lints: ^6.0.0

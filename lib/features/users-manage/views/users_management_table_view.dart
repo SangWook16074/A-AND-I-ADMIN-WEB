@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:aandi_auth/aandi_auth.dart';
 
-import '../models/users_management_user_row.dart';
+import '../domain/entities/admin_user.dart';
 
 class UsersManagementTableView extends StatelessWidget {
   const UsersManagementTableView({
     super.key,
     required this.users,
     required this.minWidth,
+    required this.onUserTap,
   });
 
-  final List<UsersManagementUserRow> users;
+  final List<AdminUser> users;
   final double minWidth;
+  final ValueChanged<AdminUser> onUserTap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +29,7 @@ class UsersManagementTableView extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(minWidth: minWidth),
           child: DataTable(
+            showCheckboxColumn: false,
             headingTextStyle: const TextStyle(
               color: Color(0xFF888888),
               fontSize: 11,
@@ -44,8 +48,9 @@ class UsersManagementTableView extends StatelessWidget {
             rows: users
                 .map(
                   (user) => DataRow(
+                    onSelectChanged: (_) => onUserTap(user),
                     cells: [
-                      DataCell(Text(user.name)),
+                      DataCell(Text(user.username)),
                       DataCell(
                         Text(
                           user.username,
@@ -62,17 +67,21 @@ class UsersManagementTableView extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: user.role == '관리자'
+                            color: user.role == AuthRole.admin
                                 ? const Color(0xFF1A1A1A)
                                 : const Color(0xFFF4F4F4),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            user.role,
+                            switch (user.role) {
+                              AuthRole.admin => '관리자',
+                              AuthRole.organizer => '멘토',
+                              AuthRole.user => '일반',
+                            },
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
-                              color: user.role == '관리자'
+                              color: user.role == AuthRole.admin
                                   ? Colors.white
                                   : const Color(0xFF1A1A1A),
                             ),
@@ -80,7 +89,10 @@ class UsersManagementTableView extends StatelessWidget {
                         ),
                       ),
                       DataCell(
-                        TextButton(onPressed: () {}, child: const Text('수정')),
+                        TextButton(
+                          onPressed: () => onUserTap(user),
+                          child: const Text('상세'),
+                        ),
                       ),
                     ],
                   ),

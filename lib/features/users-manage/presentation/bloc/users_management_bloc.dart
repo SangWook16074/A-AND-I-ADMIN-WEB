@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/datasources/users_management_api_client.dart';
 import '../../data/repositories/users_management_repository_impl.dart';
 import '../../domain/entities/admin_user.dart';
-import '../../domain/entities/admin_user_provision_type.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 import '../../domain/repositories/users_management_repository.dart';
 import '../../domain/usecases/get_admin_users_use_case.dart';
 import 'users_management_event.dart';
@@ -43,15 +43,15 @@ class UsersManagementBloc extends _$UsersManagementBloc {
   Future<void> onEvent(UsersManagementEvent event) async {
     switch (event) {
       case UsersManagementStarted():
-        await _loadUsers();
+        await loadUsers();
       case UsersManagementRefreshRequested():
-        await _loadUsers();
+        await loadUsers();
       case UsersManagementCreateRequested(:final role, :final provisionType):
-        await _createUser(role: role, provisionType: provisionType);
+        await createUser(role: role, provisionType: provisionType);
     }
   }
 
-  Future<void> _loadUsers() async {
+  Future<void> loadUsers() async {
     state = state.copyWith(
       status: UsersManagementStatus.loading,
       clearError: true,
@@ -82,7 +82,7 @@ class UsersManagementBloc extends _$UsersManagementBloc {
     }
   }
 
-  Future<void> _createUser({
+  Future<void> createUser({
     required AuthRole role,
     required AdminUserProvisionType provisionType,
   }) async {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:a_and_i_admin_web_serivce/features/users-manage/data/datasources/users_management_api_client.dart';
-import 'package:a_and_i_admin_web_serivce/features/users-manage/domain/entities/admin_user_provision_type.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;

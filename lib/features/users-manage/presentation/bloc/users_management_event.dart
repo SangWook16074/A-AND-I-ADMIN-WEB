@@ -1,6 +1,6 @@
 import 'package:aandi_auth/aandi_auth.dart';
 
-import '../../domain/entities/admin_user_provision_type.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 
 sealed class UsersManagementEvent {
   const UsersManagementEvent();

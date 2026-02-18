@@ -1,9 +1,7 @@
-import 'dart:convert';
-
+import 'package:aandi_admin_api/aandi_admin_api.dart' as admin_api;
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:http/http.dart' as http;
 
-import '../../domain/entities/admin_user_provision_type.dart';
 import '../dtos/admin_user_dto.dart';
 
 class UsersManagementApiException implements Exception {
@@ -21,110 +19,60 @@ class UsersManagementApiException implements Exception {
 
 class UsersManagementApiClient {
   UsersManagementApiClient({required this.baseUrl, http.Client? client})
-    : _client = client ?? http.Client();
+    : apiClient = admin_api.AdminApiClient(baseUrl: baseUrl, client: client);
 
   final String baseUrl;
-  final http.Client _client;
+  final admin_api.AdminApiClient apiClient;
 
   Future<List<AdminUserDto>> getUsers({required String accessToken}) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-      },
-    );
-
-    final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
+    try {
+      final users = await apiClient.getUsers(accessToken: accessToken);
+      return users
+          .map(
+            (user) => AdminUserDto(
+              id: user.id,
+              username: user.username,
+              role: user.role,
+              forcePasswordChange: user.forcePasswordChange,
+              inviteLink: user.inviteLink,
+              inviteExpiresAt: user.inviteExpiresAt,
+              active: user.active,
+            ),
+          )
+          .toList();
+    } on admin_api.AdminApiException catch (e) {
       throw UsersManagementApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
       );
     }
-
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw UsersManagementApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
-    final data = decoded['data'];
-    if (data is! List) {
-      throw UsersManagementApiException(
-        'Response data is missing',
-        statusCode: response.statusCode,
-      );
-    }
-
-    return data
-        .whereType<Map<String, dynamic>>()
-        .map(AdminUserDto.fromJson)
-        .toList();
   }
 
   Future<AdminUserDto> createUser({
     required String accessToken,
     required AuthRole role,
-    required AdminUserProvisionType provisionType,
+    required admin_api.AdminUserProvisionType provisionType,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await _client.post(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'role': role.toApi(),
-        'provisionType': provisionType.toApi(),
-      }),
-    );
-
-    final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
+    try {
+      final created = await apiClient.createUser(
+        accessToken: accessToken,
+        role: role,
+        provisionType: provisionType,
+      );
+      return AdminUserDto(
+        id: created.id,
+        username: created.username,
+        role: created.role,
+        inviteLink: created.inviteLink,
+        inviteExpiresAt: created.expiresAt,
+      );
+    } on admin_api.AdminApiException catch (e) {
       throw UsersManagementApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
       );
     }
-
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw UsersManagementApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
-    final data = decoded['data'];
-    if (data is! Map<String, dynamic>) {
-      throw UsersManagementApiException(
-        'Response data is missing',
-        statusCode: response.statusCode,
-      );
-    }
-
-    return AdminUserDto.fromJson(data);
   }
 }

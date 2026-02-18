@@ -1,5 +1,5 @@
 import 'package:a_and_i_admin_web_serivce/features/users-manage/domain/entities/admin_user.dart';
-import 'package:a_and_i_admin_web_serivce/features/users-manage/domain/entities/admin_user_provision_type.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 import 'package:a_and_i_admin_web_serivce/features/users-manage/domain/repositories/users_management_repository.dart';
 import 'package:a_and_i_admin_web_serivce/features/users-manage/presentation/bloc/users_management_bloc.dart';
 import 'package:a_and_i_admin_web_serivce/features/users-manage/presentation/bloc/users_management_event.dart';
@@ -8,8 +8,8 @@ import 'package:aandi_auth/aandi_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class _FakeUsersManagementRepository implements UsersManagementRepository {
-  final List<AdminUser> _users = const [
+class FakeUsersManagementRepository implements UsersManagementRepository {
+  final List<AdminUser> users = const [
     AdminUser(id: 'u-1', username: 'existing-admin', role: AuthRole.admin),
   ].toList();
 
@@ -19,18 +19,18 @@ class _FakeUsersManagementRepository implements UsersManagementRepository {
     required AdminUserProvisionType provisionType,
   }) async {
     final created = AdminUser(id: 'u-2', username: 'new-admin', role: role);
-    _users.add(created);
+    users.add(created);
     return created;
   }
 
   @override
-  Future<List<AdminUser>> getUsers() async => List<AdminUser>.from(_users);
+  Future<List<AdminUser>> getUsers() async => List<AdminUser>.from(users);
 }
 
 void main() {
   group('UsersManagementBloc', () {
     test('create event adds user and reloads users list', () async {
-      final fakeRepo = _FakeUsersManagementRepository();
+      final fakeRepo = FakeUsersManagementRepository();
       final container = ProviderContainer(
         overrides: [
           usersManagementRepositoryProvider.overrideWithValue(fakeRepo),
