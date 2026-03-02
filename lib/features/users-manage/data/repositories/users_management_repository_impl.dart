@@ -9,40 +9,75 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
   UsersManagementRepositoryImpl({
     required UsersManagementApiClient apiClient,
     required TokenStore tokenStore,
-  }) : apiClient = apiClient,
-       tokenStore = tokenStore;
+  }) : _apiClient = apiClient,
+       _tokenStore = tokenStore;
 
-  final UsersManagementApiClient apiClient;
-  final TokenStore tokenStore;
+  final UsersManagementApiClient _apiClient;
+  final TokenStore _tokenStore;
 
   @override
   Future<List<AdminUser>> getUsers() async {
-    final token = await tokenStore.read();
+    final token = await _tokenStore.read();
     final accessToken = token?.accessToken;
     if (accessToken == null || accessToken.isEmpty) {
       throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    final dtos = await apiClient.getUsers(accessToken: accessToken);
+    final dtos = await _apiClient.getUsers(accessToken: accessToken);
     return dtos.map((dto) => dto.toDomain()).toList();
   }
 
   @override
   Future<AdminUser> createUser({
-    required AuthRole role,
     required AdminUserProvisionType provisionType,
+    required int cohort,
   }) async {
-    final token = await tokenStore.read();
+    final token = await _tokenStore.read();
     final accessToken = token?.accessToken;
     if (accessToken == null || accessToken.isEmpty) {
       throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    final dto = await apiClient.createUser(
+    final dto = await _apiClient.createUser(
       accessToken: accessToken,
-      role: role,
       provisionType: provisionType,
+      cohort: cohort,
     );
     return dto.toDomain();
+  }
+
+  @override
+  Future<void> deleteUser({required String userId}) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    await _apiClient.deleteUser(accessToken: accessToken, userId: userId);
+  }
+
+  @override
+  Future<void> updateUser({
+    required String userId,
+    required AuthRole role,
+    required String userTrack,
+    required int cohort,
+    required String nickname,
+  }) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    await _apiClient.updateUser(
+      accessToken: accessToken,
+      userId: userId,
+      role: role,
+      userTrack: userTrack,
+      cohort: cohort,
+      nickname: nickname,
+    );
   }
 }

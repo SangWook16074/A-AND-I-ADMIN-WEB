@@ -38,12 +38,15 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
   }
 
   Future<void> onCreateUserPressed() async {
+    final cohort = await showCreateUserCohortDialog();
+    if (cohort == null) return;
+
     await ref
         .read(usersManagementBlocProvider.notifier)
         .onEvent(
-          const UsersManagementCreateRequested(
-            role: AuthRole.user,
+          UsersManagementCreateRequested(
             provisionType: AdminUserProvisionType.invite,
+            cohort: cohort,
           ),
         );
     if (!mounted) return;
@@ -63,84 +66,356 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
     );
   }
 
+  Future<int?> showCreateUserCohortDialog() async {
+    return showDialog<int>(
+      context: context,
+      builder: (dialogContext) {
+        var selectedCohort = 1;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('사용자 생성'),
+              content: SizedBox(
+                width: 320,
+                child: DropdownButtonFormField<int>(
+                  value: selectedCohort,
+                  items: List.generate(
+                    10,
+                    (index) => DropdownMenuItem(
+                      value: index + 1,
+                      child: Text('${index + 1}기'),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setDialogState(() => selectedCohort = value);
+                  },
+                  decoration: InputDecoration(
+                    labelText: '기수',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    isDense: true,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('취소'),
+                ),
+                FilledButton(
+                  onPressed: () =>
+                      Navigator.of(dialogContext).pop(selectedCohort),
+                  child: const Text('생성'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> showUserDetailDialog(AdminUser user) async {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('사용자 상세'),
-          content: SizedBox(
-            width: 460,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DetailItem(label: 'ID', value: user.id),
-                  DetailItem(label: '아이디', value: user.username),
-                  DetailItem(
-                    label: '권한',
-                    value: switch (user.role) {
-                      AuthRole.admin => 'ADMIN',
-                      AuthRole.organizer => 'ORGANIZER',
-                      AuthRole.user => 'USER',
-                    },
+        var isDeleting = false;
+        var isUpdating = false;
+        var selectedRole = _editableRole(user.role);
+        var selectedTrack = _editableTrack(user.userTrack);
+        var selectedCohort = _editableCohort(user.cohort);
+
+        return StatefulBuilder(
+          builder: (dialogBodyContext, setDialogState) {
+            return AlertDialog(
+              title: const Text('사용자 상세'),
+              content: SizedBox(
+                width: 460,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DetailItem(label: 'ID', value: user.id),
+                      DetailItem(
+                        label: '닉네임',
+                        value: _displayValue(user.nickname),
+                      ),
+                      DetailItem(label: '아이디', value: user.username),
+                      DetailItem(
+                        label: 'publicCode',
+                        value: _displayValue(user.publicCode),
+                      ),
+                      const SizedBox(height: 12),
+                      _EditableSelectField<AuthRole>(
+                        label: '권한',
+                        value: selectedRole,
+                        options: const [
+                          DropdownMenuItem(
+                            value: AuthRole.user,
+                            child: Text('사용자 (USER)'),
+                          ),
+                          DropdownMenuItem(
+                            value: AuthRole.organizer,
+                            child: Text('운영자 (ORGANIZER)'),
+                          ),
+                        ],
+                        enabled: !isDeleting && !isUpdating,
+                        onChanged: (nextValue) {
+                          if (nextValue == null) return;
+                          setDialogState(() => selectedRole = nextValue);
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      _EditableSelectField<String>(
+                        label: '트랙',
+                        value: selectedTrack,
+                        options: const [
+                          DropdownMenuItem(value: 'NO', child: Text('없음')),
+                          DropdownMenuItem(value: 'FL', child: Text('Flutter')),
+                          DropdownMenuItem(
+                            value: 'SP',
+                            child: Text('Spring Boot'),
+                          ),
+                        ],
+                        enabled: !isDeleting && !isUpdating,
+                        onChanged: (nextValue) {
+                          if (nextValue == null) return;
+                          setDialogState(() => selectedTrack = nextValue);
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      _EditableSelectField<int>(
+                        label: '기수',
+                        value: selectedCohort,
+                        options: List.generate(
+                          10,
+                          (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text('${index + 1}기'),
+                          ),
+                        ),
+                        enabled: !isDeleting && !isUpdating,
+                        onChanged: (nextValue) {
+                          if (nextValue == null) return;
+                          setDialogState(() => selectedCohort = nextValue);
+                        },
+                      ),
+                      DetailItem(
+                        label: '활성화',
+                        value: user.active == null
+                            ? '-'
+                            : (user.active! ? 'Y' : 'N'),
+                      ),
+                      DetailItem(
+                        label: '비밀번호 변경 필요',
+                        value: user.forcePasswordChange == null
+                            ? '-'
+                            : (user.forcePasswordChange! ? 'Y' : 'N'),
+                      ),
+                      DetailItem(
+                        label: '초대 만료일',
+                        value: _displayValue(user.inviteExpiresAt),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '초대 링크',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 6),
+                      SelectableText(
+                        _displayValue(user.inviteLink, emptyText: '없음'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF555555),
+                        ),
+                      ),
+                    ],
                   ),
-                  DetailItem(
-                    label: '활성화',
-                    value: user.active == null
-                        ? '-'
-                        : (user.active! ? 'Y' : 'N'),
-                  ),
-                  DetailItem(
-                    label: '비밀번호 변경 필요',
-                    value: user.forcePasswordChange == null
-                        ? '-'
-                        : (user.forcePasswordChange! ? 'Y' : 'N'),
-                  ),
-                  DetailItem(
-                    label: '초대 만료일',
-                    value: user.inviteExpiresAt ?? '-',
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '초대 링크',
-                    style: TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 6),
-                  SelectableText(
-                    user.inviteLink ?? '없음',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF555555),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('닫기'),
-            ),
-            FilledButton.icon(
-              onPressed: user.inviteLink == null
-                  ? null
-                  : () async {
-                      await Clipboard.setData(
-                        ClipboardData(text: user.inviteLink!),
-                      );
-                      if (!mounted) return;
-                      Navigator.of(dialogContext).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('초대 링크를 복사했습니다.')),
-                      );
-                    },
-              icon: const Icon(Icons.copy_rounded, size: 16),
-              label: const Text('링크 복사'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: isDeleting || isUpdating
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  child: const Text('닫기'),
+                ),
+                FilledButton.icon(
+                  onPressed: isDeleting || isUpdating || user.inviteLink == null
+                      ? null
+                      : () async {
+                          await Clipboard.setData(
+                            ClipboardData(text: user.inviteLink!),
+                          );
+                          if (!mounted) return;
+                          Navigator.of(dialogContext).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('초대 링크를 복사했습니다.')),
+                          );
+                        },
+                  icon: const Icon(Icons.copy_rounded, size: 16),
+                  label: const Text('링크 복사'),
+                ),
+                FilledButton.icon(
+                  onPressed: isDeleting || isUpdating
+                      ? null
+                      : () async {
+                          setDialogState(() => isUpdating = true);
+                          try {
+                            await ref
+                                .read(usersManagementBlocProvider.notifier)
+                                .onEvent(
+                                  UsersManagementUpdateRequested(
+                                    userId: user.id,
+                                    role: selectedRole,
+                                    userTrack: selectedTrack,
+                                    cohort: selectedCohort,
+                                    nickname: _rawOrEmpty(user.nickname),
+                                  ),
+                                );
+                            if (!mounted) return;
+
+                            final nextState = ref.read(
+                              usersManagementBlocProvider,
+                            );
+                            final isSuccess =
+                                nextState.status ==
+                                    UsersManagementStatus.success &&
+                                nextState.errorMessage == null;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isSuccess
+                                      ? '사용자 정보를 수정했습니다.'
+                                      : (nextState.errorMessage ??
+                                            '사용자 수정에 실패했습니다.'),
+                                ),
+                              ),
+                            );
+                          } finally {
+                            if (dialogBodyContext.mounted) {
+                              setDialogState(() => isUpdating = false);
+                            }
+                          }
+                        },
+                  icon: isUpdating
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.save_rounded, size: 16),
+                  label: Text(isUpdating ? '저장 중...' : '수정 저장'),
+                ),
+                if (user.role != AuthRole.admin)
+                  FilledButton.icon(
+                    onPressed: isDeleting || isUpdating
+                        ? null
+                        : () async {
+                            final confirmed = await showDialog<bool>(
+                              context: dialogContext,
+                              builder: (confirmContext) {
+                                return AlertDialog(
+                                  title: const Text('사용자 삭제'),
+                                  content: Text(
+                                    '${user.username} 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(
+                                        confirmContext,
+                                      ).pop(false),
+                                      child: const Text('취소'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.of(
+                                        confirmContext,
+                                      ).pop(true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFB3261E,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text('삭제'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            if (confirmed != true) return;
+
+                            setDialogState(() => isDeleting = true);
+                            try {
+                              await ref
+                                  .read(usersManagementBlocProvider.notifier)
+                                  .onEvent(
+                                    UsersManagementDeleteRequested(
+                                      userId: user.id,
+                                    ),
+                                  );
+                              if (!mounted) return;
+
+                              final nextState = ref.read(
+                                usersManagementBlocProvider,
+                              );
+                              final isSuccess =
+                                  nextState.status ==
+                                      UsersManagementStatus.success &&
+                                  nextState.errorMessage == null &&
+                                  !nextState.users.any(
+                                    (it) => it.id == user.id,
+                                  );
+
+                              if (isSuccess) {
+                                if (Navigator.of(dialogContext).canPop()) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('사용자를 삭제했습니다.')),
+                                );
+                                return;
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    nextState.errorMessage ?? '사용자 삭제에 실패했습니다.',
+                                  ),
+                                ),
+                              );
+                            } finally {
+                              if (dialogBodyContext.mounted) {
+                                setDialogState(() => isDeleting = false);
+                              }
+                            }
+                          },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFB3261E),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: isDeleting
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.delete_rounded, size: 16),
+                    label: Text(isDeleting ? '삭제 중...' : '삭제'),
+                  ),
+              ],
+            );
+          },
         );
       },
     );
@@ -340,4 +615,74 @@ class DetailItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class _EditableSelectField<T> extends StatelessWidget {
+  const _EditableSelectField({
+    required this.label,
+    required this.value,
+    required this.options,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final String label;
+  final T value;
+  final List<DropdownMenuItem<T>> options;
+  final bool enabled;
+  final ValueChanged<T?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<T>(
+      value: value,
+      items: options,
+      onChanged: enabled ? onChanged : null,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        isDense: true,
+      ),
+    );
+  }
+}
+
+String _displayValue(String? value, {String emptyText = '-'}) {
+  if (value == null || value.trim().isEmpty) {
+    return emptyText;
+  }
+  return value;
+}
+
+String _rawOrEmpty(String? value) {
+  return value?.trim() ?? '';
+}
+
+AuthRole _editableRole(AuthRole role) {
+  return switch (role) {
+    AuthRole.user => AuthRole.user,
+    AuthRole.organizer => AuthRole.organizer,
+    AuthRole.admin => AuthRole.user,
+  };
+}
+
+String _editableTrack(String? track) {
+  final upper = track?.trim().toUpperCase();
+  if (upper == 'NO') {
+    return 'NO';
+  }
+  if (upper == 'SP') {
+    return 'SP';
+  }
+  if (upper == 'FL') {
+    return 'FL';
+  }
+  return 'NO';
+}
+
+int _editableCohort(int? cohort) {
+  if (cohort == null) return 1;
+  if (cohort < 1) return 1;
+  if (cohort > 10) return 10;
+  return cohort;
 }

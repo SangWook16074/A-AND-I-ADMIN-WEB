@@ -67,6 +67,7 @@ class AdminApiClient {
     required String accessToken,
     required AuthRole role,
     required AdminUserProvisionType provisionType,
+    required int cohort,
   }) async {
     final uri = Uri.parse('$baseUrl/v1/admin/users');
     final response = await client.post(
@@ -79,6 +80,7 @@ class AdminApiClient {
       body: jsonEncode({
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
+        'cohort': cohort,
       }),
     );
 
@@ -115,5 +117,111 @@ class AdminApiClient {
     }
 
     return CreateAdminUserResponse.fromJson(data);
+  }
+
+  Future<void> deleteUser({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/users');
+    final response = await client.delete(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'userId': userId}),
+    );
+
+    final body = response.body.trim();
+    if (body.isEmpty) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      }
+      throw AdminApiException('요청에 실패했습니다.', statusCode: response.statusCode);
+    }
+
+    final decoded = jsonDecode(body);
+    if (decoded is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Invalid response shape',
+        statusCode: response.statusCode,
+      );
+    }
+
+    final success = decoded['success'] == true;
+    final error = decoded['error'];
+    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
+      final message = error is Map<String, dynamic>
+          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
+          : '요청에 실패했습니다.';
+      final code = error is Map<String, dynamic>
+          ? error['code']?.toString()
+          : null;
+      throw AdminApiException(
+        message,
+        statusCode: response.statusCode,
+        code: code,
+      );
+    }
+  }
+
+  Future<void> updateUser({
+    required String accessToken,
+    required String userId,
+    required AuthRole role,
+    required String userTrack,
+    required int cohort,
+    required String nickname,
+  }) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/users');
+    final response = await client.patch(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'role': role.toApi(),
+        'userTrack': userTrack,
+        'cohort': cohort,
+        'nickname': nickname,
+      }),
+    );
+
+    final body = response.body.trim();
+    if (body.isEmpty) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      }
+      throw AdminApiException('요청에 실패했습니다.', statusCode: response.statusCode);
+    }
+
+    final decoded = jsonDecode(body);
+    if (decoded is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Invalid response shape',
+        statusCode: response.statusCode,
+      );
+    }
+
+    final success = decoded['success'] == true;
+    final error = decoded['error'];
+    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
+      final message = error is Map<String, dynamic>
+          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
+          : '요청에 실패했습니다.';
+      final code = error is Map<String, dynamic>
+          ? error['code']?.toString()
+          : null;
+      throw AdminApiException(
+        message,
+        statusCode: response.statusCode,
+        code: code,
+      );
+    }
   }
 }
