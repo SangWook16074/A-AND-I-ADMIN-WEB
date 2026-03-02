@@ -30,9 +30,9 @@ jobs:
         shell: bash
         run: |
           flutter build web --release \
-            --dart-define=API_BASE_URL="${API_URL:-https://api.aandiclub.com}" --pwa-strategy=none
+            --dart-define=API_URL="${API_URL:-https://api.aandiclub.com}" --pwa-strategy=none
         env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_URL: ${{ secrets.API_URL }}
 
       - name: Deploy to Firebase Hosting (live)
         uses: FirebaseExtended/action-hosting-deploy@v0
