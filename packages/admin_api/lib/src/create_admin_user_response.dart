@@ -8,6 +8,11 @@ class CreateAdminUserResponse {
     required this.username,
     required this.role,
     required this.provisionType,
+    this.nickname,
+    this.publicCode,
+    this.userTrack,
+    this.cohort,
+    this.cohortOrder,
     this.inviteLink,
     this.expiresAt,
     this.temporaryPassword,
@@ -22,6 +27,11 @@ class CreateAdminUserResponse {
         'PASSWORD' => AdminUserProvisionType.password,
         _ => AdminUserProvisionType.invite,
       },
+      nickname: _readString(json, const ['nickname', 'nickName']),
+      publicCode: _readString(json, const ['publicCode', 'public_code']),
+      userTrack: _readString(json, const ['userTrack', 'user_track']),
+      cohort: _readInt(json['cohort']),
+      cohortOrder: _readInt(json['cohortOrder']),
       inviteLink: json['inviteLink'] as String?,
       expiresAt: json['expiresAt'] as String?,
       temporaryPassword: json['temporaryPassword'] as String?,
@@ -32,7 +42,38 @@ class CreateAdminUserResponse {
   final String username;
   final AuthRole role;
   final AdminUserProvisionType provisionType;
+  final String? nickname;
+  final String? publicCode;
+  final String? userTrack;
+  final int? cohort;
+  final int? cohortOrder;
   final String? inviteLink;
   final String? expiresAt;
   final String? temporaryPassword;
+}
+
+String? _readString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value != null) {
+      final text = value.toString();
+      if (text.trim().isNotEmpty) {
+        return text;
+      }
+    }
+  }
+  return null;
+}
+
+int? _readInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  if (value is String) {
+    return int.tryParse(value);
+  }
+  return null;
 }

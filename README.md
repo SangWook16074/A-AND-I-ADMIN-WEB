@@ -37,7 +37,7 @@ flutter run -d chrome --web-browser-flag "--disable-web-security" --dart-define=
 다른 API를 사용하려면:
 
 ```bash
-flutter run -d chrome --dart-define=API_BASE_URL=https://api.aandiclub.com
+flutter run -d chrome --dart-define=API_URL=https://api.aandiclub.com
 ```
 
 ## 3. URL에서 `#` 제거 (Hash URL 비활성화)
@@ -130,13 +130,13 @@ flutter test
 
 1. Flutter setup
 2. `flutter pub get`
-3. `flutter build web --release --dart-define=API_BASE_URL=...`
+3. `flutter build web --release --dart-define=API_URL=...`
 4. Firebase Hosting deploy
 
 필요 시크릿:
 
 - `FIREBASE_SERVICE_ACCOUNT` (필수)
-- `API_BASE_URL` (선택)
+- `API_URL` (선택)
 
 현재 설정값:
 
