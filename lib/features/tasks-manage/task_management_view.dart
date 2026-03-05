@@ -46,17 +46,17 @@ class TaskManagementView extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSearchField(searchWidth),
+                    _SearchField(width: searchWidth),
                     const SizedBox(height: 12),
-                    _buildCreateButton(),
+                    _CreateButton(onPressed: () {}),
                   ],
                 )
               else
                 Row(
                   children: [
-                    _buildSearchField(searchWidth),
+                    _SearchField(width: searchWidth),
                     const SizedBox(width: 12),
-                    _buildCreateButton(),
+                    _CreateButton(onPressed: () {}),
                   ],
                 ),
               const SizedBox(height: 20),
@@ -103,8 +103,15 @@ class TaskManagementView extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildSearchField(double width) {
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.width});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: width,
       child: TextField(
@@ -126,10 +133,17 @@ class TaskManagementView extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildCreateButton() {
+class _CreateButton extends StatelessWidget {
+  const _CreateButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return FilledButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       style: FilledButton.styleFrom(
         backgroundColor: const Color(0xFF1A1A1A),
         foregroundColor: Colors.white,
