@@ -26,30 +26,7 @@ class AdminApiClient {
       },
     );
 
-    final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
-      );
-    }
-
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw AdminApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
+    final decoded = _handleResponse(response);
     final data = decoded['data'];
     if (data is! List) {
       throw AdminApiException(
@@ -85,30 +62,7 @@ class AdminApiClient {
       }),
     );
 
-    final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
-      );
-    }
-
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw AdminApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
+    final decoded = _handleResponse(response);
     final data = decoded['data'];
     if (data is! Map<String, dynamic>) {
       throw AdminApiException(
@@ -120,9 +74,34 @@ class AdminApiClient {
     return CreateAdminUserResponse.fromJson(data);
   }
 
-  Future<List<CourseSummary>> getCourses({required String accessToken}) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/courses');
-    final response = await client.get(
+  Future<void> updateUser({
+    required String accessToken,
+    required String userId,
+    required AuthRole role,
+    required String userTrack,
+    required int cohort,
+    required String nickname,
+  }) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/users');
+    final response = await client.patch(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'role': role.toApi(),
+        'userTrack': userTrack,
+        'cohort': cohort,
+        'nickname': nickname,
+      }),
+    );
+
+    _handleResponse(response);
+  }
+
   Future<void> deleteUser({
     required String accessToken,
     required String userId,
@@ -133,63 +112,25 @@ class AdminApiClient {
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Accept': 'application/json',
-      },
-    );
-
-    dynamic decoded;
-    try {
-      if (response.body.isEmpty) {
-        throw const FormatException('Empty body');
-      }
-      decoded = jsonDecode(response.body);
-    } catch (e) {
-      throw AdminApiException(
-        'JSON 파싱 실패 (상태: ${response.statusCode}, 본문: ${response.body.isEmpty
-            ? "없음"
-            : response.body.length > 50
-            ? "${response.body.substring(0, 50)}..."
-            : response.body})',
-        statusCode: response.statusCode,
-      );
-    }
-
         'Content-Type': 'application/json',
       },
       body: jsonEncode({'userId': userId}),
     );
 
-    final body = response.body.trim();
-    if (body.isEmpty) {
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return;
-      }
-      throw AdminApiException('요청에 실패했습니다.', statusCode: response.statusCode);
-    }
+    _handleResponse(response);
+  }
 
-    final decoded = jsonDecode(body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
-      );
-    }
+  Future<List<CourseSummary>> getCourses({required String accessToken}) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/courses');
+    final response = await client.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+      },
+    );
 
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw AdminApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
+    final decoded = _handleResponse(response);
     final data = decoded['data'];
     if (data is! List) {
       throw AdminApiException(
@@ -210,18 +151,6 @@ class AdminApiClient {
   }) async {
     final uri = Uri.parse('$baseUrl/v1/admin/courses');
     final response = await client.post(
-  }
-
-  Future<void> updateUser({
-    required String accessToken,
-    required String userId,
-    required AuthRole role,
-    required String userTrack,
-    required int cohort,
-    required String nickname,
-  }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await client.patch(
       uri,
       headers: {
         'Authorization': 'Bearer $accessToken',
@@ -231,64 +160,7 @@ class AdminApiClient {
       body: jsonEncode(request.toJson()),
     );
 
-    dynamic decoded;
-    try {
-      if (response.body.isEmpty) {
-        throw const FormatException('Empty body');
-      }
-      decoded = jsonDecode(response.body);
-    } catch (e) {
-      throw AdminApiException(
-        'JSON 파싱 실패 (상태: ${response.statusCode}, 본문: ${response.body.isEmpty
-            ? "없음"
-            : response.body.length > 50
-            ? "${response.body.substring(0, 50)}..."
-            : response.body})',
-        statusCode: response.statusCode,
-      );
-    }
-
-      body: jsonEncode({
-        'userId': userId,
-        'role': role.toApi(),
-        'userTrack': userTrack,
-        'cohort': cohort,
-        'nickname': nickname,
-      }),
-    );
-
-    final body = response.body.trim();
-    if (body.isEmpty) {
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return;
-      }
-      throw AdminApiException('요청에 실패했습니다.', statusCode: response.statusCode);
-    }
-
-    final decoded = jsonDecode(body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException(
-        'Invalid response shape',
-        statusCode: response.statusCode,
-      );
-    }
-
-    final success = decoded['success'] == true;
-    final error = decoded['error'];
-    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
-      final message = error is Map<String, dynamic>
-          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
-          : '요청에 실패했습니다.';
-      final code = error is Map<String, dynamic>
-          ? error['code']?.toString()
-          : null;
-      throw AdminApiException(
-        message,
-        statusCode: response.statusCode,
-        code: code,
-      );
-    }
-
+    final decoded = _handleResponse(response);
     final data = decoded['data'];
     if (data is! Map<String, dynamic>) {
       throw AdminApiException(
@@ -298,5 +170,46 @@ class AdminApiClient {
     }
 
     return CourseSummary.fromJson(data);
+  }
+
+  Map<String, dynamic> _handleResponse(http.Response response) {
+    final body = response.body.trim();
+    if (body.isEmpty) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return {'success': true};
+      }
+      throw AdminApiException(
+        '서버 응답이 비어 있습니다.',
+        statusCode: response.statusCode,
+      );
+    }
+
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(body);
+    } catch (e) {
+      final bodyPreview = body.length > 50
+          ? '${body.substring(0, 50)}...'
+          : body;
+      throw AdminApiException(
+        'JSON 파싱 실패 (상태: ${response.statusCode}, 본문: $bodyPreview)',
+        statusCode: response.statusCode,
+      );
+    }
+
+    if (decoded is! Map<String, dynamic>) {
+      throw AdminApiException('잘못된 응답 형식입니다.', statusCode: response.statusCode);
+    }
+
+    final success = decoded['success'] == true;
+    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
+      final error = decoded['error'];
+      final message = error is Map<String, dynamic>
+          ? (error['message']?.toString() ?? '요청 실패')
+          : '요청 실패';
+      throw AdminApiException(message, statusCode: response.statusCode);
+    }
+
+    return decoded;
   }
 }
