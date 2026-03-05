@@ -9,8 +9,13 @@ import '../../domain/usecases/auth_usecases.dart';
 
 part 'auth_providers.g.dart';
 
+const _apiBaseUrlFromEnv = String.fromEnvironment(
+  'API_URL',
+  defaultValue: 'https://api.aandiclub.com',
+);
+
 @Riverpod(keepAlive: true)
-String authBaseUrl(Ref ref) => 'http://172.31.33.236:8080';
+String authBaseUrl(Ref ref) => _apiBaseUrlFromEnv;
 
 @Riverpod(keepAlive: true)
 TokenStore tokenStore(Ref ref) => InMemoryTokenStore();
