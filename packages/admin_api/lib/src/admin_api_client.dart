@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'admin_api_exception.dart';
 import 'admin_user_provision_type.dart';
 import 'admin_user_summary.dart';
+import 'course_models.dart';
 import 'create_admin_user_response.dart';
 
 class AdminApiClient {
@@ -115,5 +116,135 @@ class AdminApiClient {
     }
 
     return CreateAdminUserResponse.fromJson(data);
+  }
+
+  Future<List<CourseSummary>> getCourses({required String accessToken}) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/courses');
+    final response = await client.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+      },
+    );
+
+    dynamic decoded;
+    try {
+      if (response.body.isEmpty) {
+        throw const FormatException('Empty body');
+      }
+      decoded = jsonDecode(response.body);
+    } catch (e) {
+      throw AdminApiException(
+        'JSON 파싱 실패 (상태: ${response.statusCode}, 본문: ${response.body.isEmpty
+            ? "없음"
+            : response.body.length > 50
+            ? "${response.body.substring(0, 50)}..."
+            : response.body})',
+        statusCode: response.statusCode,
+      );
+    }
+
+    if (decoded is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Invalid response shape',
+        statusCode: response.statusCode,
+      );
+    }
+
+    final success = decoded['success'] == true;
+    final error = decoded['error'];
+    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
+      final message = error is Map<String, dynamic>
+          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
+          : '요청에 실패했습니다.';
+      final code = error is Map<String, dynamic>
+          ? error['code']?.toString()
+          : null;
+      throw AdminApiException(
+        message,
+        statusCode: response.statusCode,
+        code: code,
+      );
+    }
+
+    final data = decoded['data'];
+    if (data is! List) {
+      throw AdminApiException(
+        'Response data is missing',
+        statusCode: response.statusCode,
+      );
+    }
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(CourseSummary.fromJson)
+        .toList();
+  }
+
+  Future<CourseSummary> createCourse({
+    required String accessToken,
+    required CreateCourseRequest request,
+  }) async {
+    final uri = Uri.parse('$baseUrl/v1/admin/courses');
+    final response = await client.post(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(request.toJson()),
+    );
+
+    dynamic decoded;
+    try {
+      if (response.body.isEmpty) {
+        throw const FormatException('Empty body');
+      }
+      decoded = jsonDecode(response.body);
+    } catch (e) {
+      throw AdminApiException(
+        'JSON 파싱 실패 (상태: ${response.statusCode}, 본문: ${response.body.isEmpty
+            ? "없음"
+            : response.body.length > 50
+            ? "${response.body.substring(0, 50)}..."
+            : response.body})',
+        statusCode: response.statusCode,
+      );
+    }
+
+    if (decoded is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Invalid response shape',
+        statusCode: response.statusCode,
+      );
+    }
+
+    final success = decoded['success'] == true;
+    final error = decoded['error'];
+    if (response.statusCode < 200 || response.statusCode >= 300 || !success) {
+      final message = error is Map<String, dynamic>
+          ? (error['message']?.toString() ?? '요청에 실패했습니다.')
+          : '요청에 실패했습니다.';
+      final code = error is Map<String, dynamic>
+          ? error['code']?.toString()
+          : null;
+      throw AdminApiException(
+        message,
+        statusCode: response.statusCode,
+        code: code,
+      );
+    }
+
+    final data = decoded['data'];
+    if (data is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Response data is missing',
+        statusCode: response.statusCode,
+      );
+    }
+
+    return CourseSummary.fromJson(data);
   }
 }
