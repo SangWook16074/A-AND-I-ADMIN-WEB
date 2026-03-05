@@ -25,16 +25,15 @@ TasksManagementRepository tasksManagementRepository(Ref ref) {
 }
 
 @riverpod
+Future<List<CourseSummary>> courses(Ref ref) async {
+  final repository = ref.watch(tasksManagementRepositoryProvider);
+  return await repository.getCourses();
+}
+
+@riverpod
 class CoursesNotifier extends _$CoursesNotifier {
   @override
-  FutureOr<List<CourseSummary>> build() async {
-    return _fetchCourses();
-  }
-
-  Future<List<CourseSummary>> _fetchCourses() async {
-    final repository = ref.watch(tasksManagementRepositoryProvider);
-    return await repository.getCourses();
-  }
+  void build() {}
 
   Future<void> createCourse({
     required String slug,
@@ -43,17 +42,15 @@ class CoursesNotifier extends _$CoursesNotifier {
     required String phase,
     required String targetTrack,
   }) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final repository = ref.read(tasksManagementRepositoryProvider);
-      await repository.createCourse(
-        slug: slug,
-        title: title,
-        description: description,
-        phase: phase,
-        targetTrack: targetTrack,
-      );
-      return _fetchCourses();
-    });
+    final repository = ref.read(tasksManagementRepositoryProvider);
+    await repository.createCourse(
+      slug: slug,
+      title: title,
+      description: description,
+      phase: phase,
+      targetTrack: targetTrack,
+    );
+
+    ref.invalidate(coursesProvider);
   }
 }

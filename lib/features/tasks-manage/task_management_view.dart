@@ -15,7 +15,86 @@ class TaskManagementView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final coursesAsync = ref.watch(coursesNotifierProvider);
+    final coursesAsync = ref.watch(coursesProvider);
+
+    void showCreateCourseDialog() {
+      final titleController = TextEditingController();
+      final slugController = TextEditingController();
+      final descController = TextEditingController();
+      final phaseController = TextEditingController(text: 'BASIC');
+      final trackController = TextEditingController(text: 'FL');
+
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('새 코스(과제 묶음) 생성'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: '제목 (예: Flutter 심화)',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: slugController,
+                  decoration: const InputDecoration(
+                    labelText: '고유 슬러그 (예: flutter-adv)',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descController,
+                  decoration: const InputDecoration(labelText: '간단한 설명'),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: phaseController,
+                  decoration: const InputDecoration(
+                    labelText: '단계 (예: BASIC, ADVANCED)',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: trackController,
+                  decoration: const InputDecoration(
+                    labelText: '트랙 (예: FL, AL)',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final slug = slugController.text.trim();
+                final title = titleController.text.trim();
+                if (slug.isEmpty || title.isEmpty) return;
+
+                ref
+                    .read(coursesNotifierProvider.notifier)
+                    .createCourse(
+                      slug: slug,
+                      title: title,
+                      description: descController.text.trim(),
+                      phase: phaseController.text.trim(),
+                      targetTrack: trackController.text.trim(),
+                    );
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('생성'),
+            ),
+          ],
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
@@ -52,9 +131,7 @@ class TaskManagementView extends ConsumerWidget {
                   children: [
                     _SearchField(width: searchWidth),
                     const SizedBox(height: 12),
-                    _CreateButton(
-                      onPressed: () => _showCreateCourseDialog(context, ref),
-                    ),
+                    _CreateButton(onPressed: () => showCreateCourseDialog()),
                   ],
                 )
               else
@@ -62,9 +139,7 @@ class TaskManagementView extends ConsumerWidget {
                   children: [
                     _SearchField(width: searchWidth),
                     const SizedBox(width: 12),
-                    _CreateButton(
-                      onPressed: () => _showCreateCourseDialog(context, ref),
-                    ),
+                    _CreateButton(onPressed: () => showCreateCourseDialog()),
                   ],
                 ),
               const SizedBox(height: 20),
@@ -143,83 +218,6 @@ class TaskManagementView extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-
-  void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
-    final titleController = TextEditingController();
-    final slugController = TextEditingController();
-    final descController = TextEditingController();
-    final phaseController = TextEditingController(text: 'BASIC');
-    final trackController = TextEditingController(text: 'FL');
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('새 코스(과제 묶음) 생성'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: '제목 (예: Flutter 심화)',
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: slugController,
-                decoration: const InputDecoration(
-                  labelText: '고유 슬러그 (예: flutter-adv)',
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(labelText: '간단한 설명'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: phaseController,
-                decoration: const InputDecoration(
-                  labelText: '단계 (예: BASIC, ADVANCED)',
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: trackController,
-                decoration: const InputDecoration(labelText: '트랙 (예: FL, AL)'),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final slug = slugController.text.trim();
-              final title = titleController.text.trim();
-              if (slug.isEmpty || title.isEmpty) return;
-
-              ref
-                  .read(coursesNotifierProvider.notifier)
-                  .createCourse(
-                    slug: slug,
-                    title: title,
-                    description: descController.text.trim(),
-                    phase: phaseController.text.trim(),
-                    targetTrack: trackController.text.trim(),
-                  );
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('생성'),
-          ),
-        ],
       ),
     );
   }

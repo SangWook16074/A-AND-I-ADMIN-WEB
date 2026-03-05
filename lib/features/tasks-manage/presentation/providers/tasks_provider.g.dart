@@ -43,15 +43,29 @@ final tasksManagementRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TasksManagementRepositoryRef = ProviderRef<TasksManagementRepository>;
-String _$coursesNotifierHash() => r'36f72fdfea412b37af69b306856ce5e3d62fc9b4';
+String _$coursesHash() => r'46da57b20dbef4a9647f48c358b654a69fe765f1';
+
+/// See also [courses].
+@ProviderFor(courses)
+final coursesProvider = AutoDisposeFutureProvider<List<CourseSummary>>.internal(
+  courses,
+  name: r'coursesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$coursesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CoursesRef = AutoDisposeFutureProviderRef<List<CourseSummary>>;
+String _$coursesNotifierHash() => r'dda36159fb89dd891678b6b90d8f070a490008fe';
 
 /// See also [CoursesNotifier].
 @ProviderFor(CoursesNotifier)
 final coursesNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<
-      CoursesNotifier,
-      List<CourseSummary>
-    >.internal(
+    AutoDisposeNotifierProvider<CoursesNotifier, void>.internal(
       CoursesNotifier.new,
       name: r'coursesNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -61,6 +75,6 @@ final coursesNotifierProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$CoursesNotifier = AutoDisposeAsyncNotifier<List<CourseSummary>>;
+typedef _$CoursesNotifier = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

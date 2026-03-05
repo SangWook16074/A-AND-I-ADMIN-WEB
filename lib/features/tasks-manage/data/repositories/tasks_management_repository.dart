@@ -3,15 +3,16 @@ import 'package:aandi_admin_api/aandi_admin_api.dart';
 
 class TasksManagementRepository {
   TasksManagementRepository({
-    required this.apiClient,
-    required this.tokenStore,
-  });
+    required AdminApiClient apiClient,
+    required TokenStore tokenStore,
+  }) : _apiClient = apiClient,
+       _tokenStore = tokenStore;
 
-  final AdminApiClient apiClient;
-  final TokenStore tokenStore;
+  final AdminApiClient _apiClient;
+  final TokenStore _tokenStore;
 
   Future<String> _getAccessToken() async {
-    final token = await tokenStore.read();
+    final token = await _tokenStore.read();
     final accessToken = token?.accessToken;
     if (accessToken == null || accessToken.isEmpty) {
       throw AuthApiException('인증 토큰이 없습니다.', statusCode: 401);
@@ -21,7 +22,7 @@ class TasksManagementRepository {
 
   Future<List<CourseSummary>> getCourses() async {
     final token = await _getAccessToken();
-    return apiClient.getCourses(accessToken: token);
+    return _apiClient.getCourses(accessToken: token);
   }
 
   Future<CourseSummary> createCourse({
@@ -32,7 +33,7 @@ class TasksManagementRepository {
     required String targetTrack,
   }) async {
     final token = await _getAccessToken();
-    return apiClient.createCourse(
+    return _apiClient.createCourse(
       accessToken: token,
       request: CreateCourseRequest(
         slug: slug,
