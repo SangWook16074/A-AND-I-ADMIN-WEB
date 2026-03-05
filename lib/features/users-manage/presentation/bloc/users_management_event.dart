@@ -16,10 +16,32 @@ class UsersManagementRefreshRequested extends UsersManagementEvent {
 
 class UsersManagementCreateRequested extends UsersManagementEvent {
   const UsersManagementCreateRequested({
-    required this.role,
     required this.provisionType,
+    required this.cohort,
   });
 
-  final AuthRole role;
   final AdminUserProvisionType provisionType;
+  final int cohort;
+}
+
+class UsersManagementDeleteRequested extends UsersManagementEvent {
+  const UsersManagementDeleteRequested({required this.userId});
+
+  final String userId;
+}
+
+class UsersManagementUpdateRequested extends UsersManagementEvent {
+  const UsersManagementUpdateRequested({
+    required this.userId,
+    required this.role,
+    required this.userTrack,
+    required this.cohort,
+    required this.nickname,
+  });
+
+  final String userId;
+  final AuthRole role;
+  final String userTrack;
+  final int cohort;
+  final String nickname;
 }

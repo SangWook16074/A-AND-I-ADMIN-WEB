@@ -17,11 +17,17 @@ class UsersManagementTableView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const nameWidth = 220.0;
-    const usernameWidth = 260.0;
-    const roleWidth = 160.0;
+    const nicknameWidth = 180.0;
+    const usernameWidth = 220.0;
+    const publicCodeWidth = 180.0;
+    const roleWidth = 140.0;
     const actionWidth = 120.0;
-    const tableWidth = nameWidth + usernameWidth + roleWidth + actionWidth;
+    const tableWidth =
+        nicknameWidth +
+        usernameWidth +
+        publicCodeWidth +
+        roleWidth +
+        actionWidth;
 
     return Container(
       decoration: BoxDecoration(
@@ -39,8 +45,9 @@ class UsersManagementTableView extends StatelessWidget {
           child: Column(
             children: [
               const HeaderRow(
-                nameWidth: nameWidth,
+                nicknameWidth: nicknameWidth,
                 usernameWidth: usernameWidth,
+                publicCodeWidth: publicCodeWidth,
                 roleWidth: roleWidth,
                 actionWidth: actionWidth,
               ),
@@ -54,11 +61,24 @@ class UsersManagementTableView extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        SizedBox(width: nameWidth, child: Text(user.username)),
+                        SizedBox(
+                          width: nicknameWidth,
+                          child: Text(_displayValue(user.nickname)),
+                        ),
                         SizedBox(
                           width: usernameWidth,
                           child: Text(
                             user.username,
+                            style: const TextStyle(
+                              color: Color(0xFF767676),
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: publicCodeWidth,
+                          child: Text(
+                            _displayValue(user.publicCode),
                             style: const TextStyle(
                               color: Color(0xFF767676),
                               fontFamily: 'monospace',
@@ -122,14 +142,17 @@ class UsersManagementTableView extends StatelessWidget {
 
 class HeaderRow extends StatelessWidget {
   const HeaderRow({
-    required this.nameWidth,
+    super.key,
+    required this.nicknameWidth,
     required this.usernameWidth,
+    required this.publicCodeWidth,
     required this.roleWidth,
     required this.actionWidth,
   });
 
-  final double nameWidth;
+  final double nicknameWidth;
   final double usernameWidth;
+  final double publicCodeWidth;
   final double roleWidth;
   final double actionWidth;
 
@@ -141,7 +164,7 @@ class HeaderRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: nameWidth,
+            width: nicknameWidth,
             child: Text(
               '닉네임',
               style: TextStyle(
@@ -155,6 +178,17 @@ class HeaderRow extends StatelessWidget {
             width: usernameWidth,
             child: Text(
               '아이디',
+              style: TextStyle(
+                color: Color(0xFF888888),
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: publicCodeWidth,
+            child: Text(
+              'publicCode',
               style: TextStyle(
                 color: Color(0xFF888888),
                 fontSize: 11,
@@ -188,4 +222,11 @@ class HeaderRow extends StatelessWidget {
       ),
     );
   }
+}
+
+String _displayValue(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return '-';
+  }
+  return value;
 }
