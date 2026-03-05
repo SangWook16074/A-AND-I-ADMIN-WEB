@@ -60,6 +60,16 @@ class DashboardSidebarView extends ConsumerWidget {
                   .selectTab(DashboardNavTab.usersManage);
             },
           ),
+          DashboardSidebarItemView(
+            icon: Icons.add_task_rounded,
+            label: '과제 추가',
+            selected: selectedTab == DashboardNavTab.tasksManage,
+            onTap: () {
+              ref
+                  .read(dashboardNavViewModelProvider.notifier)
+                  .selectTab(DashboardNavTab.tasksManage);
+            },
+          ),
           const Spacer(),
           const Divider(height: 1, color: Color(0xFFF1F1F1)),
           const Padding(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../tasks-manage/task_management_view.dart';
 import '../../users-manage/users_management_view.dart';
 import '../dashboard_nav_view_model.dart';
 
@@ -19,6 +20,10 @@ class DashboardBodyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (selectedTab) {
       DashboardNavTab.usersManage => UsersManagementView(
+        showLogoutButton: !isDesktop,
+        onLogout: onLogout,
+      ),
+      DashboardNavTab.tasksManage => TaskManagementView(
         showLogoutButton: !isDesktop,
         onLogout: onLogout,
       ),
