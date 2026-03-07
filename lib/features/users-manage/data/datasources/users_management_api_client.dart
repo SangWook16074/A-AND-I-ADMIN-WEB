@@ -1,6 +1,6 @@
 import 'package:aandi_admin_api/aandi_admin_api.dart' as admin_api;
 import 'package:aandi_auth/aandi_auth.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import '../dtos/admin_user_dto.dart';
 
@@ -18,8 +18,8 @@ class UsersManagementApiException implements Exception {
 }
 
 class UsersManagementApiClient {
-  UsersManagementApiClient({required this.baseUrl, http.Client? client})
-    : apiClient = admin_api.AdminApiClient(baseUrl: baseUrl, client: client);
+  UsersManagementApiClient({required this.baseUrl, Dio? dio})
+    : apiClient = admin_api.AdminApiClient(baseUrl: baseUrl, dio: dio);
 
   final String baseUrl;
   final admin_api.AdminApiClient apiClient;
