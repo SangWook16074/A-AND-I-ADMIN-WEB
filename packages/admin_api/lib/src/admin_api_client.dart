@@ -11,37 +11,21 @@ import 'create_admin_user_response.dart';
 class AdminApiClient {
   AdminApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
 
+  static const _usersPath = '/v1/admin/users';
+
   final String baseUrl;
   final Dio dio;
 
   Future<List<AdminUserSummary>> getUsers({required String accessToken}) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await dio.getUri<dynamic>(
-      uri,
-      options: _requestOptions(
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json',
-        },
-      ),
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
     );
-    final statusCode = response.statusCode ?? 0;
 
-    final decoded = _decodeResponseMap(response.data, statusCode: statusCode);
-    _throwIfRequestFailed(statusCode: statusCode, decoded: decoded);
-
-    final data = decoded['data'];
-    if (data is! List) {
-      throw AdminApiException(
-        'Response data is missing',
-        statusCode: statusCode,
-      );
-    }
-
-    return data
-        .whereType<Map<String, dynamic>>()
-        .map(AdminUserSummary.fromJson)
-        .toList();
+    return _readListData(
+      response.body,
+      statusCode: response.statusCode,
+    ).whereType<Map<String, dynamic>>().map(AdminUserSummary.fromJson).toList();
   }
 
   Future<CreateAdminUserResponse> createUser({
@@ -50,70 +34,31 @@ class AdminApiClient {
     required AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await dio.postUri<dynamic>(
-      uri,
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
       data: {
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
         'cohort': cohort,
       },
-      options: _requestOptions(
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
     );
-    final statusCode = response.statusCode ?? 0;
 
-    final decoded = _decodeResponseMap(response.data, statusCode: statusCode);
-    _throwIfRequestFailed(statusCode: statusCode, decoded: decoded);
-
-    final data = decoded['data'];
-    if (data is! Map<String, dynamic>) {
-      throw AdminApiException(
-        'Response data is missing',
-        statusCode: statusCode,
-      );
-    }
-
-    return CreateAdminUserResponse.fromJson(data);
+    return CreateAdminUserResponse.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
   }
 
   Future<void> deleteUser({
     required String accessToken,
     required String userId,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await dio.deleteUri<dynamic>(
-      uri,
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
       data: {'userId': userId},
-      options: _requestOptions(
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
+      allowEmptySuccessBody: true,
     );
-    final statusCode = response.statusCode ?? 0;
-
-    final body = _responseBodyAsString(response.data).trim();
-    if (body.isEmpty) {
-      if (_isSuccessfulStatus(statusCode)) {
-        return;
-      }
-      throw AdminApiException('요청에 실패했습니다.', statusCode: statusCode);
-    }
-
-    final decoded = jsonDecode(body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException('Invalid response shape', statusCode: statusCode);
-    }
-
-    _throwIfRequestFailed(statusCode: statusCode, decoded: decoded);
   }
 
   Future<void> updateUser({
@@ -124,9 +69,9 @@ class AdminApiClient {
     required int cohort,
     required String nickname,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await dio.patchUri<dynamic>(
-      uri,
+    await _requestJson(
+      method: 'PATCH',
+      accessToken: accessToken,
       data: {
         'userId': userId,
         'role': role.toApi(),
@@ -134,69 +79,130 @@ class AdminApiClient {
         'cohort': cohort,
         'nickname': nickname,
       },
-      options: _requestOptions(
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+      allowEmptySuccessBody: true,
+    );
+  }
+
+  Future<({int statusCode, Map<String, dynamic> body})> _requestJson({
+    required String method,
+    required String accessToken,
+    Object? data,
+    bool allowEmptySuccessBody = false,
+  }) async {
+    final response = await dio.requestUri<dynamic>(
+      Uri.parse('$baseUrl$_usersPath'),
+      data: data,
+      options: Options(
+        method: method,
+        headers: _headers(
+          accessToken: accessToken,
+          includeContentType: data != null,
+        ),
+        responseType: ResponseType.plain,
+        validateStatus: (_) => true,
       ),
     );
-    final statusCode = response.statusCode ?? 0;
 
-    final body = _responseBodyAsString(response.data).trim();
-    if (body.isEmpty) {
-      if (_isSuccessfulStatus(statusCode)) {
-        return;
+    final statusCode = response.statusCode ?? 0;
+    final decoded = _decodeResponseMap(
+      response.data,
+      statusCode: statusCode,
+      allowEmptySuccessBody: allowEmptySuccessBody,
+    );
+    if (decoded == null) {
+      return (statusCode: statusCode, body: const <String, dynamic>{});
+    }
+
+    _throwIfRequestFailed(statusCode: statusCode, decoded: decoded);
+    return (statusCode: statusCode, body: decoded);
+  }
+
+  Map<String, String> _headers({
+    required String accessToken,
+    required bool includeContentType,
+  }) {
+    return {
+      'Authorization': 'Bearer $accessToken',
+      'Accept': 'application/json',
+      if (includeContentType) 'Content-Type': 'application/json',
+    };
+  }
+
+  List _readListData(Map<String, dynamic> decoded, {required int statusCode}) {
+    final data = decoded['data'];
+    if (data is! List) {
+      throw AdminApiException(
+        'Response data is missing',
+        statusCode: statusCode,
+      );
+    }
+    return data;
+  }
+
+  Map<String, dynamic> _readMapData(
+    Map<String, dynamic> decoded, {
+    required int statusCode,
+  }) {
+    final data = decoded['data'];
+    if (data is! Map<String, dynamic>) {
+      throw AdminApiException(
+        'Response data is missing',
+        statusCode: statusCode,
+      );
+    }
+    return data;
+  }
+
+  Map<String, dynamic>? _decodeResponseMap(
+    dynamic responseData, {
+    required int statusCode,
+    required bool allowEmptySuccessBody,
+  }) {
+    if (_isEmptyBody(responseData)) {
+      if (allowEmptySuccessBody && _isSuccessfulStatus(statusCode)) {
+        return null;
       }
       throw AdminApiException('요청에 실패했습니다.', statusCode: statusCode);
     }
 
-    final decoded = jsonDecode(body);
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException('Invalid response shape', statusCode: statusCode);
-    }
-
-    _throwIfRequestFailed(statusCode: statusCode, decoded: decoded);
-  }
-
-  Options _requestOptions({required Map<String, String> headers}) {
-    return Options(
-      headers: headers,
-      responseType: ResponseType.plain,
-      validateStatus: (_) => true,
-    );
-  }
-
-  Map<String, dynamic> _decodeResponseMap(
-    dynamic responseData, {
-    required int statusCode,
-  }) {
     final decoded = switch (responseData) {
-      String value => jsonDecode(value),
-      null => jsonDecode(''),
-      _ => responseData,
+      Map<String, dynamic> value => value,
+      Map value => value.map((key, value) => MapEntry(key.toString(), value)),
+      String value => _decodeJsonString(value, statusCode: statusCode),
+      _ => throw AdminApiException(
+        'Invalid response shape',
+        statusCode: statusCode,
+      ),
     };
-
-    if (decoded is! Map<String, dynamic>) {
-      throw AdminApiException('Invalid response shape', statusCode: statusCode);
-    }
 
     return decoded;
   }
 
-  bool _isSuccessfulStatus(int statusCode) {
-    return statusCode >= 200 && statusCode < 300;
+  Map<String, dynamic> _decodeJsonString(
+    String value, {
+    required int statusCode,
+  }) {
+    try {
+      final decoded = jsonDecode(value);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      if (decoded is Map) {
+        return decoded.map((key, value) => MapEntry(key.toString(), value));
+      }
+      throw AdminApiException('Invalid response shape', statusCode: statusCode);
+    } on FormatException {
+      throw AdminApiException('Invalid response shape', statusCode: statusCode);
+    }
   }
 
-  String _responseBodyAsString(dynamic responseData) {
-    if (responseData == null) {
-      return '';
-    }
-    if (responseData is String) {
-      return responseData;
-    }
-    return jsonEncode(responseData);
+  bool _isEmptyBody(dynamic responseData) {
+    return responseData == null ||
+        (responseData is String && responseData.trim().isEmpty);
+  }
+
+  bool _isSuccessfulStatus(int statusCode) {
+    return statusCode >= 200 && statusCode < 300;
   }
 
   void _throwIfRequestFailed({
