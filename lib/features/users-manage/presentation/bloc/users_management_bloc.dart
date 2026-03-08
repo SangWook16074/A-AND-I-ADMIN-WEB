@@ -1,6 +1,6 @@
 import 'package:aandi_auth/aandi_auth.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/datasources/users_management_api_client.dart';
@@ -18,7 +18,7 @@ part 'users_management_bloc.g.dart';
 UsersManagementApiClient usersManagementApiClient(Ref ref) {
   return UsersManagementApiClient(
     baseUrl: ref.watch(authBaseUrlProvider),
-    client: http.Client(),
+    dio: Dio(),
   );
 }
 
