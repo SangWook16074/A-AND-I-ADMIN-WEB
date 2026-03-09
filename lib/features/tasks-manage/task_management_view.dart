@@ -18,53 +18,63 @@ class TaskManagementView extends ConsumerWidget {
     final coursesAsync = ref.watch(coursesProvider);
 
     void showCreateCourseDialog() {
-      final titleController = TextEditingController();
-      final slugController = TextEditingController();
-      final descController = TextEditingController();
-      final phaseController = TextEditingController(text: 'BASIC');
-      final trackController = TextEditingController(text: 'FL');
+      final formKey = GlobalKey<FormState>();
+      String title = '';
+      String slug = '';
+      String description = '';
+      String phase = 'BASIC';
+      String targetTrack = 'FL';
 
       showDialog(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('새 코스(과제 묶음) 생성'),
           content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: '제목 (예: Flutter 심화)',
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: '제목 (예: Flutter 심화)',
+                    ),
+                    onSaved: (value) => title = value?.trim() ?? '',
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty) ? '제목을 입력해주세요.' : null,
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: slugController,
-                  decoration: const InputDecoration(
-                    labelText: '고유 슬러그 (예: flutter-adv)',
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: '고유 슬러그 (예: flutter-adv)',
+                    ),
+                    onSaved: (value) => slug = value?.trim() ?? '',
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty) ? '슬러그를 입력해주세요.' : null,
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descController,
-                  decoration: const InputDecoration(labelText: '간단한 설명'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: phaseController,
-                  decoration: const InputDecoration(
-                    labelText: '단계 (예: BASIC, ADVANCED)',
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: '간단한 설명'),
+                    onSaved: (value) => description = value?.trim() ?? '',
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: trackController,
-                  decoration: const InputDecoration(
-                    labelText: '트랙 (예: FL, AL)',
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    initialValue: phase,
+                    decoration: const InputDecoration(
+                      labelText: '단계 (예: BASIC, ADVANCED)',
+                    ),
+                    onSaved: (value) => phase = value?.trim() ?? 'BASIC',
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    initialValue: targetTrack,
+                    decoration: const InputDecoration(
+                      labelText: '트랙 (예: FL, AL)',
+                    ),
+                    onSaved: (value) => targetTrack = value?.trim() ?? 'FL',
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -74,20 +84,18 @@ class TaskManagementView extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () {
-                final slug = slugController.text.trim();
-                final title = titleController.text.trim();
-                if (slug.isEmpty || title.isEmpty) return;
+                if (formKey.currentState?.validate() ?? false) {
+                  formKey.currentState?.save();
 
-                ref
-                    .read(coursesNotifierProvider.notifier)
-                    .createCourse(
-                      slug: slug,
-                      title: title,
-                      description: descController.text.trim(),
-                      phase: phaseController.text.trim(),
-                      targetTrack: trackController.text.trim(),
-                    );
-                Navigator.pop(dialogContext);
+                  ref.read(coursesNotifierProvider.notifier).createCourse(
+                        slug: slug,
+                        title: title,
+                        description: description.isEmpty ? null : description,
+                        phase: phase,
+                        targetTrack: targetTrack,
+                      );
+                  Navigator.pop(dialogContext);
+                }
               },
               child: const Text('생성'),
             ),

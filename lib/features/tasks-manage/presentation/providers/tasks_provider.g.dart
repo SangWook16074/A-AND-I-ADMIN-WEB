@@ -25,7 +25,7 @@ final tasksAdminApiClientProvider = Provider<AdminApiClient>.internal(
 // ignore: unused_element
 typedef TasksAdminApiClientRef = ProviderRef<AdminApiClient>;
 String _$tasksManagementRepositoryHash() =>
-    r'2fccbc32828bb06cfb71b4bc19beefbdc91bdf5e';
+    r'49dfd5638e3c7fa4818f08aca2c94dec815a5a01';
 
 /// See also [tasksManagementRepository].
 @ProviderFor(tasksManagementRepository)
@@ -43,29 +43,65 @@ final tasksManagementRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TasksManagementRepositoryRef = ProviderRef<TasksManagementRepository>;
-String _$coursesHash() => r'46da57b20dbef4a9647f48c358b654a69fe765f1';
+String _$getCoursesUseCaseHash() => r'f942252eb457c66ab4baabf10b95604b4ddd6fe8';
 
-/// See also [courses].
-@ProviderFor(courses)
-final coursesProvider = AutoDisposeFutureProvider<List<CourseSummary>>.internal(
-  courses,
-  name: r'coursesProvider',
+/// See also [getCoursesUseCase].
+@ProviderFor(getCoursesUseCase)
+final getCoursesUseCaseProvider = Provider<GetCoursesUseCase>.internal(
+  getCoursesUseCase,
+  name: r'getCoursesUseCaseProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$coursesHash,
+      : _$getCoursesUseCaseHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CoursesRef = AutoDisposeFutureProviderRef<List<CourseSummary>>;
-String _$coursesNotifierHash() => r'dda36159fb89dd891678b6b90d8f070a490008fe';
+typedef GetCoursesUseCaseRef = ProviderRef<GetCoursesUseCase>;
+String _$createCourseUseCaseHash() =>
+    r'43d0bd5e282f3b02e3987dffc67924d85a44533b';
+
+/// See also [createCourseUseCase].
+@ProviderFor(createCourseUseCase)
+final createCourseUseCaseProvider = Provider<CreateCourseUseCase>.internal(
+  createCourseUseCase,
+  name: r'createCourseUseCaseProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$createCourseUseCaseHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CreateCourseUseCaseRef = ProviderRef<CreateCourseUseCase>;
+String _$coursesHash() => r'f80d89cdcc54671ae5e387e7a205403351bde37e';
+
+/// See also [courses].
+@ProviderFor(courses)
+final coursesProvider =
+    AutoDisposeProvider<AsyncValue<List<CourseSummary>>>.internal(
+      courses,
+      name: r'coursesProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$coursesHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CoursesRef = AutoDisposeProviderRef<AsyncValue<List<CourseSummary>>>;
+String _$coursesNotifierHash() => r'c983bf15ad5b370d2631afb50874d29513ede619';
 
 /// See also [CoursesNotifier].
 @ProviderFor(CoursesNotifier)
 final coursesNotifierProvider =
-    AutoDisposeNotifierProvider<CoursesNotifier, void>.internal(
+    AutoDisposeNotifierProvider<CoursesNotifier, CourseViewState>.internal(
       CoursesNotifier.new,
       name: r'coursesNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -75,6 +111,6 @@ final coursesNotifierProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$CoursesNotifier = AutoDisposeNotifier<void>;
+typedef _$CoursesNotifier = AutoDisposeNotifier<CourseViewState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

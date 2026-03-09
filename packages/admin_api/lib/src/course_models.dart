@@ -1,63 +1,36 @@
-class CourseSummary {
-  const CourseSummary({
-    required this.id,
-    required this.title,
-    required this.slug,
-    this.description,
-    required this.phase,
-    required this.targetTrack,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  factory CourseSummary.fromJson(Map<String, dynamic> json) {
-    return CourseSummary(
-      id: (json['id'] ?? '').toString(),
-      title: (json['title'] ?? '').toString(),
-      slug: (json['slug'] ?? '').toString(),
-      description: json['description'] as String?,
-      phase: (json['phase'] ?? '').toString(),
-      targetTrack: (json['targetTrack'] ?? '').toString(),
-      status: (json['status'] ?? '').toString(),
-      createdAt: DateTime.parse((json['createdAt'] ?? '').toString()),
-      updatedAt: DateTime.parse((json['updatedAt'] ?? '').toString()),
-    );
-  }
+part 'course_models.freezed.dart';
+part 'course_models.g.dart';
 
-  final String id;
-  final String title;
-  final String slug;
-  final String? description;
-  final String phase;
-  final String targetTrack;
-  final String status;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+@freezed
+abstract class CourseSummary with _$CourseSummary {
+  const factory CourseSummary({
+    required String id,
+    required String title,
+    required String slug,
+    String? description,
+    required String phase,
+    required String targetTrack,
+    required String status,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) = _CourseSummary;
+
+  factory CourseSummary.fromJson(Map<String, dynamic> json) =>
+      _$CourseSummaryFromJson(json);
 }
 
-class CreateCourseRequest {
-  const CreateCourseRequest({
-    required this.title,
-    required this.slug,
-    this.description,
-    required this.phase,
-    required this.targetTrack,
-  });
+@freezed
+abstract class CreateCourseRequest with _$CreateCourseRequest {
+  const factory CreateCourseRequest({
+    required String title,
+    required String slug,
+    String? description,
+    required String phase,
+    required String targetTrack,
+  }) = _CreateCourseRequest;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'slug': slug,
-      if (description != null) 'description': description,
-      'phase': phase,
-      'targetTrack': targetTrack,
-    };
-  }
-
-  final String title;
-  final String slug;
-  final String? description;
-  final String phase;
-  final String targetTrack;
+  factory CreateCourseRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateCourseRequestFromJson(json);
 }
