@@ -17,6 +17,7 @@ abstract class AuthTokens with _$AuthTokens {
     String? tokenType,
   }) = _AuthTokens;
 
+  /// JSON 역직렬화.
   factory AuthTokens.fromJson(Map<String, dynamic> json) =>
       _$AuthTokensFromJson(json);
 }

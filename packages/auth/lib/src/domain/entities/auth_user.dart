@@ -17,6 +17,7 @@ abstract class AuthUser with _$AuthUser {
     required AuthRole role,
   }) = _AuthUser;
 
+  /// JSON 역직렬화.
   factory AuthUser.fromJson(Map<String, dynamic> json) =>
       _$AuthUserFromJson(json);
 }

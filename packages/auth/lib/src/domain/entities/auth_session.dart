@@ -19,6 +19,7 @@ abstract class AuthSession with _$AuthSession {
     required AuthTokens tokens,
   }) = _AuthSession;
 
+  /// JSON 역직렬화.
   factory AuthSession.fromJson(Map<String, dynamic> json) =>
       _$AuthSessionFromJson(json);
 }
