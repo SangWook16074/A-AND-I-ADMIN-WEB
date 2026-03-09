@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:aandi_auth/aandi_auth.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import 'admin_api_exception.dart';
 import 'admin_user_provision_type.dart';
@@ -10,20 +10,17 @@ import 'course_models.dart';
 import 'create_admin_user_response.dart';
 
 class AdminApiClient {
-  AdminApiClient({required this.baseUrl, http.Client? client})
-    : client = client ?? http.Client();
+  AdminApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
+
+  static const _usersPath = '/v1/admin/users';
 
   final String baseUrl;
-  final http.Client client;
+  final Dio dio;
 
   Future<List<AdminUserSummary>> getUsers({required String accessToken}) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await client.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-      },
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
     );
 
     final decoded = _handleResponse(response);
@@ -47,19 +44,14 @@ class AdminApiClient {
     required AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await client.post(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      data: {
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
         'cohort': cohort,
-      }),
+      },
     );
 
     final decoded = _handleResponse(response);
@@ -106,15 +98,11 @@ class AdminApiClient {
     required String accessToken,
     required String userId,
   }) async {
-    final uri = Uri.parse('$baseUrl/v1/admin/users');
-    final response = await client.delete(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'userId': userId}),
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
+      data: {'userId': userId},
+      allowEmptySuccessBody: true,
     );
 
     _handleResponse(response);
@@ -159,6 +147,7 @@ class AdminApiClient {
       },
       body: jsonEncode(request.toJson()),
     );
+  }
 
     final decoded = _handleResponse(response);
     final data = decoded['data'];
@@ -196,6 +185,8 @@ class AdminApiClient {
         statusCode: response.statusCode,
       );
     }
+    return data;
+  }
 
     if (decoded is! Map<String, dynamic>) {
       throw AdminApiException('잘못된 응답 형식입니다.', statusCode: response.statusCode);
