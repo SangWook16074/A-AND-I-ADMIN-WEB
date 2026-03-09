@@ -8,14 +8,23 @@ import 'admin_user_provision_type.dart';
 import 'admin_user_summary.dart';
 import 'create_admin_user_response.dart';
 
+/// 관리자 유저 관리 API(`/v1/admin/users`)를 호출하는 클라이언트입니다.
+///
+/// 모든 요청은 `success/data/error` 형태의 공통 응답 계약을 기대하며,
+/// 계약을 벗어난 경우 [AdminApiException]을 던집니다.
 class AdminApiClient {
   AdminApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
 
+  /// 유저 조회/생성/수정/삭제를 단일 엔드포인트로 처리하는 서버 규약 경로입니다.
   static const _usersPath = '/v1/admin/users';
 
+  /// API 호스트(base url)입니다. 예: `https://api.example.com`
   final String baseUrl;
+
+  /// HTTP 클라이언트입니다. 테스트에서는 외부에서 주입해 모킹할 수 있습니다.
   final Dio dio;
 
+  /// 관리자 유저 목록을 조회합니다.
   Future<List<AdminUserSummary>> getUsers({required String accessToken}) async {
     final response = await _requestJson(
       method: 'GET',
@@ -28,6 +37,7 @@ class AdminApiClient {
     ).whereType<Map<String, dynamic>>().map(AdminUserSummary.fromJson).toList();
   }
 
+  /// 관리자 유저를 생성하고, 생성된 계정 메타데이터를 반환합니다.
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
     required AuthRole role,
@@ -49,6 +59,9 @@ class AdminApiClient {
     );
   }
 
+  /// 관리자 유저를 삭제합니다.
+  ///
+  /// 성공 시 응답 바디가 비어 있어도 정상 처리합니다.
   Future<void> deleteUser({
     required String accessToken,
     required String userId,
@@ -61,6 +74,9 @@ class AdminApiClient {
     );
   }
 
+  /// 관리자 유저의 권한/프로필 정보를 수정합니다.
+  ///
+  /// 성공 시 응답 바디가 비어 있어도 정상 처리합니다.
   Future<void> updateUser({
     required String accessToken,
     required String userId,
@@ -83,6 +99,12 @@ class AdminApiClient {
     );
   }
 
+  /// 공통 JSON 요청 실행 메서드입니다.
+  ///
+  /// 1) 요청 전송
+  /// 2) 응답 본문 디코딩
+  /// 3) 실패 시 예외 변환
+  /// 순서로 동작합니다.
   Future<({int statusCode, Map<String, dynamic> body})> _requestJson({
     required String method,
     required String accessToken,
@@ -117,6 +139,7 @@ class AdminApiClient {
     return (statusCode: statusCode, body: decoded);
   }
 
+  /// 인증/콘텐츠 협상을 위한 기본 헤더를 구성합니다.
   Map<String, String> _headers({
     required String accessToken,
     required bool includeContentType,
@@ -128,6 +151,7 @@ class AdminApiClient {
     };
   }
 
+  /// 공통 응답의 `data`가 리스트인지 검증하고 반환합니다.
   List _readListData(Map<String, dynamic> decoded, {required int statusCode}) {
     final data = decoded['data'];
     if (data is! List) {
@@ -139,6 +163,7 @@ class AdminApiClient {
     return data;
   }
 
+  /// 공통 응답의 `data`가 맵인지 검증하고 반환합니다.
   Map<String, dynamic> _readMapData(
     Map<String, dynamic> decoded, {
     required int statusCode,
@@ -153,6 +178,10 @@ class AdminApiClient {
     return data;
   }
 
+  /// Dio 응답 바디를 `Map<String, dynamic>`으로 정규화합니다.
+  ///
+  /// - 성공 + 빈 바디 허용 케이스는 `null` 반환
+  /// - 그 외 빈 바디/형식 불일치는 예외 처리
   Map<String, dynamic>? _decodeResponseMap(
     dynamic responseData, {
     required int statusCode,
@@ -178,6 +207,7 @@ class AdminApiClient {
     return decoded;
   }
 
+  /// 문자열(JSON text) 응답을 맵으로 파싱합니다.
   Map<String, dynamic> _decodeJsonString(
     String value, {
     required int statusCode,
@@ -196,15 +226,18 @@ class AdminApiClient {
     }
   }
 
+  /// `null` 또는 공백 문자열 응답을 빈 바디로 간주합니다.
   bool _isEmptyBody(dynamic responseData) {
     return responseData == null ||
         (responseData is String && responseData.trim().isEmpty);
   }
 
+  /// HTTP 상태코드가 2xx 범위인지 확인합니다.
   bool _isSuccessfulStatus(int statusCode) {
     return statusCode >= 200 && statusCode < 300;
   }
 
+  /// 상태코드/응답 body를 기반으로 요청 실패 여부를 판단하고 예외를 던집니다.
   void _throwIfRequestFailed({
     required int statusCode,
     required Map<String, dynamic> decoded,
