@@ -7,6 +7,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
+/// `AdminApiClient`의 요청/응답 계약을 검증하는 단위 테스트입니다.
+///
+/// 실제 네트워크 대신 `_createClient`의 `handler` 콜백을 통해 응답을 제어하고,
+/// 내부 mock adapter로 요청 payload와 파싱 결과를 검증합니다.
 void main() {
   const baseUrl = 'https://api.example.com';
   const accessToken = 'test-token';
@@ -381,6 +385,7 @@ void main() {
   });
 }
 
+/// 핸들러 기반 mock adapter를 주입한 [AdminApiClient] 테스트 인스턴스를 생성합니다.
 AdminApiClient _createClient({
   required String baseUrl,
   required Future<ResponseBody> Function(RequestOptions options, String body)
@@ -391,6 +396,7 @@ AdminApiClient _createClient({
   return AdminApiClient(baseUrl: baseUrl, dio: dio);
 }
 
+/// 공통 JSON 응답 body를 빠르게 만드는 테스트 유틸입니다.
 ResponseBody _jsonResponse(Object? body, int statusCode) {
   return ResponseBody.fromString(
     jsonEncode(body),
@@ -401,6 +407,7 @@ ResponseBody _jsonResponse(Object? body, int statusCode) {
   );
 }
 
+/// 헤더 키 대소문자를 무시하고 값을 찾기 위한 헬퍼입니다.
 String? _headerValue(Map<String, dynamic> headers, String name) {
   for (final entry in headers.entries) {
     if (entry.key.toLowerCase() == name.toLowerCase()) {
@@ -410,6 +417,7 @@ String? _headerValue(Map<String, dynamic> headers, String name) {
   return null;
 }
 
+/// [AdminApiException]의 주요 필드를 부분 매칭하는 커스텀 matcher입니다.
 Matcher _isAdminApiException({String? message, int? statusCode, String? code}) {
   return predicate<AdminApiException>((exception) {
     if (message != null && exception.message != message) {
@@ -425,6 +433,9 @@ Matcher _isAdminApiException({String? message, int? statusCode, String? code}) {
   }, 'AdminApiException($message, $statusCode, $code)');
 }
 
+/// Dio의 네트워크 계층을 대체하는 테스트 전용 adapter입니다.
+///
+/// 요청 스트림을 문자열 body로 모아 테스트 핸들러로 전달합니다.
 class _MockDioAdapter implements HttpClientAdapter {
   _MockDioAdapter(this._handler);
 
