@@ -39,38 +39,6 @@ class AdminApiClient {
   }
 
   /// 관리자 유저를 생성하고, 생성된 계정 메타데이터를 반환합니다.
-  Future<AdminUserSummary> getUser({
-    required String accessToken,
-    required String userId,
-  }) async {
-    final response = await _requestJson(
-      method: 'GET',
-      accessToken: accessToken,
-      pathSuffix: '/$userId',
-    );
-
-    return AdminUserSummary.fromJson(
-      _readMapData(response.body, statusCode: response.statusCode),
-    );
-  }
-
-  Future<AdminUserSummary> lookupUserByPublicCode({
-    required String accessToken,
-    required String publicCode,
-  }) async {
-    final response = await _requestJson(
-      method: 'GET',
-      accessToken: accessToken,
-      path: _userLookupPath,
-      queryParameters: {'code': publicCode},
-    );
-
-    return AdminUserSummary.fromJson(
-      _readMapData(response.body, statusCode: response.statusCode),
-    );
-  }
-
-  /// 관리자 유저를 생성하고, 생성된 계정 메타데이터를 반환합니다.
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
     required AuthRole role,
@@ -110,29 +78,6 @@ class AdminApiClient {
   /// 관리자 유저의 권한/프로필 정보를 수정합니다.
   ///
   /// 성공 시 응답 바디가 비어 있어도 정상 처리합니다.
-  Future<String> resetPassword({
-    required String accessToken,
-    required String userId,
-  }) async {
-    final response = await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      pathSuffix: '/$userId/reset-password',
-      data: const <String, dynamic>{},
-    );
-    final data = _readMapData(response.body, statusCode: response.statusCode);
-    if (data['temporaryPassword'] is! String) {
-      throw AdminApiException(
-        'Missing temporaryPassword in response',
-        statusCode: response.statusCode,
-      );
-    }
-    return data['temporaryPassword'] as String;
-  }
-
-  /// 관리자 유저의 권한/프로필 정보를 수정합니다.
-  ///
-  /// 성공 시 응답 바디가 비어 있어도 정상 처리합니다.
   Future<void> updateUser({
     required String accessToken,
     required String userId,
@@ -152,34 +97,6 @@ class AdminApiClient {
         'nickname': nickname,
       },
       allowEmptySuccessBody: true,
-    );
-  }
-
-  /// 공통 JSON 요청 실행 메서드입니다.
-  ///
-  /// 1) 요청 전송
-  /// 2) 응답 본문 디코딩
-  /// 3) 실패 시 예외 변환
-  /// 순서로 동작합니다.
-  Future<void> inviteMail({
-    required String accessToken,
-    required List<String> emails,
-    required AuthRole role,
-    required int cohort,
-    required int cohortOrder,
-    required String userTrack,
-  }) async {
-    await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      path: '/v1/admin/invite-mail',
-      data: {
-        'emails': emails,
-        'role': role.toApi(),
-        'cohort': cohort,
-        'cohortOrder': cohortOrder,
-        'userTrack': userTrack,
-      },
     );
   }
 
