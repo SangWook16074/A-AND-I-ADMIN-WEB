@@ -1,16 +1,16 @@
 import 'package:aandi_auth/aandi_auth.dart';
-import 'package:aandi_admin_api/aandi_admin_api.dart';
+import 'package:aandi_course_api/aandi_course_api.dart';
 
 import '../../domain/repositories/tasks_management_repository.dart';
 
 class TasksManagementRepositoryImpl implements TasksManagementRepository {
   TasksManagementRepositoryImpl({
-    required AdminApiClient apiClient,
+    required CourseApiClient apiClient,
     required TokenStore tokenStore,
   }) : _apiClient = apiClient,
        _tokenStore = tokenStore;
 
-  final AdminApiClient _apiClient;
+  final CourseApiClient _apiClient;
   final TokenStore _tokenStore;
 
   Future<String> _getAccessToken() async {

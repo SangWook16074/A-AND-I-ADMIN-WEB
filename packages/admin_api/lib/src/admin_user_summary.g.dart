@@ -39,7 +39,7 @@ Map<String, dynamic> _$AdminUserSummaryToJson(_AdminUserSummary instance) =>
     };
 
 const _$AuthRoleEnumMap = {
-  AuthRole.user: 'user',
-  AuthRole.organizer: 'organizer',
-  AuthRole.admin: 'admin',
+  AuthRole.user: 'USER',
+  AuthRole.organizer: 'ORGANIZER',
+  AuthRole.admin: 'ADMIN',
 };

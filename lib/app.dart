@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/dashboard/dashboard_page.dart';
-import '../features/auth/presentation/bloc/auth_bloc.dart';
-import '../features/login/login_page.dart';
+import 'features/dashboard/dashboard_page.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/login/login_page.dart';
 
 class AdminApp extends ConsumerStatefulWidget {
   const AdminApp({super.key});

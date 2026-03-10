@@ -7,7 +7,7 @@ part of 'users_management_bloc.dart';
 // **************************************************************************
 
 String _$usersManagementApiClientHash() =>
-    r'82dce7b704532f662fb137f25e5caf1e6121cd9a';
+    r'2b1058ba79ebb2eef18f49727d9064351ec1e5a3';
 
 /// See also [usersManagementApiClient].
 @ProviderFor(usersManagementApiClient)

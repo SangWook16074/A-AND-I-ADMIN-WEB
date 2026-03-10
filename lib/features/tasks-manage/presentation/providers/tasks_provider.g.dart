@@ -6,26 +6,26 @@ part of 'tasks_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tasksAdminApiClientHash() =>
-    r'0a0d221af21291692fd0f644b97252af53a3ef94';
+String _$tasksCourseApiClientHash() =>
+    r'e10fbd54e24eaed83256bf484e7fa4afd2c52da9';
 
-/// See also [tasksAdminApiClient].
-@ProviderFor(tasksAdminApiClient)
-final tasksAdminApiClientProvider = Provider<AdminApiClient>.internal(
-  tasksAdminApiClient,
-  name: r'tasksAdminApiClientProvider',
+/// See also [tasksCourseApiClient].
+@ProviderFor(tasksCourseApiClient)
+final tasksCourseApiClientProvider = Provider<CourseApiClient>.internal(
+  tasksCourseApiClient,
+  name: r'tasksCourseApiClientProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$tasksAdminApiClientHash,
+      : _$tasksCourseApiClientHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef TasksAdminApiClientRef = ProviderRef<AdminApiClient>;
+typedef TasksCourseApiClientRef = ProviderRef<CourseApiClient>;
 String _$tasksManagementRepositoryHash() =>
-    r'49dfd5638e3c7fa4818f08aca2c94dec815a5a01';
+    r'6b8395fbb6abefacd8a01525b4ccee56ffb3614b';
 
 /// See also [tasksManagementRepository].
 @ProviderFor(tasksManagementRepository)
@@ -78,7 +78,7 @@ final createCourseUseCaseProvider = Provider<CreateCourseUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CreateCourseUseCaseRef = ProviderRef<CreateCourseUseCase>;
-String _$coursesHash() => r'f80d89cdcc54671ae5e387e7a205403351bde37e';
+String _$coursesHash() => r'349b00a90465bc5e5607ef63f04faa72a59e4acf';
 
 /// See also [courses].
 @ProviderFor(courses)

@@ -1,4 +1,4 @@
-import 'package:aandi_admin_api/aandi_admin_api.dart';
+import 'package:aandi_course_api/aandi_course_api.dart';
 import '../repositories/tasks_management_repository.dart';
 
 class GetCoursesUseCase {

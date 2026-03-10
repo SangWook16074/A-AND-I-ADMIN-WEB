@@ -1,8 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:aandi_auth/aandi_auth.dart';
-import 'package:aandi_admin_api/aandi_admin_api.dart';
-import 'package:http/http.dart' as http;
+import 'package:aandi_course_api/aandi_course_api.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/repositories/tasks_management_repository.dart';
@@ -25,17 +25,14 @@ abstract class CourseViewState with _$CourseViewState {
 }
 
 @Riverpod(keepAlive: true)
-AdminApiClient tasksAdminApiClient(Ref ref) {
-  return AdminApiClient(
-    baseUrl: ref.watch(authBaseUrlProvider),
-    client: http.Client(),
-  );
+CourseApiClient tasksCourseApiClient(Ref ref) {
+  return CourseApiClient(baseUrl: ref.watch(authBaseUrlProvider), dio: Dio());
 }
 
 @Riverpod(keepAlive: true)
 TasksManagementRepository tasksManagementRepository(Ref ref) {
   return TasksManagementRepositoryImpl(
-    apiClient: ref.watch(tasksAdminApiClientProvider),
+    apiClient: ref.watch(tasksCourseApiClientProvider),
     tokenStore: ref.watch(tokenStoreProvider),
   );
 }
