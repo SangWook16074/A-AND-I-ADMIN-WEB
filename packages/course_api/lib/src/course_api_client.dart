@@ -2,18 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'course_models.dart';
 
-class CourseApiException implements Exception {
-  CourseApiException(this.message, {this.statusCode, this.code});
-
-  final String message;
-  final int? statusCode;
-  final String? code;
-
-  @override
-  String toString() {
-    return 'CourseApiException: $message (statusCode: $statusCode, code: $code)';
-  }
-}
+import 'course_api_exceptions.dart';
 
 class CourseApiClient {
   CourseApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
@@ -42,7 +31,9 @@ class CourseApiClient {
       accessToken: accessToken,
       data: {
         'slug': request.slug,
-        'fieldTag': request.targetTrack, // Mapping targetTrack to fieldTag
+        'fieldTag': request.targetTrack,
+        'startDate': request.startDate,
+        'endDate': request.endDate,
         'metadata': {
           'title': request.title,
           'description': request.description,
@@ -60,6 +51,8 @@ class CourseApiClient {
       'id': json['id'],
       'slug': json['slug'],
       'targetTrack': json['fieldTag'],
+      'startDate': json['startDate'],
+      'endDate': json['endDate'],
       'status': json['status'],
       'createdAt': json['createdAt'],
       'updatedAt': json['updatedAt'],

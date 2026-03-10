@@ -35,6 +35,8 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
     String? description,
     required String phase,
     required String targetTrack,
+    required String startDate,
+    required String endDate,
   }) async {
     final token = await _getAccessToken();
     return _apiClient.createCourse(
@@ -45,6 +47,8 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
         description: description,
         phase: phase,
         targetTrack: targetTrack,
+        startDate: startDate,
+        endDate: endDate,
       ),
     );
   }

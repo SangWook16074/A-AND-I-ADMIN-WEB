@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'presentation/providers/tasks_provider.dart';
+import 'presentation/bloc/tasks_management_bloc.dart';
+import 'presentation/bloc/tasks_management_event.dart';
+import 'presentation/bloc/tasks_management_state.dart';
 
 class TaskManagementView extends ConsumerWidget {
   const TaskManagementView({
@@ -15,94 +17,8 @@ class TaskManagementView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final coursesAsync = ref.watch(coursesProvider);
-
-    void showCreateCourseDialog() {
-      final formKey = GlobalKey<FormState>();
-      String title = '';
-      String slug = '';
-      String description = '';
-      String phase = 'BASIC';
-      String targetTrack = 'FL';
-
-      showDialog(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('새 코스(과제 묶음) 생성'),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '제목 (예: Flutter 심화)',
-                    ),
-                    onSaved: (value) => title = value?.trim() ?? '',
-                    validator: (value) =>
-                        (value == null || value.trim().isEmpty) ? '제목을 입력해주세요.' : null,
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '고유 슬러그 (예: flutter-adv)',
-                    ),
-                    onSaved: (value) => slug = value?.trim() ?? '',
-                    validator: (value) =>
-                        (value == null || value.trim().isEmpty) ? '슬러그를 입력해주세요.' : null,
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: '간단한 설명'),
-                    onSaved: (value) => description = value?.trim() ?? '',
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    initialValue: phase,
-                    decoration: const InputDecoration(
-                      labelText: '단계 (예: BASIC, ADVANCED)',
-                    ),
-                    onSaved: (value) => phase = value?.trim() ?? 'BASIC',
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    initialValue: targetTrack,
-                    decoration: const InputDecoration(
-                      labelText: '트랙 (예: FL, AL)',
-                    ),
-                    onSaved: (value) => targetTrack = value?.trim() ?? 'FL',
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('취소'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (formKey.currentState?.validate() ?? false) {
-                  formKey.currentState?.save();
-
-                  ref.read(coursesNotifierProvider.notifier).createCourse(
-                        slug: slug,
-                        title: title,
-                        description: description.isEmpty ? null : description,
-                        phase: phase,
-                        targetTrack: targetTrack,
-                      );
-                  Navigator.pop(dialogContext);
-                }
-              },
-              child: const Text('생성'),
-            ),
-          ],
-        ),
-      );
-    }
+    final blocState = ref.watch(tasksManagementBlocProvider);
+    final courses = blocState.courses;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
@@ -139,7 +55,7 @@ class TaskManagementView extends ConsumerWidget {
                   children: [
                     _SearchField(width: searchWidth),
                     const SizedBox(height: 12),
-                    _CreateButton(onPressed: () => showCreateCourseDialog()),
+                    const _CreateButton(),
                   ],
                 )
               else
@@ -147,58 +63,62 @@ class TaskManagementView extends ConsumerWidget {
                   children: [
                     _SearchField(width: searchWidth),
                     const SizedBox(width: 12),
-                    _CreateButton(onPressed: () => showCreateCourseDialog()),
+                    const _CreateButton(),
                   ],
                 ),
               const SizedBox(height: 20),
-              coursesAsync.when(
-                data: (courses) {
-                  if (courses.isEmpty) {
+              () {
+                switch (blocState.status) {
+                  case TasksManagementStatus.initial:
+                  case TasksManagementStatus.loading:
                     return const SizedBox(
                       height: 220,
-                      child: Center(
-                        child: Text(
-                          '등록된 과제가 없습니다.',
-                          style: TextStyle(
-                            color: Color(0xFF8A8A8A),
-                            fontWeight: FontWeight.w600,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  case TasksManagementStatus.failure:
+                    return SizedBox(
+                      height: 220,
+                      child: Center(child: Text('에러 발생: ${blocState.errorMessage}')),
+                    );
+                  case TasksManagementStatus.success:
+                    if (courses.isEmpty) {
+                      return const SizedBox(
+                        height: 220,
+                        child: Center(
+                          child: Text(
+                            '등록된 과제가 없습니다.',
+                            style: TextStyle(
+                              color: Color(0xFF8A8A8A),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: courses.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return ListTile(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: Color(0xFFEAEAEA)),
-                        ),
-                        title: Text(
-                          course.title,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: Text(course.description ?? '설명 없음'),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () {},
                       );
-                    },
-                  );
-                },
-                loading: () => const SizedBox(
-                  height: 220,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (error, stack) => SizedBox(
-                  height: 220,
-                  child: Center(child: Text('에러 발생: $error')),
-                ),
-              ),
+                    }
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: courses.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final course = courses[index];
+                        return ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Color(0xFFEAEAEA)),
+                          ),
+                          title: Text(
+                            course.title,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(course.description ?? '설명 없음'),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () {},
+                        );
+                      },
+                    );
+                }
+              }(),
               const SizedBox(height: 48),
               const Divider(color: Color(0xFFF0F0F0)),
               const SizedBox(height: 18),
@@ -261,15 +181,13 @@ class _SearchField extends StatelessWidget {
   }
 }
 
-class _CreateButton extends StatelessWidget {
-  const _CreateButton({required this.onPressed});
-
-  final VoidCallback onPressed;
+class _CreateButton extends ConsumerWidget {
+  const _CreateButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FilledButton.icon(
-      onPressed: onPressed,
+      onPressed: () => _showCreateCourseDialog(context, ref),
       style: FilledButton.styleFrom(
         backgroundColor: const Color(0xFF1A1A1A),
         foregroundColor: Colors.white,
@@ -280,4 +198,115 @@ class _CreateButton extends StatelessWidget {
       label: const Text('과제 생성', style: TextStyle(fontWeight: FontWeight.w800)),
     );
   }
+}
+
+void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
+  final formKey = GlobalKey<FormState>();
+  String title = '';
+  String slug = '';
+  String description = '';
+  String phase = 'BASIC';
+  String targetTrack = 'FL';
+  String startDate = '';
+  String endDate = '';
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('새 코스(과제 묶음) 생성'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: '제목 (예: Flutter 심화)',
+                ),
+                onSaved: (value) => title = value?.trim() ?? '',
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? '제목을 입력해주세요.' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: '고유 슬러그 (예: flutter-adv)',
+                ),
+                onSaved: (value) => slug = value?.trim() ?? '',
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? '슬러그를 입력해주세요.' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                decoration: const InputDecoration(labelText: '간단한 설명'),
+                onSaved: (value) => description = value?.trim() ?? '',
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                initialValue: phase,
+                decoration: const InputDecoration(
+                  labelText: '단계 (예: BASIC, ADVANCED)',
+                ),
+                onSaved: (value) => phase = value?.trim() ?? 'BASIC',
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                initialValue: targetTrack,
+                decoration: const InputDecoration(
+                  labelText: '트랙 (예: FL, AL)',
+                ),
+                onSaved: (value) => targetTrack = value?.trim() ?? 'FL',
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: '시작일 (예: 2026-03-02)',
+                ),
+                onSaved: (value) => startDate = value?.trim() ?? '',
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? '시작일을 입력해주세요.' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: '종료일 (예: 2026-03-30)',
+                ),
+                onSaved: (value) => endDate = value?.trim() ?? '',
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? '종료일을 입력해주세요.' : null,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: const Text('취소'),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (formKey.currentState?.validate() ?? false) {
+              formKey.currentState?.save();
+
+              ref.read(tasksManagementBlocProvider.notifier).onEvent(
+                    TasksManagementCreateCourseRequested(
+                      slug: slug,
+                      title: title,
+                      description: description.isEmpty ? null : description,
+                      phase: phase,
+                      targetTrack: targetTrack,
+                      startDate: startDate,
+                      endDate: endDate,
+                    ),
+                  );
+              Navigator.pop(dialogContext);
+            }
+          },
+          child: const Text('생성'),
+        ),
+      ],
+    ),
+  );
 }

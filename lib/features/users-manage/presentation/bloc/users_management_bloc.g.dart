@@ -63,7 +63,7 @@ final getAdminUsersUseCaseProvider = Provider<GetAdminUsersUseCase>.internal(
 // ignore: unused_element
 typedef GetAdminUsersUseCaseRef = ProviderRef<GetAdminUsersUseCase>;
 String _$usersManagementBlocHash() =>
-    r'3da4f5106d392de3994c13c99656ca1ed9bea4b0';
+    r'255dfa4051301f65859c693b93ca477d44d097a5';
 
 /// See also [UsersManagementBloc].
 @ProviderFor(UsersManagementBloc)

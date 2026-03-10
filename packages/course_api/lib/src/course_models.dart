@@ -15,6 +15,8 @@ abstract class CourseSummary with _$CourseSummary {
     required String status,
     required DateTime createdAt,
     required DateTime updatedAt,
+    String? startDate,
+    String? endDate,
   }) = _CourseSummary;
 
   factory CourseSummary.fromJson(Map<String, dynamic> json) =>
@@ -29,6 +31,8 @@ abstract class CreateCourseRequest with _$CreateCourseRequest {
     String? description,
     required String phase,
     required String targetTrack,
+    required String startDate,
+    required String endDate,
   }) = _CreateCourseRequest;
 
   factory CreateCourseRequest.fromJson(Map<String, dynamic> json) =>

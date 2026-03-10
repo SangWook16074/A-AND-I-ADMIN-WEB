@@ -8,5 +8,7 @@ abstract interface class TasksManagementRepository {
     String? description,
     required String phase,
     required String targetTrack,
+    required String startDate,
+    required String endDate,
   });
 }

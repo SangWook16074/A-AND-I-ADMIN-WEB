@@ -17,6 +17,8 @@ _CourseSummary _$CourseSummaryFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      startDate: json['startDate'] as String?,
+      endDate: json['endDate'] as String?,
     );
 
 Map<String, dynamic> _$CourseSummaryToJson(_CourseSummary instance) =>
@@ -30,6 +32,8 @@ Map<String, dynamic> _$CourseSummaryToJson(_CourseSummary instance) =>
       'status': instance.status,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
+      'startDate': instance.startDate,
+      'endDate': instance.endDate,
     };
 
 _CreateCourseRequest _$CreateCourseRequestFromJson(Map<String, dynamic> json) =>
@@ -39,6 +43,8 @@ _CreateCourseRequest _$CreateCourseRequestFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       phase: json['phase'] as String,
       targetTrack: json['targetTrack'] as String,
+      startDate: json['startDate'] as String,
+      endDate: json['endDate'] as String,
     );
 
 Map<String, dynamic> _$CreateCourseRequestToJson(
@@ -49,4 +55,6 @@ Map<String, dynamic> _$CreateCourseRequestToJson(
   'description': instance.description,
   'phase': instance.phase,
   'targetTrack': instance.targetTrack,
+  'startDate': instance.startDate,
+  'endDate': instance.endDate,
 };
