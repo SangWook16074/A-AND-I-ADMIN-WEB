@@ -55,13 +55,26 @@ extension TasksManagementEventPatterns on TasksManagementEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( TasksManagementStarted value)?  started,TResult Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( TasksManagementStarted value)?  started,TResult Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult Function( TasksManagementCourseSelected value)?  courseSelected,TResult Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,TResult Function( TasksManagementAddEnrollmentRequested value)?  addEnrollmentRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started(_that);case TasksManagementRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
-return createCourseRequested(_that);case _:
+return refreshRequested(_that);case TasksManagementCourseSelected() when courseSelected != null:
+return courseSelected(_that);case TasksManagementEnrollmentsRequested() when enrollmentsRequested != null:
+return enrollmentsRequested(_that);case TasksManagementCreateWeekRequested() when createWeekRequested != null:
+return createWeekRequested(_that);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
+return createCourseRequested(_that);case TasksManagementAssignmentsRequested() when assignmentsRequested != null:
+return assignmentsRequested(_that);case TasksManagementCreateAssignmentRequested() when createAssignmentRequested != null:
+return createAssignmentRequested(_that);case TasksManagementPublishAssignmentRequested() when publishAssignmentRequested != null:
+return publishAssignmentRequested(_that);case TasksManagementDeliverAssignmentRequested() when deliverAssignmentRequested != null:
+return deliverAssignmentRequested(_that);case TasksManagementCourseDeletedRequested() when courseDeletedRequested != null:
+return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested() when updateCourseRequested != null:
+return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
+return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
+return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that);case _:
   return orElse();
 
 }
@@ -79,13 +92,26 @@ return createCourseRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( TasksManagementStarted value)  started,required TResult Function( TasksManagementRefreshRequested value)  refreshRequested,required TResult Function( TasksManagementCreateCourseRequested value)  createCourseRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( TasksManagementStarted value)  started,required TResult Function( TasksManagementRefreshRequested value)  refreshRequested,required TResult Function( TasksManagementCourseSelected value)  courseSelected,required TResult Function( TasksManagementEnrollmentsRequested value)  enrollmentsRequested,required TResult Function( TasksManagementCreateWeekRequested value)  createWeekRequested,required TResult Function( TasksManagementCreateCourseRequested value)  createCourseRequested,required TResult Function( TasksManagementAssignmentsRequested value)  assignmentsRequested,required TResult Function( TasksManagementCreateAssignmentRequested value)  createAssignmentRequested,required TResult Function( TasksManagementPublishAssignmentRequested value)  publishAssignmentRequested,required TResult Function( TasksManagementDeliverAssignmentRequested value)  deliverAssignmentRequested,required TResult Function( TasksManagementCourseDeletedRequested value)  courseDeletedRequested,required TResult Function( TasksManagementUpdateCourseRequested value)  updateCourseRequested,required TResult Function( TasksManagementAssignmentDetailsRequested value)  assignmentDetailsRequested,required TResult Function( TasksManagementAssignmentDeletedRequested value)  assignmentDeletedRequested,required TResult Function( TasksManagementUpdateAssignmentRequested value)  updateAssignmentRequested,required TResult Function( TasksManagementAddEnrollmentRequested value)  addEnrollmentRequested,}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted():
 return started(_that);case TasksManagementRefreshRequested():
-return refreshRequested(_that);case TasksManagementCreateCourseRequested():
-return createCourseRequested(_that);}
+return refreshRequested(_that);case TasksManagementCourseSelected():
+return courseSelected(_that);case TasksManagementEnrollmentsRequested():
+return enrollmentsRequested(_that);case TasksManagementCreateWeekRequested():
+return createWeekRequested(_that);case TasksManagementCreateCourseRequested():
+return createCourseRequested(_that);case TasksManagementAssignmentsRequested():
+return assignmentsRequested(_that);case TasksManagementCreateAssignmentRequested():
+return createAssignmentRequested(_that);case TasksManagementPublishAssignmentRequested():
+return publishAssignmentRequested(_that);case TasksManagementDeliverAssignmentRequested():
+return deliverAssignmentRequested(_that);case TasksManagementCourseDeletedRequested():
+return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested():
+return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested():
+return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested():
+return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested():
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested():
+return addEnrollmentRequested(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -99,13 +125,26 @@ return createCourseRequested(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( TasksManagementStarted value)?  started,TResult? Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult? Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( TasksManagementStarted value)?  started,TResult? Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult? Function( TasksManagementCourseSelected value)?  courseSelected,TResult? Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult? Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult? Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult? Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult? Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult? Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult? Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult? Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult? Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult? Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult? Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult? Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,TResult? Function( TasksManagementAddEnrollmentRequested value)?  addEnrollmentRequested,}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started(_that);case TasksManagementRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
-return createCourseRequested(_that);case _:
+return refreshRequested(_that);case TasksManagementCourseSelected() when courseSelected != null:
+return courseSelected(_that);case TasksManagementEnrollmentsRequested() when enrollmentsRequested != null:
+return enrollmentsRequested(_that);case TasksManagementCreateWeekRequested() when createWeekRequested != null:
+return createWeekRequested(_that);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
+return createCourseRequested(_that);case TasksManagementAssignmentsRequested() when assignmentsRequested != null:
+return assignmentsRequested(_that);case TasksManagementCreateAssignmentRequested() when createAssignmentRequested != null:
+return createAssignmentRequested(_that);case TasksManagementPublishAssignmentRequested() when publishAssignmentRequested != null:
+return publishAssignmentRequested(_that);case TasksManagementDeliverAssignmentRequested() when deliverAssignmentRequested != null:
+return deliverAssignmentRequested(_that);case TasksManagementCourseDeletedRequested() when courseDeletedRequested != null:
+return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested() when updateCourseRequested != null:
+return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
+return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
+return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that);case _:
   return null;
 
 }
@@ -122,12 +161,25 @@ return createCourseRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  refreshRequested,TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  refreshRequested,TResult Function( CourseSummary course)?  courseSelected,TResult Function( String courseSlug)?  enrollmentsRequested,TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult Function( String courseSlug)?  courseDeletedRequested,TResult Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,TResult Function( String courseSlug,  AddEnrollmentRequest request)?  addEnrollmentRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started();case TasksManagementRefreshRequested() when refreshRequested != null:
-return refreshRequested();case TasksManagementCreateCourseRequested() when createCourseRequested != null:
-return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);case _:
+return refreshRequested();case TasksManagementCourseSelected() when courseSelected != null:
+return courseSelected(_that.course);case TasksManagementEnrollmentsRequested() when enrollmentsRequested != null:
+return enrollmentsRequested(_that.courseSlug);case TasksManagementCreateWeekRequested() when createWeekRequested != null:
+return createWeekRequested(_that.courseSlug,_that.weekNo,_that.title,_that.startDate,_that.endDate);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
+return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);case TasksManagementAssignmentsRequested() when assignmentsRequested != null:
+return assignmentsRequested(_that.courseSlug,_that.weekNo,_that.status);case TasksManagementCreateAssignmentRequested() when createAssignmentRequested != null:
+return createAssignmentRequested(_that.courseSlug,_that.request);case TasksManagementPublishAssignmentRequested() when publishAssignmentRequested != null:
+return publishAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementDeliverAssignmentRequested() when deliverAssignmentRequested != null:
+return deliverAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementCourseDeletedRequested() when courseDeletedRequested != null:
+return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourseRequested() when updateCourseRequested != null:
+return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
+return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
+return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that.courseSlug,_that.request);case _:
   return orElse();
 
 }
@@ -145,12 +197,25 @@ return createCourseRequested(_that.slug,_that.title,_that.description,_that.phas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  refreshRequested,required TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)  createCourseRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  refreshRequested,required TResult Function( CourseSummary course)  courseSelected,required TResult Function( String courseSlug)  enrollmentsRequested,required TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)  createWeekRequested,required TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)  createCourseRequested,required TResult Function( String courseSlug,  int? weekNo,  String? status)  assignmentsRequested,required TResult Function( String courseSlug,  CreateAssignmentRequest request)  createAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  publishAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  deliverAssignmentRequested,required TResult Function( String courseSlug)  courseDeletedRequested,required TResult Function( String courseSlug,  UpdateCourseRequest request)  updateCourseRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDetailsRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDeletedRequested,required TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)  updateAssignmentRequested,required TResult Function( String courseSlug,  AddEnrollmentRequest request)  addEnrollmentRequested,}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted():
 return started();case TasksManagementRefreshRequested():
-return refreshRequested();case TasksManagementCreateCourseRequested():
-return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);}
+return refreshRequested();case TasksManagementCourseSelected():
+return courseSelected(_that.course);case TasksManagementEnrollmentsRequested():
+return enrollmentsRequested(_that.courseSlug);case TasksManagementCreateWeekRequested():
+return createWeekRequested(_that.courseSlug,_that.weekNo,_that.title,_that.startDate,_that.endDate);case TasksManagementCreateCourseRequested():
+return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);case TasksManagementAssignmentsRequested():
+return assignmentsRequested(_that.courseSlug,_that.weekNo,_that.status);case TasksManagementCreateAssignmentRequested():
+return createAssignmentRequested(_that.courseSlug,_that.request);case TasksManagementPublishAssignmentRequested():
+return publishAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementDeliverAssignmentRequested():
+return deliverAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementCourseDeletedRequested():
+return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourseRequested():
+return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested():
+return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested():
+return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested():
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested():
+return addEnrollmentRequested(_that.courseSlug,_that.request);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -164,12 +229,25 @@ return createCourseRequested(_that.slug,_that.title,_that.description,_that.phas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  refreshRequested,TResult? Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  refreshRequested,TResult? Function( CourseSummary course)?  courseSelected,TResult? Function( String courseSlug)?  enrollmentsRequested,TResult? Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult? Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult? Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult? Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult? Function( String courseSlug)?  courseDeletedRequested,TResult? Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult? Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,TResult? Function( String courseSlug,  AddEnrollmentRequest request)?  addEnrollmentRequested,}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started();case TasksManagementRefreshRequested() when refreshRequested != null:
-return refreshRequested();case TasksManagementCreateCourseRequested() when createCourseRequested != null:
-return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);case _:
+return refreshRequested();case TasksManagementCourseSelected() when courseSelected != null:
+return courseSelected(_that.course);case TasksManagementEnrollmentsRequested() when enrollmentsRequested != null:
+return enrollmentsRequested(_that.courseSlug);case TasksManagementCreateWeekRequested() when createWeekRequested != null:
+return createWeekRequested(_that.courseSlug,_that.weekNo,_that.title,_that.startDate,_that.endDate);case TasksManagementCreateCourseRequested() when createCourseRequested != null:
+return createCourseRequested(_that.slug,_that.title,_that.description,_that.phase,_that.targetTrack,_that.startDate,_that.endDate);case TasksManagementAssignmentsRequested() when assignmentsRequested != null:
+return assignmentsRequested(_that.courseSlug,_that.weekNo,_that.status);case TasksManagementCreateAssignmentRequested() when createAssignmentRequested != null:
+return createAssignmentRequested(_that.courseSlug,_that.request);case TasksManagementPublishAssignmentRequested() when publishAssignmentRequested != null:
+return publishAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementDeliverAssignmentRequested() when deliverAssignmentRequested != null:
+return deliverAssignmentRequested(_that.courseSlug,_that.assignmentId);case TasksManagementCourseDeletedRequested() when courseDeletedRequested != null:
+return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourseRequested() when updateCourseRequested != null:
+return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
+return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
+return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that.courseSlug,_that.request);case _:
   return null;
 
 }
@@ -240,6 +318,221 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class TasksManagementCourseSelected implements TasksManagementEvent {
+  const TasksManagementCourseSelected(this.course);
+  
+
+ final  CourseSummary course;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementCourseSelectedCopyWith<TasksManagementCourseSelected> get copyWith => _$TasksManagementCourseSelectedCopyWithImpl<TasksManagementCourseSelected>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementCourseSelected&&(identical(other.course, course) || other.course == course));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,course);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.courseSelected(course: $course)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementCourseSelectedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementCourseSelectedCopyWith(TasksManagementCourseSelected value, $Res Function(TasksManagementCourseSelected) _then) = _$TasksManagementCourseSelectedCopyWithImpl;
+@useResult
+$Res call({
+ CourseSummary course
+});
+
+
+$CourseSummaryCopyWith<$Res> get course;
+
+}
+/// @nodoc
+class _$TasksManagementCourseSelectedCopyWithImpl<$Res>
+    implements $TasksManagementCourseSelectedCopyWith<$Res> {
+  _$TasksManagementCourseSelectedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementCourseSelected _self;
+  final $Res Function(TasksManagementCourseSelected) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? course = null,}) {
+  return _then(TasksManagementCourseSelected(
+null == course ? _self.course : course // ignore: cast_nullable_to_non_nullable
+as CourseSummary,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CourseSummaryCopyWith<$Res> get course {
+  
+  return $CourseSummaryCopyWith<$Res>(_self.course, (value) {
+    return _then(_self.copyWith(course: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class TasksManagementEnrollmentsRequested implements TasksManagementEvent {
+  const TasksManagementEnrollmentsRequested(this.courseSlug);
+  
+
+ final  String courseSlug;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementEnrollmentsRequestedCopyWith<TasksManagementEnrollmentsRequested> get copyWith => _$TasksManagementEnrollmentsRequestedCopyWithImpl<TasksManagementEnrollmentsRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementEnrollmentsRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.enrollmentsRequested(courseSlug: $courseSlug)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementEnrollmentsRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementEnrollmentsRequestedCopyWith(TasksManagementEnrollmentsRequested value, $Res Function(TasksManagementEnrollmentsRequested) _then) = _$TasksManagementEnrollmentsRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementEnrollmentsRequestedCopyWithImpl<$Res>
+    implements $TasksManagementEnrollmentsRequestedCopyWith<$Res> {
+  _$TasksManagementEnrollmentsRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementEnrollmentsRequested _self;
+  final $Res Function(TasksManagementEnrollmentsRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,}) {
+  return _then(TasksManagementEnrollmentsRequested(
+null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementCreateWeekRequested implements TasksManagementEvent {
+  const TasksManagementCreateWeekRequested({required this.courseSlug, required this.weekNo, required this.title, required this.startDate, required this.endDate});
+  
+
+ final  String courseSlug;
+ final  int weekNo;
+ final  String title;
+ final  String startDate;
+ final  String endDate;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementCreateWeekRequestedCopyWith<TasksManagementCreateWeekRequested> get copyWith => _$TasksManagementCreateWeekRequestedCopyWithImpl<TasksManagementCreateWeekRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementCreateWeekRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.weekNo, weekNo) || other.weekNo == weekNo)&&(identical(other.title, title) || other.title == title)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,weekNo,title,startDate,endDate);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.createWeekRequested(courseSlug: $courseSlug, weekNo: $weekNo, title: $title, startDate: $startDate, endDate: $endDate)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementCreateWeekRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementCreateWeekRequestedCopyWith(TasksManagementCreateWeekRequested value, $Res Function(TasksManagementCreateWeekRequested) _then) = _$TasksManagementCreateWeekRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, int weekNo, String title, String startDate, String endDate
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementCreateWeekRequestedCopyWithImpl<$Res>
+    implements $TasksManagementCreateWeekRequestedCopyWith<$Res> {
+  _$TasksManagementCreateWeekRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementCreateWeekRequested _self;
+  final $Res Function(TasksManagementCreateWeekRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? weekNo = null,Object? title = null,Object? startDate = null,Object? endDate = null,}) {
+  return _then(TasksManagementCreateWeekRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,weekNo: null == weekNo ? _self.weekNo : weekNo // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
@@ -317,6 +610,724 @@ as String,
 }
 
 
+}
+
+/// @nodoc
+
+
+class TasksManagementAssignmentsRequested implements TasksManagementEvent {
+  const TasksManagementAssignmentsRequested({required this.courseSlug, this.weekNo, this.status});
+  
+
+ final  String courseSlug;
+ final  int? weekNo;
+ final  String? status;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementAssignmentsRequestedCopyWith<TasksManagementAssignmentsRequested> get copyWith => _$TasksManagementAssignmentsRequestedCopyWithImpl<TasksManagementAssignmentsRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementAssignmentsRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.weekNo, weekNo) || other.weekNo == weekNo)&&(identical(other.status, status) || other.status == status));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,weekNo,status);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.assignmentsRequested(courseSlug: $courseSlug, weekNo: $weekNo, status: $status)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementAssignmentsRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementAssignmentsRequestedCopyWith(TasksManagementAssignmentsRequested value, $Res Function(TasksManagementAssignmentsRequested) _then) = _$TasksManagementAssignmentsRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, int? weekNo, String? status
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementAssignmentsRequestedCopyWithImpl<$Res>
+    implements $TasksManagementAssignmentsRequestedCopyWith<$Res> {
+  _$TasksManagementAssignmentsRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementAssignmentsRequested _self;
+  final $Res Function(TasksManagementAssignmentsRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? weekNo = freezed,Object? status = freezed,}) {
+  return _then(TasksManagementAssignmentsRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,weekNo: freezed == weekNo ? _self.weekNo : weekNo // ignore: cast_nullable_to_non_nullable
+as int?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementCreateAssignmentRequested implements TasksManagementEvent {
+  const TasksManagementCreateAssignmentRequested({required this.courseSlug, required this.request});
+  
+
+ final  String courseSlug;
+ final  CreateAssignmentRequest request;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementCreateAssignmentRequestedCopyWith<TasksManagementCreateAssignmentRequested> get copyWith => _$TasksManagementCreateAssignmentRequestedCopyWithImpl<TasksManagementCreateAssignmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementCreateAssignmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.request, request) || other.request == request));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,request);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.createAssignmentRequested(courseSlug: $courseSlug, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementCreateAssignmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementCreateAssignmentRequestedCopyWith(TasksManagementCreateAssignmentRequested value, $Res Function(TasksManagementCreateAssignmentRequested) _then) = _$TasksManagementCreateAssignmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, CreateAssignmentRequest request
+});
+
+
+$CreateAssignmentRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$TasksManagementCreateAssignmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementCreateAssignmentRequestedCopyWith<$Res> {
+  _$TasksManagementCreateAssignmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementCreateAssignmentRequested _self;
+  final $Res Function(TasksManagementCreateAssignmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? request = null,}) {
+  return _then(TasksManagementCreateAssignmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as CreateAssignmentRequest,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CreateAssignmentRequestCopyWith<$Res> get request {
+  
+  return $CreateAssignmentRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class TasksManagementPublishAssignmentRequested implements TasksManagementEvent {
+  const TasksManagementPublishAssignmentRequested({required this.courseSlug, required this.assignmentId});
+  
+
+ final  String courseSlug;
+ final  String assignmentId;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementPublishAssignmentRequestedCopyWith<TasksManagementPublishAssignmentRequested> get copyWith => _$TasksManagementPublishAssignmentRequestedCopyWithImpl<TasksManagementPublishAssignmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementPublishAssignmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.assignmentId, assignmentId) || other.assignmentId == assignmentId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,assignmentId);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.publishAssignmentRequested(courseSlug: $courseSlug, assignmentId: $assignmentId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementPublishAssignmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementPublishAssignmentRequestedCopyWith(TasksManagementPublishAssignmentRequested value, $Res Function(TasksManagementPublishAssignmentRequested) _then) = _$TasksManagementPublishAssignmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, String assignmentId
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementPublishAssignmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementPublishAssignmentRequestedCopyWith<$Res> {
+  _$TasksManagementPublishAssignmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementPublishAssignmentRequested _self;
+  final $Res Function(TasksManagementPublishAssignmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? assignmentId = null,}) {
+  return _then(TasksManagementPublishAssignmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,assignmentId: null == assignmentId ? _self.assignmentId : assignmentId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementDeliverAssignmentRequested implements TasksManagementEvent {
+  const TasksManagementDeliverAssignmentRequested({required this.courseSlug, required this.assignmentId});
+  
+
+ final  String courseSlug;
+ final  String assignmentId;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementDeliverAssignmentRequestedCopyWith<TasksManagementDeliverAssignmentRequested> get copyWith => _$TasksManagementDeliverAssignmentRequestedCopyWithImpl<TasksManagementDeliverAssignmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementDeliverAssignmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.assignmentId, assignmentId) || other.assignmentId == assignmentId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,assignmentId);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.deliverAssignmentRequested(courseSlug: $courseSlug, assignmentId: $assignmentId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementDeliverAssignmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementDeliverAssignmentRequestedCopyWith(TasksManagementDeliverAssignmentRequested value, $Res Function(TasksManagementDeliverAssignmentRequested) _then) = _$TasksManagementDeliverAssignmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, String assignmentId
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementDeliverAssignmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementDeliverAssignmentRequestedCopyWith<$Res> {
+  _$TasksManagementDeliverAssignmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementDeliverAssignmentRequested _self;
+  final $Res Function(TasksManagementDeliverAssignmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? assignmentId = null,}) {
+  return _then(TasksManagementDeliverAssignmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,assignmentId: null == assignmentId ? _self.assignmentId : assignmentId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementCourseDeletedRequested implements TasksManagementEvent {
+  const TasksManagementCourseDeletedRequested({required this.courseSlug});
+  
+
+ final  String courseSlug;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementCourseDeletedRequestedCopyWith<TasksManagementCourseDeletedRequested> get copyWith => _$TasksManagementCourseDeletedRequestedCopyWithImpl<TasksManagementCourseDeletedRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementCourseDeletedRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.courseDeletedRequested(courseSlug: $courseSlug)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementCourseDeletedRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementCourseDeletedRequestedCopyWith(TasksManagementCourseDeletedRequested value, $Res Function(TasksManagementCourseDeletedRequested) _then) = _$TasksManagementCourseDeletedRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementCourseDeletedRequestedCopyWithImpl<$Res>
+    implements $TasksManagementCourseDeletedRequestedCopyWith<$Res> {
+  _$TasksManagementCourseDeletedRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementCourseDeletedRequested _self;
+  final $Res Function(TasksManagementCourseDeletedRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,}) {
+  return _then(TasksManagementCourseDeletedRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementUpdateCourseRequested implements TasksManagementEvent {
+  const TasksManagementUpdateCourseRequested({required this.courseSlug, required this.request});
+  
+
+ final  String courseSlug;
+ final  UpdateCourseRequest request;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementUpdateCourseRequestedCopyWith<TasksManagementUpdateCourseRequested> get copyWith => _$TasksManagementUpdateCourseRequestedCopyWithImpl<TasksManagementUpdateCourseRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementUpdateCourseRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.request, request) || other.request == request));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,request);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.updateCourseRequested(courseSlug: $courseSlug, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementUpdateCourseRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementUpdateCourseRequestedCopyWith(TasksManagementUpdateCourseRequested value, $Res Function(TasksManagementUpdateCourseRequested) _then) = _$TasksManagementUpdateCourseRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, UpdateCourseRequest request
+});
+
+
+$UpdateCourseRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$TasksManagementUpdateCourseRequestedCopyWithImpl<$Res>
+    implements $TasksManagementUpdateCourseRequestedCopyWith<$Res> {
+  _$TasksManagementUpdateCourseRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementUpdateCourseRequested _self;
+  final $Res Function(TasksManagementUpdateCourseRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? request = null,}) {
+  return _then(TasksManagementUpdateCourseRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as UpdateCourseRequest,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateCourseRequestCopyWith<$Res> get request {
+  
+  return $UpdateCourseRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class TasksManagementAssignmentDetailsRequested implements TasksManagementEvent {
+  const TasksManagementAssignmentDetailsRequested({required this.courseSlug, required this.assignmentId});
+  
+
+ final  String courseSlug;
+ final  String assignmentId;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementAssignmentDetailsRequestedCopyWith<TasksManagementAssignmentDetailsRequested> get copyWith => _$TasksManagementAssignmentDetailsRequestedCopyWithImpl<TasksManagementAssignmentDetailsRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementAssignmentDetailsRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.assignmentId, assignmentId) || other.assignmentId == assignmentId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,assignmentId);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.assignmentDetailsRequested(courseSlug: $courseSlug, assignmentId: $assignmentId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementAssignmentDetailsRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementAssignmentDetailsRequestedCopyWith(TasksManagementAssignmentDetailsRequested value, $Res Function(TasksManagementAssignmentDetailsRequested) _then) = _$TasksManagementAssignmentDetailsRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, String assignmentId
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementAssignmentDetailsRequestedCopyWithImpl<$Res>
+    implements $TasksManagementAssignmentDetailsRequestedCopyWith<$Res> {
+  _$TasksManagementAssignmentDetailsRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementAssignmentDetailsRequested _self;
+  final $Res Function(TasksManagementAssignmentDetailsRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? assignmentId = null,}) {
+  return _then(TasksManagementAssignmentDetailsRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,assignmentId: null == assignmentId ? _self.assignmentId : assignmentId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementAssignmentDeletedRequested implements TasksManagementEvent {
+  const TasksManagementAssignmentDeletedRequested({required this.courseSlug, required this.assignmentId});
+  
+
+ final  String courseSlug;
+ final  String assignmentId;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementAssignmentDeletedRequestedCopyWith<TasksManagementAssignmentDeletedRequested> get copyWith => _$TasksManagementAssignmentDeletedRequestedCopyWithImpl<TasksManagementAssignmentDeletedRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementAssignmentDeletedRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.assignmentId, assignmentId) || other.assignmentId == assignmentId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,assignmentId);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.assignmentDeletedRequested(courseSlug: $courseSlug, assignmentId: $assignmentId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementAssignmentDeletedRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementAssignmentDeletedRequestedCopyWith(TasksManagementAssignmentDeletedRequested value, $Res Function(TasksManagementAssignmentDeletedRequested) _then) = _$TasksManagementAssignmentDeletedRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, String assignmentId
+});
+
+
+
+
+}
+/// @nodoc
+class _$TasksManagementAssignmentDeletedRequestedCopyWithImpl<$Res>
+    implements $TasksManagementAssignmentDeletedRequestedCopyWith<$Res> {
+  _$TasksManagementAssignmentDeletedRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementAssignmentDeletedRequested _self;
+  final $Res Function(TasksManagementAssignmentDeletedRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? assignmentId = null,}) {
+  return _then(TasksManagementAssignmentDeletedRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,assignmentId: null == assignmentId ? _self.assignmentId : assignmentId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TasksManagementUpdateAssignmentRequested implements TasksManagementEvent {
+  const TasksManagementUpdateAssignmentRequested({required this.courseSlug, required this.assignmentId, required this.request});
+  
+
+ final  String courseSlug;
+ final  String assignmentId;
+ final  UpdateAssignmentRequest request;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementUpdateAssignmentRequestedCopyWith<TasksManagementUpdateAssignmentRequested> get copyWith => _$TasksManagementUpdateAssignmentRequestedCopyWithImpl<TasksManagementUpdateAssignmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementUpdateAssignmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.assignmentId, assignmentId) || other.assignmentId == assignmentId)&&(identical(other.request, request) || other.request == request));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,assignmentId,request);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.updateAssignmentRequested(courseSlug: $courseSlug, assignmentId: $assignmentId, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementUpdateAssignmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementUpdateAssignmentRequestedCopyWith(TasksManagementUpdateAssignmentRequested value, $Res Function(TasksManagementUpdateAssignmentRequested) _then) = _$TasksManagementUpdateAssignmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, String assignmentId, UpdateAssignmentRequest request
+});
+
+
+$UpdateAssignmentRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$TasksManagementUpdateAssignmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementUpdateAssignmentRequestedCopyWith<$Res> {
+  _$TasksManagementUpdateAssignmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementUpdateAssignmentRequested _self;
+  final $Res Function(TasksManagementUpdateAssignmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? assignmentId = null,Object? request = null,}) {
+  return _then(TasksManagementUpdateAssignmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,assignmentId: null == assignmentId ? _self.assignmentId : assignmentId // ignore: cast_nullable_to_non_nullable
+as String,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as UpdateAssignmentRequest,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateAssignmentRequestCopyWith<$Res> get request {
+  
+  return $UpdateAssignmentRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class TasksManagementAddEnrollmentRequested implements TasksManagementEvent {
+  const TasksManagementAddEnrollmentRequested({required this.courseSlug, required this.request});
+  
+
+ final  String courseSlug;
+ final  AddEnrollmentRequest request;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementAddEnrollmentRequestedCopyWith<TasksManagementAddEnrollmentRequested> get copyWith => _$TasksManagementAddEnrollmentRequestedCopyWithImpl<TasksManagementAddEnrollmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementAddEnrollmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.request, request) || other.request == request));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,request);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.addEnrollmentRequested(courseSlug: $courseSlug, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementAddEnrollmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementAddEnrollmentRequestedCopyWith(TasksManagementAddEnrollmentRequested value, $Res Function(TasksManagementAddEnrollmentRequested) _then) = _$TasksManagementAddEnrollmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, AddEnrollmentRequest request
+});
+
+
+$AddEnrollmentRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$TasksManagementAddEnrollmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementAddEnrollmentRequestedCopyWith<$Res> {
+  _$TasksManagementAddEnrollmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementAddEnrollmentRequested _self;
+  final $Res Function(TasksManagementAddEnrollmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? request = null,}) {
+  return _then(TasksManagementAddEnrollmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as AddEnrollmentRequest,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AddEnrollmentRequestCopyWith<$Res> get request {
+  
+  return $AddEnrollmentRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
 }
 
 // dart format on

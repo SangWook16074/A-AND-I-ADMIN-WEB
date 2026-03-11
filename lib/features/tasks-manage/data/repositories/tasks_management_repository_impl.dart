@@ -23,9 +23,31 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<void> deleteCourse({required String slug}) async {
+    final token = await _getAccessToken();
+    return _apiClient.deleteCourse(
+      accessToken: token,
+      courseSlug: slug,
+    );
+  }
+
+  @override
   Future<List<CourseSummary>> getCourses() async {
     final token = await _getAccessToken();
     return _apiClient.getCourses(accessToken: token);
+  }
+
+  @override
+  Future<CourseSummary> updateCourse({
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.updateCourse(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
   }
 
   @override
@@ -82,6 +104,129 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
     return _apiClient.getEnrollments(
       accessToken: token,
       courseSlug: courseSlug,
+    );
+  }
+
+  @override
+  Future<Enrollment> addEnrollment({
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.addEnrollment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
+  }
+
+  @override
+  Future<List<Assignment>> getAssignments({
+    required String courseSlug,
+    int? weekNo,
+    String? status,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignments(
+      accessToken: token,
+      courseSlug: courseSlug,
+      weekNo: weekNo,
+      status: status,
+    );
+  }
+
+  @override
+  Future<Assignment> getAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<Assignment> createAssignment({
+    required String courseSlug,
+    required CreateAssignmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.createAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
+  }
+
+  @override
+  Future<void> publishAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    await _apiClient.publishAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
+    required String courseSlug,
+    required String assignmentId,
+    String? status,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignmentDeliveries(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+      status: status,
+    );
+  }
+
+  @override
+  Future<DeliverAssignmentResult> deliverAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.deliverAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<void> deleteAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    await _apiClient.deleteAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<Assignment> updateAssignment({
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.updateAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+      request: request,
     );
   }
 }

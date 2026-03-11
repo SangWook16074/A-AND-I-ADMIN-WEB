@@ -76,6 +76,200 @@ class CourseApiClient {
     return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
   }
 
+  Future<Enrollment> addEnrollment({
+    required String accessToken,
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/enrollments',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Enrollment.fromJson(mapData);
+  }
+  Future<Assignment> getAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
+  }
+
+
+  Future<List<Assignment>> getAssignments({
+    required String accessToken,
+    required String courseSlug,
+    int? weekNo,
+    String? status,
+  }) async {
+    final queryParams = <String, dynamic>{};
+    if (weekNo != null) queryParams['weekNo'] = weekNo.toString();
+    if (status != null) queryParams['status'] = status;
+
+    final queryString = queryParams.isEmpty
+        ? ''
+        : '?${queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value.toString())}').join('&')}';
+
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments$queryString',
+    );
+
+    final listData = _readListData(response.body, statusCode: response.statusCode);
+    return listData.whereType<Map<String, dynamic>>().map(Assignment.fromJson).toList();
+  }
+
+  Future<Assignment> createAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required CreateAssignmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
+  }
+
+  Future<void> publishAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/publish',
+      data: const <String, dynamic>{}, // required for Content-Type: application/json
+    );
+  }
+
+  Future<DeliverAssignmentResult> deliverAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries',
+      data: const <String, dynamic>{}, // required for Content-Type: application/json
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return DeliverAssignmentResult.fromJson(mapData);
+  }
+
+  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+    String? status,
+  }) async {
+    final queryParams = <String, String>{};
+    if (status != null) {
+      queryParams['status'] = status;
+    }
+
+    final queryString = queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
+    final queryPart = queryString.isNotEmpty ? '?$queryString' : '';
+
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries$queryPart',
+      allowEmptySuccessBody: true,
+    );
+
+    final listData = _readListData(response.body, statusCode: response.statusCode);
+    return listData.whereType<Map<String, dynamic>>().map(AssignmentDelivery.fromJson).toList();
+  }
+
+  Future<CourseSummary> updateCourse({
+    required String accessToken,
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'PATCH',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug',
+      data: {
+        'fieldTag': request.fieldTag,
+        'startDate': request.startDate,
+        'endDate': request.endDate,
+        'metadata': {
+          'title': request.title,
+          'description': request.description ?? '',
+          'phase': request.phase,
+          'attributes': <String, dynamic>{},
+        },
+        'status': request.status,
+      },
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return CourseSummary.fromJson(_mapCourseJson(mapData));
+  }
+
+  Future<void> deleteCourse({
+    required String accessToken,
+    required String courseSlug,
+  }) async {
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug',
+      allowEmptySuccessBody: true,
+    );
+  }
+
+  Future<void> deleteAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+      allowEmptySuccessBody: true,
+    );
+  }
+
+  Future<Assignment> updateAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'PATCH',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
+  }
+
   Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {
     return {
       'id': json['id'],
