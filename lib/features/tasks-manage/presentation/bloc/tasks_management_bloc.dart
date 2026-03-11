@@ -57,6 +57,22 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _createAssignment(courseSlug: event.courseSlug, request: event.request);
     });
 
+    on<TasksManagementPublishAssignmentRequested>((event) async {
+      await _publishAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+    });
+
+    on<TasksManagementDeliverAssignmentRequested>((event) async {
+      await _deliverAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+    });
+
+    on<TasksManagementCourseDeletedRequested>((event) async {
+      await _deleteCourse(courseSlug: event.courseSlug);
+    });
+
+    on<TasksManagementUpdateCourseRequested>((event) async {
+      await _updateCourse(courseSlug: event.courseSlug, request: event.request);
+    });
+
     Future.microtask(() => add(const TasksManagementStarted()));
     return const TasksManagementState.initial();
   }
@@ -214,4 +230,98 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     }
   }
+
+  Future<void> _publishAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    // Reusing isCreating or isLoadingDetails? Let's use isCreating as it means "performing action" and blocks forms.
+    // However, publish is an action on a specific assignment. Let's just use isCreating.
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      await ref.read(publishAssignmentUseCaseProvider)(
+        courseSlug: courseSlug,
+        assignmentId: assignmentId,
+      );
+
+      state = state.copyWith(isCreating: false);
+      add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
+    } catch (e) {
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _deliverAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true, clearDeliveryResult: true);
+    try {
+      final result = await ref.read(deliverAssignmentUseCaseProvider)(
+        courseSlug: courseSlug,
+        assignmentId: assignmentId,
+      );
+
+      state = state.copyWith(
+        isCreating: false,
+        lastDeliveryResult: result,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _deleteCourse({required String courseSlug}) async {
+    state = state.copyWith(isDeleting: true, clearError: true);
+    try {
+      await ref.read(deleteCourseUseCaseProvider)(slug: courseSlug);
+      
+      // Remove from the list of courses
+      final newCourses = state.courses.where((c) => c.slug != courseSlug).toList();
+      state = state.copyWith(
+        isDeleting: false,
+        courses: newCourses,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isDeleting: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _updateCourse({
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      final updated = await ref.read(updateCourseUseCaseProvider)(
+        courseSlug: courseSlug,
+        request: request,
+      );
+
+      // Replace in list
+      final newCourses = state.courses.map<CourseSummary>((c) => c.slug == courseSlug ? updated : c).toList();
+      state = state.copyWith(
+        isCreating: false,
+        courses: newCourses,
+        selectedCourse: updated,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isCreating: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
 }
+

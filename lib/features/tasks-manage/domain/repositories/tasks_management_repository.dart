@@ -1,6 +1,13 @@
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 abstract interface class TasksManagementRepository {
+  Future<void> deleteCourse({required String slug});
+
+  Future<CourseSummary> updateCourse({
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  });
+
   Future<List<CourseSummary>> getCourses();
   Future<CourseSummary> createCourse({
     required String slug,
@@ -33,5 +40,21 @@ abstract interface class TasksManagementRepository {
   Future<Assignment> createAssignment({
     required String courseSlug,
     required CreateAssignmentRequest request,
+  });
+
+  Future<void> publishAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  });
+
+  Future<DeliverAssignmentResult> deliverAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  });
+
+  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
+    required String courseSlug,
+    required String assignmentId,
+    String? status,
   });
 }

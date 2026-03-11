@@ -5,11 +5,11 @@ abstract interface class GetCoursesUseCase {
   Future<List<CourseSummary>> call();
 }
 
-class GetCoursesUseCaseImp implements GetCoursesUseCase {
-  const GetCoursesUseCaseImp(this.repository);
+class GetCoursesUseCaseImpl implements GetCoursesUseCase {
+  const GetCoursesUseCaseImpl(this._repository);
 
-  final TasksManagementRepository repository;
+  final TasksManagementRepository _repository;
 
   @override
-  Future<List<CourseSummary>> call() => repository.getCourses();
+  Future<List<CourseSummary>> call() => _repository.getCourses();
 }

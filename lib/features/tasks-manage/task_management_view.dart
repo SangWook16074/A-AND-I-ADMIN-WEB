@@ -245,20 +245,32 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
                 onSaved: (value) => description = value?.trim() ?? '',
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              DropdownButtonFormField<String>(
                 initialValue: phase,
                 decoration: const InputDecoration(
-                  labelText: '단계 (예: BASIC, ADVANCED)',
+                  labelText: '단계 (Phase)',
                 ),
-                onSaved: (value) => phase = value?.trim() ?? 'BASIC',
+                items: const [
+                  DropdownMenuItem(value: 'BASIC', child: Text('BASIC')),
+                  DropdownMenuItem(value: 'CS', child: Text('CS')),
+                  DropdownMenuItem(value: 'FRAMEWORK', child: Text('FRAMEWORK')),
+                ],
+                onChanged: (value) => phase = value ?? 'BASIC',
+                onSaved: (value) => phase = value ?? 'BASIC',
               ),
               const SizedBox(height: 8),
-              TextFormField(
+              DropdownButtonFormField<String>(
                 initialValue: targetTrack,
                 decoration: const InputDecoration(
-                  labelText: '트랙 (예: FL, AL)',
+                  labelText: '트랙 (Field Tag)',
                 ),
-                onSaved: (value) => targetTrack = value?.trim() ?? 'FL',
+                items: const [
+                  DropdownMenuItem(value: 'FL', child: Text('FL')),
+                  DropdownMenuItem(value: 'SP', child: Text('SP')),
+                  DropdownMenuItem(value: 'NO', child: Text('NO')),
+                ],
+                onChanged: (value) => targetTrack = value ?? 'FL',
+                onSaved: (value) => targetTrack = value ?? 'FL',
               ),
               const SizedBox(height: 8),
               TextFormField(

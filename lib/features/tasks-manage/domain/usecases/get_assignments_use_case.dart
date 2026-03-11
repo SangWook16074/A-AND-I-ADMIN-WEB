@@ -11,7 +11,7 @@ abstract interface class GetAssignmentsUseCase {
 }
 
 class GetAssignmentsUseCaseImpl implements GetAssignmentsUseCase {
-  GetAssignmentsUseCaseImpl(this._repository);
+  const GetAssignmentsUseCaseImpl(this._repository);
 
   final TasksManagementRepository _repository;
 

@@ -41,4 +41,23 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String courseSlug,
     required CreateAssignmentRequest request,
   }) = TasksManagementCreateAssignmentRequested;
+
+  const factory TasksManagementEvent.publishAssignmentRequested({
+    required String courseSlug,
+    required String assignmentId,
+  }) = TasksManagementPublishAssignmentRequested;
+
+  const factory TasksManagementEvent.deliverAssignmentRequested({
+    required String courseSlug,
+    required String assignmentId,
+  }) = TasksManagementDeliverAssignmentRequested;
+
+  const factory TasksManagementEvent.courseDeletedRequested({
+    required String courseSlug,
+  }) = TasksManagementCourseDeletedRequested;
+
+  const factory TasksManagementEvent.updateCourseRequested({
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  }) = TasksManagementUpdateCourseRequested;
 }

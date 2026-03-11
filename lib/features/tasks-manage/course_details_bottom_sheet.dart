@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
-
+import 'assignment_deliveries_dialog.dart';
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
     context: context,
@@ -41,6 +41,50 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(tasksManagementBlocProvider, (previous, next) {
+      if (previous?.lastDeliveryResult != next.lastDeliveryResult && next.lastDeliveryResult != null) {
+        final result = next.lastDeliveryResult!;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('과제 배포 결과', style: TextStyle(fontWeight: FontWeight.w800)),
+            content: Text(
+              '총 대상자: ${result.targetCount}명\n배포 성공: ${result.deliveredCount}명\n배포 실패: ${result.failedCount}명',
+              style: const TextStyle(height: 1.5),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('확인', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (previous?.isDeleting == true && next.isDeleting == false) {
+        if (next.errorMessage == null) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('코스가 정상적으로 삭제되었습니다.')));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('코스 삭제 실패: ${next.errorMessage}')));
+        }
+      }
+
+      // Update result listener
+      if (previous?.isCreating == true && next.isCreating == false) {
+        if (next.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('코스 수정 실패: ${next.errorMessage}')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('코스가 수정되었습니다.')),
+          );
+        }
+      }
+    });
+
     final state = ref.watch(tasksManagementBlocProvider);
     final enrollments = state.selectedCourseEnrollments;
 
@@ -62,25 +106,76 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                widget.course.title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              if (widget.course.description != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  widget.course.description!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF8A8A8A),
-                    fontWeight: FontWeight.w500,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.course.title,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        if (widget.course.description != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.course.description!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF8A8A8A),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, color: Color(0xFF555555)),
+                    onPressed: () {
+                      _showEditCourseDialog(
+                        context: context,
+                        ref: ref,
+                        course: widget.course,
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: state.isDeleting ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: state.isDeleting
+                        ? null
+                        : () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('코스 삭제', style: TextStyle(fontWeight: FontWeight.w800)),
+                                content: const Text('정말로 이 코스를 삭제하시겠습니까?\n주차, 과제, 수강생 등의 모든 데이터가 함께 삭제되며 복구할 수 없습니다.', style: TextStyle(height: 1.5)),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      ref.read(tasksManagementBlocProvider.notifier).add(
+                                        TasksManagementCourseDeletedRequested(courseSlug: widget.course.slug),
+                                      );
+                                    },
+                                    child: const Text('삭제', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
               TabBar(
                 controller: _tabController,
@@ -118,6 +213,169 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
           ),
         ),
       );
+  }
+
+  void _showEditCourseDialog({
+    required BuildContext context,
+    required WidgetRef ref,
+    required CourseSummary course,
+  }) {
+    final formKey = GlobalKey<FormState>();
+    String title = course.title;
+    String description = course.description ?? '';
+    String phase = course.phase;
+    String fieldTag = course.targetTrack;
+    String status = course.status;
+    String startDate = course.startDate ?? '';
+    String endDate = course.endDate ?? '';
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('코스 수정', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: SizedBox(
+          width: 440,
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    initialValue: title,
+                    decoration: const InputDecoration(
+                      labelText: '제목',
+                      border: OutlineInputBorder(),
+                    ),
+                    onSaved: (v) => title = v?.trim() ?? title,
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '제목을 입력해주세요.' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: description,
+                    decoration: const InputDecoration(
+                      labelText: '설명',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 2,
+                    onSaved: (v) => description = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: phase,
+                          decoration: const InputDecoration(
+                            labelText: '단계 (Phase)',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'BASIC', child: Text('BASIC')),
+                            DropdownMenuItem(value: 'CS', child: Text('CS')),
+                            DropdownMenuItem(value: 'FRAMEWORK', child: Text('FRAMEWORK')),
+                          ],
+                          onChanged: (v) => phase = v ?? phase,
+                          onSaved: (v) => phase = v ?? phase,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: fieldTag,
+                          decoration: const InputDecoration(
+                            labelText: '트랙 (Field Tag)',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'FL', child: Text('FL')),
+                            DropdownMenuItem(value: 'SP', child: Text('SP')),
+                            DropdownMenuItem(value: 'NO', child: Text('NO')),
+                          ],
+                          onChanged: (v) => fieldTag = v ?? fieldTag,
+                          onSaved: (v) => fieldTag = v ?? fieldTag,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: status,
+                    decoration: const InputDecoration(
+                      labelText: '상태 (Status)',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
+                      DropdownMenuItem(value: 'PUBLISHED', child: Text('PUBLISHED')),
+                    ],
+                    onChanged: (v) => status = v ?? status,
+                    onSaved: (v) => status = v ?? status,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: startDate,
+                          decoration: const InputDecoration(
+                            labelText: '시작일 (YYYY-MM-DD)',
+                            border: OutlineInputBorder(),
+                          ),
+                          onSaved: (v) => startDate = v?.trim() ?? '',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: endDate,
+                          decoration: const InputDecoration(
+                            labelText: '종료일 (YYYY-MM-DD)',
+                            border: OutlineInputBorder(),
+                          ),
+                          onSaved: (v) => endDate = v?.trim() ?? '',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() ?? false) {
+                formKey.currentState?.save();
+
+                ref.read(tasksManagementBlocProvider.notifier).add(
+                  TasksManagementUpdateCourseRequested(
+                    courseSlug: course.slug,
+                    request: UpdateCourseRequest(
+                      fieldTag: fieldTag,
+                      startDate: startDate,
+                      endDate: endDate,
+                      title: title,
+                      description: description,
+                      phase: phase,
+                      status: status,
+                    ),
+                  ),
+                );
+                Navigator.pop(dialogContext);
+              }
+            },
+            child: const Text('수정'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -421,9 +679,76 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        '난이도: ${assignment.metadata.difficulty} | 기한: ${assignment.startAt.split('T').first} ~ ${assignment.endAt.split('T').first}',
-                        style: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 13),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '난이도: ${assignment.metadata.difficulty} | 기한: ${assignment.startAt.split('T').first} ~ ${assignment.endAt.split('T').first}',
+                              style: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 13),
+                            ),
+                          ),
+                          if (assignment.status == 'DRAFT')
+                            TextButton(
+                              onPressed: () {
+                                ref.read(tasksManagementBlocProvider.notifier).add(
+                                  TasksManagementPublishAssignmentRequested(
+                                    courseSlug: widget.courseSlug,
+                                    assignmentId: assignment.id,
+                                  ),
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('과제 게시 요청을 보냈습니다.')));
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text('게시하기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                            )
+                          else if (assignment.status != 'DRAFT')
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    ref.read(tasksManagementBlocProvider.notifier).add(
+                                      TasksManagementDeliverAssignmentRequested(
+                                        courseSlug: widget.courseSlug,
+                                        assignmentId: assignment.id,
+                                      ),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('과제 배포 요청을 보냈습니다.')));
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor: Colors.blue,
+                                  ),
+                                  child: const Text('배포하기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AssignmentDeliveriesDialog(
+                                        courseSlug: widget.courseSlug,
+                                        assignmentId: assignment.id,
+                                      ),
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text('배포 결과 보기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
                     ],
                   ),

@@ -10,7 +10,7 @@ abstract interface class CreateAssignmentUseCase {
 }
 
 class CreateAssignmentUseCaseImpl implements CreateAssignmentUseCase {
-  CreateAssignmentUseCaseImpl(this._repository);
+  const CreateAssignmentUseCaseImpl(this._repository);
 
   final TasksManagementRepository _repository;
 

@@ -23,9 +23,31 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<void> deleteCourse({required String slug}) async {
+    final token = await _getAccessToken();
+    return _apiClient.deleteCourse(
+      accessToken: token,
+      courseSlug: slug,
+    );
+  }
+
+  @override
   Future<List<CourseSummary>> getCourses() async {
     final token = await _getAccessToken();
     return _apiClient.getCourses(accessToken: token);
+  }
+
+  @override
+  Future<CourseSummary> updateCourse({
+    required String courseSlug,
+    required UpdateCourseRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.updateCourse(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
   }
 
   @override
@@ -110,6 +132,47 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       accessToken: token,
       courseSlug: courseSlug,
       request: request,
+    );
+  }
+
+  @override
+  Future<void> publishAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    await _apiClient.publishAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
+    required String courseSlug,
+    required String assignmentId,
+    String? status,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignmentDeliveries(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+      status: status,
+    );
+  }
+
+  @override
+  Future<DeliverAssignmentResult> deliverAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.deliverAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
     );
   }
 }

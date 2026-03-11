@@ -12,6 +12,11 @@ import '../../domain/usecases/get_courses_use_case.dart';
 import '../../domain/usecases/get_enrollments_use_case.dart';
 import '../../domain/usecases/get_assignments_use_case.dart';
 import '../../domain/usecases/create_assignment_use_case.dart';
+import '../../domain/usecases/publish_assignment_use_case.dart';
+import '../../domain/usecases/get_assignment_deliveries_use_case.dart';
+import '../../domain/usecases/deliver_assignment_use_case.dart';
+import '../../domain/usecases/delete_course_use_case.dart';
+import '../../domain/usecases/update_course_use_case.dart';
 
 part 'tasks_management_providers.g.dart';
 
@@ -30,32 +35,81 @@ TasksManagementRepository tasksManagementRepository(Ref ref) {
 
 @Riverpod(keepAlive: true)
 GetCoursesUseCase getCoursesUseCase(Ref ref) {
-  return GetCoursesUseCaseImp(ref.watch(tasksManagementRepositoryProvider));
+  return GetCoursesUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
 }
 
 @Riverpod(keepAlive: true)
 CreateCourseUseCase createCourseUseCase(Ref ref) {
-  return CreateCourseUseCaseImpl(
-    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
-  );
+  return CreateCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+DeleteCourseUseCase deleteCourseUseCase(Ref ref) {
+  return DeleteCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+UpdateCourseUseCase updateCourseUseCase(Ref ref) {
+  return UpdateCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
 }
 
 @Riverpod(keepAlive: true)
 GetEnrollmentsUseCase getEnrollmentsUseCase(Ref ref) {
-  return GetEnrollmentsUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return GetEnrollmentsUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 CreateOrUpdateWeekUseCase createOrUpdateWeekUseCase(Ref ref) {
-  return CreateOrUpdateWeekUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return CreateOrUpdateWeekUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 GetAssignmentsUseCase getAssignmentsUseCase(Ref ref) {
-  return GetAssignmentsUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return GetAssignmentsUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 CreateAssignmentUseCase createAssignmentUseCase(Ref ref) {
-  return CreateAssignmentUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return CreateAssignmentUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
+}
+
+@Riverpod(keepAlive: true)
+PublishAssignmentUseCase publishAssignmentUseCase(Ref ref) {
+  return PublishAssignmentUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+DeliverAssignmentUseCase deliverAssignmentUseCase(Ref ref) {
+  return DeliverAssignmentUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
+}
+
+@Riverpod(keepAlive: true)
+GetAssignmentDeliveriesUseCase getAssignmentDeliveriesUseCase(Ref ref) {
+  return GetAssignmentDeliveriesUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
+  );
+}
+
+@riverpod
+Future<List<AssignmentDelivery>> assignmentDeliveries(
+  Ref ref, {
+  required String courseSlug,
+  required String assignmentId,
+  String? status,
+}) {
+  return ref.watch(getAssignmentDeliveriesUseCaseProvider)(
+    courseSlug: courseSlug,
+    assignmentId: assignmentId,
+    status: status,
+  );
 }

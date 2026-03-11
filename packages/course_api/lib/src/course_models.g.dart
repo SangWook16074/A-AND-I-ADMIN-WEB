@@ -59,6 +59,29 @@ Map<String, dynamic> _$CreateCourseRequestToJson(
   'endDate': instance.endDate,
 };
 
+_UpdateCourseRequest _$UpdateCourseRequestFromJson(Map<String, dynamic> json) =>
+    _UpdateCourseRequest(
+      fieldTag: json['fieldTag'] as String?,
+      startDate: json['startDate'] as String?,
+      endDate: json['endDate'] as String?,
+      title: json['title'] as String?,
+      description: json['description'] as String?,
+      phase: json['phase'] as String?,
+      status: json['status'] as String?,
+    );
+
+Map<String, dynamic> _$UpdateCourseRequestToJson(
+  _UpdateCourseRequest instance,
+) => <String, dynamic>{
+  'fieldTag': instance.fieldTag,
+  'startDate': instance.startDate,
+  'endDate': instance.endDate,
+  'title': instance.title,
+  'description': instance.description,
+  'phase': instance.phase,
+  'status': instance.status,
+};
+
 _CourseWeek _$CourseWeekFromJson(Map<String, dynamic> json) => _CourseWeek(
   id: json['id'] as String,
   weekNo: (json['weekNo'] as num).toInt(),
@@ -249,3 +272,39 @@ Map<String, dynamic> _$CreateAssignmentRequestToJson(
   'requirements': instance.requirements,
   'examples': instance.examples,
 };
+
+_DeliverAssignmentResult _$DeliverAssignmentResultFromJson(
+  Map<String, dynamic> json,
+) => _DeliverAssignmentResult(
+  assignmentId: json['assignmentId'] as String,
+  courseSlug: json['courseSlug'] as String,
+  targetCount: (json['targetCount'] as num).toInt(),
+  deliveredCount: (json['deliveredCount'] as num).toInt(),
+  failedCount: (json['failedCount'] as num).toInt(),
+);
+
+Map<String, dynamic> _$DeliverAssignmentResultToJson(
+  _DeliverAssignmentResult instance,
+) => <String, dynamic>{
+  'assignmentId': instance.assignmentId,
+  'courseSlug': instance.courseSlug,
+  'targetCount': instance.targetCount,
+  'deliveredCount': instance.deliveredCount,
+  'failedCount': instance.failedCount,
+};
+
+_AssignmentDelivery _$AssignmentDeliveryFromJson(Map<String, dynamic> json) =>
+    _AssignmentDelivery(
+      userId: json['userId'] as String,
+      status: json['status'] as String,
+      deliveredAt: json['deliveredAt'] as String?,
+      failureReason: json['failureReason'] as String?,
+    );
+
+Map<String, dynamic> _$AssignmentDeliveryToJson(_AssignmentDelivery instance) =>
+    <String, dynamic>{
+      'userId': instance.userId,
+      'status': instance.status,
+      'deliveredAt': instance.deliveredAt,
+      'failureReason': instance.failureReason,
+    };

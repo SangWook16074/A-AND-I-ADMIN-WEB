@@ -40,6 +40,22 @@ abstract class CreateCourseRequest with _$CreateCourseRequest {
 }
 
 @freezed
+abstract class UpdateCourseRequest with _$UpdateCourseRequest {
+  const factory UpdateCourseRequest({
+    String? fieldTag,
+    String? startDate,
+    String? endDate,
+    String? title,
+    String? description,
+    String? phase,
+    String? status,
+  }) = _UpdateCourseRequest;
+
+  factory UpdateCourseRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateCourseRequestFromJson(json);
+}
+
+@freezed
 abstract class CourseWeek with _$CourseWeek {
   const factory CourseWeek({
     required String id,
@@ -156,4 +172,31 @@ abstract class CreateAssignmentRequest with _$CreateAssignmentRequest {
 
   factory CreateAssignmentRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateAssignmentRequestFromJson(json);
+}
+
+@freezed
+abstract class DeliverAssignmentResult with _$DeliverAssignmentResult {
+  const factory DeliverAssignmentResult({
+    required String assignmentId,
+    required String courseSlug,
+    required int targetCount,
+    required int deliveredCount,
+    required int failedCount,
+  }) = _DeliverAssignmentResult;
+
+  factory DeliverAssignmentResult.fromJson(Map<String, dynamic> json) =>
+      _$DeliverAssignmentResultFromJson(json);
+}
+
+@freezed
+abstract class AssignmentDelivery with _$AssignmentDelivery {
+  const factory AssignmentDelivery({
+    required String userId,
+    required String status,
+    String? deliveredAt,
+    String? failureReason,
+  }) = _AssignmentDelivery;
+
+  factory AssignmentDelivery.fromJson(Map<String, dynamic> json) =>
+      _$AssignmentDeliveryFromJson(json);
 }
