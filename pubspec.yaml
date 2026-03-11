@@ -21,6 +21,11 @@ version: 1.0.0+1
 environment:
   sdk: ^3.10.4
 
+workspace:
+  - packages/auth
+  - packages/admin_api
+  - packages/tech_blog
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -65,6 +70,22 @@ dev_dependencies:
   riverpod_lint: ^2.6.3
   custom_lint: ^0.7.5
   flutterfire_cli: ^1.2.0
+  melos: ^7.4.0
+
+melos:
+  command:
+    version:
+      branch: main
+      fetchTags: true
+      workspaceChangelog: true
+  scripts:
+    bootstrap: melos bootstrap
+    analyze: melos exec -- "dart analyze ."
+    test: melos exec -c 1 --fail-fast -- "flutter test"
+    release_version: melos version --all
+    release_version_and_push_tags: melos version --all && git push && git push --tags
+    sync_packages: bash scripts/sync_package_repos.sh --require-all
+    release_and_sync_packages: melos version --all && bash scripts/sync_package_repos.sh --require-all
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
