@@ -39,68 +39,78 @@ TasksManagementRepository tasksManagementRepository(Ref ref) {
 
 @Riverpod(keepAlive: true)
 GetCoursesUseCase getCoursesUseCase(Ref ref) {
-  return GetCoursesUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return GetCoursesUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 CreateCourseUseCase createCourseUseCase(Ref ref) {
-  return CreateCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return CreateCourseUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 DeleteCourseUseCase deleteCourseUseCase(Ref ref) {
-  return DeleteCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return DeleteCourseUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 UpdateCourseUseCase updateCourseUseCase(Ref ref) {
-  return UpdateCourseUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return UpdateCourseUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 GetEnrollmentsUseCase getEnrollmentsUseCase(Ref ref) {
   return GetEnrollmentsUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 CreateOrUpdateWeekUseCase createOrUpdateWeekUseCase(Ref ref) {
   return CreateOrUpdateWeekUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 GetAssignmentsUseCase getAssignmentsUseCase(Ref ref) {
   return GetAssignmentsUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 CreateAssignmentUseCase createAssignmentUseCase(Ref ref) {
   return CreateAssignmentUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 PublishAssignmentUseCase publishAssignmentUseCase(Ref ref) {
-  return PublishAssignmentUseCaseImpl(ref.watch(tasksManagementRepositoryProvider));
+  return PublishAssignmentUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 DeliverAssignmentUseCase deliverAssignmentUseCase(Ref ref) {
   return DeliverAssignmentUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 GetAssignmentDeliveriesUseCase getAssignmentDeliveriesUseCase(Ref ref) {
   return GetAssignmentDeliveriesUseCaseImpl(
-    ref.watch(tasksManagementRepositoryProvider),
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }
 
@@ -120,20 +130,28 @@ Future<List<AssignmentDelivery>> assignmentDeliveries(
 
 @Riverpod(keepAlive: true)
 GetAssignmentDetailsUseCase getAssignmentDetailsUseCase(Ref ref) {
-  return GetAssignmentDetailsUseCase(ref.watch(tasksManagementRepositoryProvider));
+  return GetAssignmentDetailsUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 DeleteAssignmentUseCase deleteAssignmentUseCase(Ref ref) {
-  return DeleteAssignmentUseCase(ref.watch(tasksManagementRepositoryProvider));
+  return DeleteAssignmentUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 UpdateAssignmentUseCase updateAssignmentUseCase(Ref ref) {
-  return UpdateAssignmentUseCase(ref.watch(tasksManagementRepositoryProvider));
+  return UpdateAssignmentUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
 AddEnrollmentUseCase addEnrollmentUseCase(Ref ref) {
-  return AddEnrollmentUseCase(ref.watch(tasksManagementRepositoryProvider));
+  return AddEnrollmentUseCaseImpl(
+    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+  );
 }

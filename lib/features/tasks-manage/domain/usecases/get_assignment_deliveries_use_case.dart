@@ -10,10 +10,13 @@ abstract interface class GetAssignmentDeliveriesUseCase {
   });
 }
 
-class GetAssignmentDeliveriesUseCaseImpl implements GetAssignmentDeliveriesUseCase {
-  const GetAssignmentDeliveriesUseCaseImpl(this._repository);
+class GetAssignmentDeliveriesUseCaseImpl
+    implements GetAssignmentDeliveriesUseCase {
+  const GetAssignmentDeliveriesUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<List<AssignmentDelivery>> call({
@@ -21,7 +24,7 @@ class GetAssignmentDeliveriesUseCaseImpl implements GetAssignmentDeliveriesUseCa
     required String assignmentId,
     String? status,
   }) {
-    return _repository.getAssignmentDeliveries(
+    return _tasksManagementRepository.getAssignmentDeliveries(
       courseSlug: courseSlug,
       assignmentId: assignmentId,
       status: status,

@@ -10,16 +10,18 @@ abstract interface class DeliverAssignmentUseCase {
 }
 
 class DeliverAssignmentUseCaseImpl implements DeliverAssignmentUseCase {
-  const DeliverAssignmentUseCaseImpl(this._repository);
+  const DeliverAssignmentUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<DeliverAssignmentResult> call({
     required String courseSlug,
     required String assignmentId,
   }) {
-    return _repository.deliverAssignment(
+    return _tasksManagementRepository.deliverAssignment(
       courseSlug: courseSlug,
       assignmentId: assignmentId,
     );

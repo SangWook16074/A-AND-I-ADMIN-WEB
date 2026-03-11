@@ -5,12 +5,14 @@ abstract interface class DeleteCourseUseCase {
 }
 
 class DeleteCourseUseCaseImpl implements DeleteCourseUseCase {
-  const DeleteCourseUseCaseImpl(this._repository);
+  const DeleteCourseUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<void> call({required String slug}) {
-    return _repository.deleteCourse(slug: slug);
+    return _tasksManagementRepository.deleteCourse(slug: slug);
   }
 }

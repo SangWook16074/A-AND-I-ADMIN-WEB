@@ -7,12 +7,14 @@ abstract interface class GetEnrollmentsUseCase {
 }
 
 class GetEnrollmentsUseCaseImpl implements GetEnrollmentsUseCase {
-  const GetEnrollmentsUseCaseImpl(this._repository);
+  const GetEnrollmentsUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<List<Enrollment>> call({required String courseSlug}) {
-    return _repository.getEnrollments(courseSlug: courseSlug);
+    return _tasksManagementRepository.getEnrollments(courseSlug: courseSlug);
   }
 }

@@ -11,9 +11,11 @@ abstract interface class GetAssignmentsUseCase {
 }
 
 class GetAssignmentsUseCaseImpl implements GetAssignmentsUseCase {
-  const GetAssignmentsUseCaseImpl(this._repository);
+  const GetAssignmentsUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<List<Assignment>> call({
@@ -21,7 +23,7 @@ class GetAssignmentsUseCaseImpl implements GetAssignmentsUseCase {
     int? weekNo,
     String? status,
   }) {
-    return _repository.getAssignments(
+    return _tasksManagementRepository.getAssignments(
       courseSlug: courseSlug,
       weekNo: weekNo,
       status: status,

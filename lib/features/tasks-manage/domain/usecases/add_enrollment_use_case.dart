@@ -1,16 +1,27 @@
 import 'package:aandi_course_api/aandi_course_api.dart';
+
 import '../repositories/tasks_management_repository.dart';
 
-class AddEnrollmentUseCase {
-  final TasksManagementRepository repository;
+abstract interface class AddEnrollmentUseCase {
+  Future<Enrollment> call({
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  });
+}
 
-  AddEnrollmentUseCase(this.repository);
+class AddEnrollmentUseCaseImpl implements AddEnrollmentUseCase {
+  const AddEnrollmentUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  Future<Enrollment> execute({
+  final TasksManagementRepository _tasksManagementRepository;
+
+  @override
+  Future<Enrollment> call({
     required String courseSlug,
     required AddEnrollmentRequest request,
   }) {
-    return repository.addEnrollment(
+    return _tasksManagementRepository.addEnrollment(
       courseSlug: courseSlug,
       request: request,
     );

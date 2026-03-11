@@ -9,16 +9,18 @@ abstract interface class UpdateCourseUseCase {
 }
 
 class UpdateCourseUseCaseImpl implements UpdateCourseUseCase {
-  const UpdateCourseUseCaseImpl(this._repository);
+  const UpdateCourseUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<CourseSummary> call({
     required String courseSlug,
     required UpdateCourseRequest request,
   }) {
-    return _repository.updateCourse(
+    return _tasksManagementRepository.updateCourse(
       courseSlug: courseSlug,
       request: request,
     );

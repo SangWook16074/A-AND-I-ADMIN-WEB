@@ -14,9 +14,11 @@ abstract interface class CreateCourseUseCase {
 }
 
 class CreateCourseUseCaseImpl implements CreateCourseUseCase {
-  const CreateCourseUseCaseImpl(this._repository);
+  const CreateCourseUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<CourseSummary> call({
@@ -28,7 +30,7 @@ class CreateCourseUseCaseImpl implements CreateCourseUseCase {
     required String startDate,
     required String endDate,
   }) {
-    return _repository.createCourse(
+    return _tasksManagementRepository.createCourse(
       slug: slug,
       title: title,
       description: description,

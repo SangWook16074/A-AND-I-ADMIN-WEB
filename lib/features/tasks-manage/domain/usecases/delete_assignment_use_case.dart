@@ -1,15 +1,22 @@
 import '../repositories/tasks_management_repository.dart';
 
-class DeleteAssignmentUseCase {
-  final TasksManagementRepository repository;
+abstract interface class DeleteAssignmentUseCase {
+  Future<void> call({required String courseSlug, required String assignmentId});
+}
 
-  DeleteAssignmentUseCase(this.repository);
+class DeleteAssignmentUseCaseImpl implements DeleteAssignmentUseCase {
+  const DeleteAssignmentUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  Future<void> execute({
+  final TasksManagementRepository _tasksManagementRepository;
+
+  @override
+  Future<void> call({
     required String courseSlug,
     required String assignmentId,
   }) {
-    return repository.deleteAssignment(
+    return _tasksManagementRepository.deleteAssignment(
       courseSlug: courseSlug,
       assignmentId: assignmentId,
     );

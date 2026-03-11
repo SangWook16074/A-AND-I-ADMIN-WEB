@@ -11,7 +11,9 @@ part 'tasks_management_bloc.g.dart';
 class TasksManagementBloc extends _$TasksManagementBloc {
   final Map<Type, Future<void> Function(dynamic)> _handlers = {};
 
-  void on<T extends TasksManagementEvent>(Future<void> Function(T event) handler) {
+  void on<T extends TasksManagementEvent>(
+    Future<void> Function(T event) handler,
+  ) {
     _handlers[T] = (event) => handler(event as T);
   }
 
@@ -26,8 +28,12 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   TasksManagementState build() {
     on<TasksManagementStarted>((event) async => _loadCourses());
     on<TasksManagementRefreshRequested>((event) async => _loadCourses());
-    on<TasksManagementCourseSelected>((event) async => _selectCourse(event.course));
-    on<TasksManagementEnrollmentsRequested>((event) async => _loadEnrollments(event.courseSlug));
+    on<TasksManagementCourseSelected>(
+      (event) async => _selectCourse(event.course),
+    );
+    on<TasksManagementEnrollmentsRequested>(
+      (event) async => _loadEnrollments(event.courseSlug),
+    );
     on<TasksManagementCreateWeekRequested>((event) async {
       await _createWeek(
         courseSlug: event.courseSlug,
@@ -48,37 +54,63 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         endDate: event.endDate,
       );
     });
-    
+
     on<TasksManagementAssignmentsRequested>((event) async {
-      await _loadAssignments(event.courseSlug, weekNo: event.weekNo, status: event.status);
+      await _loadAssignments(
+        event.courseSlug,
+        weekNo: event.weekNo,
+        status: event.status,
+      );
     });
 
     on<TasksManagementCreateAssignmentRequested>((event) async {
-      await _createAssignment(courseSlug: event.courseSlug, request: event.request);
+      await _createAssignment(
+        courseSlug: event.courseSlug,
+        request: event.request,
+      );
     });
 
     on<TasksManagementAssignmentDetailsRequested>((event) async {
-      await _loadAssignmentDetails(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+      await _loadAssignmentDetails(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
     });
 
     on<TasksManagementAddEnrollmentRequested>((event) async {
-      await _addEnrollment(courseSlug: event.courseSlug, request: event.request);
+      await _addEnrollment(
+        courseSlug: event.courseSlug,
+        request: event.request,
+      );
     });
 
     on<TasksManagementUpdateAssignmentRequested>((event) async {
-      await _updateAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId, request: event.request);
+      await _updateAssignment(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+        request: event.request,
+      );
     });
 
     on<TasksManagementPublishAssignmentRequested>((event) async {
-      await _publishAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+      await _publishAssignment(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
     });
 
     on<TasksManagementAssignmentDeletedRequested>((event) async {
-      await _deleteAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+      await _deleteAssignment(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
     });
 
     on<TasksManagementDeliverAssignmentRequested>((event) async {
-      await _deliverAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+      await _deliverAssignment(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
     });
 
     on<TasksManagementCourseDeletedRequested>((event) async {
@@ -160,7 +192,9 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   Future<void> _loadEnrollments(String courseSlug) async {
     state = state.copyWith(isLoadingDetails: true, clearError: true);
     try {
-      final enrollments = await ref.read(getEnrollmentsUseCaseProvider)(courseSlug: courseSlug);
+      final enrollments = await ref.read(getEnrollmentsUseCaseProvider)(
+        courseSlug: courseSlug,
+      );
       // Ensure the course hasn't changed while loading
       if (state.selectedCourse?.slug == courseSlug) {
         state = state.copyWith(
@@ -212,16 +246,17 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   }) async {
     state = state.copyWith(isCreating: true, clearError: true);
     try {
-      await ref.read(addEnrollmentUseCaseProvider).execute(
-            courseSlug: courseSlug,
-            request: request,
-          );
+      await ref.read(addEnrollmentUseCaseProvider)(
+        courseSlug: courseSlug,
+        request: request,
+      );
       state = state.copyWith(isCreating: false);
       add(TasksManagementEnrollmentsRequested(courseSlug));
     } catch (e) {
       String errorMessage = '수강생 등록 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
-        errorMessage = '수강생 등록 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+        errorMessage =
+            '수강생 등록 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
       }
       state = state.copyWith(
         status: TasksManagementStatus.failure,
@@ -231,10 +266,18 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
-  Future<void> _loadAssignments(String courseSlug, {int? weekNo, String? status}) async {
+  Future<void> _loadAssignments(
+    String courseSlug, {
+    int? weekNo,
+    String? status,
+  }) async {
     state = state.copyWith(isLoadingDetails: true, clearError: true);
     try {
-      final assignments = await ref.read(getAssignmentsUseCaseProvider)(courseSlug: courseSlug, weekNo: weekNo, status: status);
+      final assignments = await ref.read(getAssignmentsUseCaseProvider)(
+        courseSlug: courseSlug,
+        weekNo: weekNo,
+        status: status,
+      );
       if (state.selectedCourse?.slug == courseSlug) {
         state = state.copyWith(
           selectedCourseAssignments: assignments,
@@ -270,7 +313,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     } catch (e) {
       String errorMessage = '과제 상세 정보를 불러오는데 실패했습니다: $e';
       if (e is CourseApiException) {
-        errorMessage = '과제 정보 로드 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+        errorMessage =
+            '과제 정보 로드 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
       }
       state = state.copyWith(
         status: TasksManagementStatus.failure,
@@ -309,7 +353,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   }) async {
     state = state.copyWith(isCreating: true, clearError: true);
     try {
-      await ref.read(updateAssignmentUseCaseProvider).execute(
+      await ref.read(updateAssignmentUseCaseProvider)(
         courseSlug: courseSlug,
         assignmentId: assignmentId,
         request: request,
@@ -320,7 +364,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     } catch (e) {
       String errorMessage = '과제 수정 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
-        errorMessage = '과제 수정 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+        errorMessage =
+            '과제 수정 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
       }
       state = state.copyWith(
         status: TasksManagementStatus.failure,
@@ -336,7 +381,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   }) async {
     state = state.copyWith(isCreating: true, clearError: true);
     try {
-      await ref.read(deleteAssignmentUseCaseProvider).execute(
+      await ref.read(deleteAssignmentUseCaseProvider)(
         courseSlug: courseSlug,
         assignmentId: assignmentId,
       );
@@ -346,7 +391,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     } catch (e) {
       String errorMessage = '과제 삭제 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
-        errorMessage = '과제 삭제 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+        errorMessage =
+            '과제 삭제 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
       }
       state = state.copyWith(
         status: TasksManagementStatus.failure,
@@ -384,17 +430,18 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     required String courseSlug,
     required String assignmentId,
   }) async {
-    state = state.copyWith(isCreating: true, clearError: true, clearDeliveryResult: true);
+    state = state.copyWith(
+      isCreating: true,
+      clearError: true,
+      clearDeliveryResult: true,
+    );
     try {
       final result = await ref.read(deliverAssignmentUseCaseProvider)(
         courseSlug: courseSlug,
         assignmentId: assignmentId,
       );
 
-      state = state.copyWith(
-        isCreating: false,
-        lastDeliveryResult: result,
-      );
+      state = state.copyWith(isCreating: false, lastDeliveryResult: result);
     } catch (e) {
       state = state.copyWith(
         status: TasksManagementStatus.failure,
@@ -408,18 +455,14 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     state = state.copyWith(isDeleting: true, clearError: true);
     try {
       await ref.read(deleteCourseUseCaseProvider)(slug: courseSlug);
-      
+
       // Remove from the list of courses
-      final newCourses = state.courses.where((c) => c.slug != courseSlug).toList();
-      state = state.copyWith(
-        isDeleting: false,
-        courses: newCourses,
-      );
+      final newCourses = state.courses
+          .where((c) => c.slug != courseSlug)
+          .toList();
+      state = state.copyWith(isDeleting: false, courses: newCourses);
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, errorMessage: e.toString());
     }
   }
 
@@ -435,18 +478,16 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
 
       // Replace in list
-      final newCourses = state.courses.map<CourseSummary>((c) => c.slug == courseSlug ? updated : c).toList();
+      final newCourses = state.courses
+          .map<CourseSummary>((c) => c.slug == courseSlug ? updated : c)
+          .toList();
       state = state.copyWith(
         isCreating: false,
         courses: newCourses,
         selectedCourse: updated,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, errorMessage: e.toString());
     }
   }
 }
-

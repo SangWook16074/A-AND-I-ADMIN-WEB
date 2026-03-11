@@ -10,16 +10,18 @@ abstract interface class CreateAssignmentUseCase {
 }
 
 class CreateAssignmentUseCaseImpl implements CreateAssignmentUseCase {
-  const CreateAssignmentUseCaseImpl(this._repository);
+  const CreateAssignmentUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<Assignment> call({
     required String courseSlug,
     required CreateAssignmentRequest request,
   }) {
-    return _repository.createAssignment(
+    return _tasksManagementRepository.createAssignment(
       courseSlug: courseSlug,
       request: request,
     );

@@ -1,17 +1,29 @@
 import 'package:aandi_course_api/aandi_course_api.dart';
+
 import '../repositories/tasks_management_repository.dart';
 
-class UpdateAssignmentUseCase {
-  final TasksManagementRepository repository;
+abstract interface class UpdateAssignmentUseCase {
+  Future<Assignment> call({
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  });
+}
 
-  UpdateAssignmentUseCase(this.repository);
+class UpdateAssignmentUseCaseImpl implements UpdateAssignmentUseCase {
+  const UpdateAssignmentUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  Future<Assignment> execute({
+  final TasksManagementRepository _tasksManagementRepository;
+
+  @override
+  Future<Assignment> call({
     required String courseSlug,
     required String assignmentId,
     required UpdateAssignmentRequest request,
   }) {
-    return repository.updateAssignment(
+    return _tasksManagementRepository.updateAssignment(
       courseSlug: courseSlug,
       assignmentId: assignmentId,
       request: request,

@@ -13,9 +13,11 @@ abstract interface class CreateOrUpdateWeekUseCase {
 }
 
 class CreateOrUpdateWeekUseCaseImpl implements CreateOrUpdateWeekUseCase {
-  const CreateOrUpdateWeekUseCaseImpl(this._repository);
+  const CreateOrUpdateWeekUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
   Future<CourseWeek> call({
@@ -25,7 +27,7 @@ class CreateOrUpdateWeekUseCaseImpl implements CreateOrUpdateWeekUseCase {
     required String startDate,
     required String endDate,
   }) {
-    return _repository.createOrUpdateWeek(
+    return _tasksManagementRepository.createOrUpdateWeek(
       courseSlug: courseSlug,
       weekNo: weekNo,
       title: title,

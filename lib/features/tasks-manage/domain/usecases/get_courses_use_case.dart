@@ -6,10 +6,12 @@ abstract interface class GetCoursesUseCase {
 }
 
 class GetCoursesUseCaseImpl implements GetCoursesUseCase {
-  const GetCoursesUseCaseImpl(this._repository);
+  const GetCoursesUseCaseImpl({
+    required TasksManagementRepository tasksManagementRepository,
+  }) : _tasksManagementRepository = tasksManagementRepository;
 
-  final TasksManagementRepository _repository;
+  final TasksManagementRepository _tasksManagementRepository;
 
   @override
-  Future<List<CourseSummary>> call() => _repository.getCourses();
+  Future<List<CourseSummary>> call() => _tasksManagementRepository.getCourses();
 }
