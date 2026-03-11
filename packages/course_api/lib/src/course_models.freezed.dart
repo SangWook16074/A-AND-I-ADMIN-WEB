@@ -4277,4 +4277,270 @@ as String,
 
 }
 
+
+/// @nodoc
+mixin _$UpdateEnrollmentStatusRequest {
+
+ String get status; String? get banReason;
+/// Create a copy of UpdateEnrollmentStatusRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateEnrollmentStatusRequestCopyWith<UpdateEnrollmentStatusRequest> get copyWith => _$UpdateEnrollmentStatusRequestCopyWithImpl<UpdateEnrollmentStatusRequest>(this as UpdateEnrollmentStatusRequest, _$identity);
+
+  /// Serializes this UpdateEnrollmentStatusRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateEnrollmentStatusRequest&&(identical(other.status, status) || other.status == status)&&(identical(other.banReason, banReason) || other.banReason == banReason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,status,banReason);
+
+@override
+String toString() {
+  return 'UpdateEnrollmentStatusRequest(status: $status, banReason: $banReason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UpdateEnrollmentStatusRequestCopyWith<$Res>  {
+  factory $UpdateEnrollmentStatusRequestCopyWith(UpdateEnrollmentStatusRequest value, $Res Function(UpdateEnrollmentStatusRequest) _then) = _$UpdateEnrollmentStatusRequestCopyWithImpl;
+@useResult
+$Res call({
+ String status, String? banReason
+});
+
+
+
+
+}
+/// @nodoc
+class _$UpdateEnrollmentStatusRequestCopyWithImpl<$Res>
+    implements $UpdateEnrollmentStatusRequestCopyWith<$Res> {
+  _$UpdateEnrollmentStatusRequestCopyWithImpl(this._self, this._then);
+
+  final UpdateEnrollmentStatusRequest _self;
+  final $Res Function(UpdateEnrollmentStatusRequest) _then;
+
+/// Create a copy of UpdateEnrollmentStatusRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? banReason = freezed,}) {
+  return _then(_self.copyWith(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [UpdateEnrollmentStatusRequest].
+extension UpdateEnrollmentStatusRequestPatterns on UpdateEnrollmentStatusRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateEnrollmentStatusRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateEnrollmentStatusRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateEnrollmentStatusRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String status,  String? banReason)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest() when $default != null:
+return $default(_that.status,_that.banReason);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String status,  String? banReason)  $default,) {final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest():
+return $default(_that.status,_that.banReason);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String status,  String? banReason)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdateEnrollmentStatusRequest() when $default != null:
+return $default(_that.status,_that.banReason);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _UpdateEnrollmentStatusRequest implements UpdateEnrollmentStatusRequest {
+  const _UpdateEnrollmentStatusRequest({required this.status, this.banReason});
+  factory _UpdateEnrollmentStatusRequest.fromJson(Map<String, dynamic> json) => _$UpdateEnrollmentStatusRequestFromJson(json);
+
+@override final  String status;
+@override final  String? banReason;
+
+/// Create a copy of UpdateEnrollmentStatusRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateEnrollmentStatusRequestCopyWith<_UpdateEnrollmentStatusRequest> get copyWith => __$UpdateEnrollmentStatusRequestCopyWithImpl<_UpdateEnrollmentStatusRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateEnrollmentStatusRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateEnrollmentStatusRequest&&(identical(other.status, status) || other.status == status)&&(identical(other.banReason, banReason) || other.banReason == banReason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,status,banReason);
+
+@override
+String toString() {
+  return 'UpdateEnrollmentStatusRequest(status: $status, banReason: $banReason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateEnrollmentStatusRequestCopyWith<$Res> implements $UpdateEnrollmentStatusRequestCopyWith<$Res> {
+  factory _$UpdateEnrollmentStatusRequestCopyWith(_UpdateEnrollmentStatusRequest value, $Res Function(_UpdateEnrollmentStatusRequest) _then) = __$UpdateEnrollmentStatusRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ String status, String? banReason
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdateEnrollmentStatusRequestCopyWithImpl<$Res>
+    implements _$UpdateEnrollmentStatusRequestCopyWith<$Res> {
+  __$UpdateEnrollmentStatusRequestCopyWithImpl(this._self, this._then);
+
+  final _UpdateEnrollmentStatusRequest _self;
+  final $Res Function(_UpdateEnrollmentStatusRequest) _then;
+
+/// Create a copy of UpdateEnrollmentStatusRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? banReason = freezed,}) {
+  return _then(_UpdateEnrollmentStatusRequest(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
 // dart format on

@@ -7,19 +7,14 @@ part 'tasks_management_event.freezed.dart';
 sealed class TasksManagementEvent with _$TasksManagementEvent {
   const factory TasksManagementEvent.started() = TasksManagementStarted;
 
-  const factory TasksManagementEvent.refreshRequested() = TasksManagementRefreshRequested;
+  const factory TasksManagementEvent.refreshRequested() =
+      TasksManagementRefreshRequested;
 
-  const factory TasksManagementEvent.courseSelected(CourseSummary course) = TasksManagementCourseSelected;
+  const factory TasksManagementEvent.courseSelected(CourseSummary course) =
+      TasksManagementCourseSelected;
 
-  const factory TasksManagementEvent.enrollmentsRequested(String courseSlug) = TasksManagementEnrollmentsRequested;
-
-  const factory TasksManagementEvent.createWeekRequested({
-    required String courseSlug,
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  }) = TasksManagementCreateWeekRequested;
+  const factory TasksManagementEvent.enrollmentsRequested(String courseSlug) =
+      TasksManagementEnrollmentsRequested;
 
   const factory TasksManagementEvent.createCourseRequested({
     required String slug,
@@ -81,4 +76,10 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String courseSlug,
     required AddEnrollmentRequest request,
   }) = TasksManagementAddEnrollmentRequested;
+
+  const factory TasksManagementEvent.updateEnrollmentStatusRequested({
+    required String courseSlug,
+    required String userId,
+    required UpdateEnrollmentStatusRequest request,
+  }) = TasksManagementUpdateEnrollmentStatusRequested;
 }

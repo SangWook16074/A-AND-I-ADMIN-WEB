@@ -7,10 +7,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/repositories/tasks_management_repository_impl.dart';
 import '../../domain/repositories/tasks_management_repository.dart';
 import '../../domain/usecases/create_course_use_case.dart';
-import '../../domain/usecases/create_or_update_week_use_case.dart';
+
 import '../../domain/usecases/get_courses_use_case.dart';
 import '../../domain/usecases/get_enrollments_use_case.dart';
 import '../../domain/usecases/add_enrollment_use_case.dart';
+import '../../domain/usecases/update_enrollment_status_use_case.dart';
 import '../../domain/usecases/get_assignments_use_case.dart';
 import '../../domain/usecases/create_assignment_use_case.dart';
 import '../../domain/usecases/delete_assignment_use_case.dart';
@@ -73,8 +74,8 @@ GetEnrollmentsUseCase getEnrollmentsUseCase(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-CreateOrUpdateWeekUseCase createOrUpdateWeekUseCase(Ref ref) {
-  return CreateOrUpdateWeekUseCaseImpl(
+UpdateEnrollmentStatusUseCase updateEnrollmentStatusUseCase(Ref ref) {
+  return UpdateEnrollmentStatusUseCaseImpl(
     tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
 }

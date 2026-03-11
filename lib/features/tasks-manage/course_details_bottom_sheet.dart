@@ -7,6 +7,8 @@ import 'assignment_deliveries_dialog.dart';
 import 'assignment_details_dialog.dart';
 import 'edit_assignment_dialog.dart';
 
+enum _EnrollmentActionStatus { enrolled, dropped, banned }
+
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
     context: context,
@@ -24,16 +26,19 @@ class _CourseDetailsBottomSheet extends ConsumerStatefulWidget {
   final CourseSummary course;
 
   @override
-  ConsumerState<_CourseDetailsBottomSheet> createState() => _CourseDetailsBottomSheetState();
+  ConsumerState<_CourseDetailsBottomSheet> createState() =>
+      _CourseDetailsBottomSheetState();
 }
 
-class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomSheet> with SingleTickerProviderStateMixin {
+class _CourseDetailsBottomSheetState
+    extends ConsumerState<_CourseDetailsBottomSheet>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -45,12 +50,16 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
   @override
   Widget build(BuildContext context) {
     ref.listen(tasksManagementBlocProvider, (previous, next) {
-      if (previous?.lastDeliveryResult != next.lastDeliveryResult && next.lastDeliveryResult != null) {
+      if (previous?.lastDeliveryResult != next.lastDeliveryResult &&
+          next.lastDeliveryResult != null) {
         final result = next.lastDeliveryResult!;
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('과제 배포 결과', style: TextStyle(fontWeight: FontWeight.w800)),
+            title: const Text(
+              '과제 배포 결과',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
             content: Text(
               '총 대상자: ${result.targetCount}명\n배포 성공: ${result.deliveredCount}명\n배포 실패: ${result.failedCount}명',
               style: const TextStyle(height: 1.5),
@@ -58,7 +67,10 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('확인', style: TextStyle(fontWeight: FontWeight.w700)),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -68,9 +80,13 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
       if (previous?.isDeleting == true && next.isDeleting == false) {
         if (next.errorMessage == null) {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('코스가 정상적으로 삭제되었습니다.')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('코스가 정상적으로 삭제되었습니다.')));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('코스 삭제 실패: ${next.errorMessage}')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('코스 삭제 실패: ${next.errorMessage}')),
+          );
         }
       }
 
@@ -81,9 +97,9 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
             SnackBar(content: Text('코스 수정 실패: ${next.errorMessage}')),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('코스가 수정되었습니다.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('유저 상태가 변경되었습니다.')));
         }
       }
     });
@@ -95,128 +111,154 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
       heightFactor: 0.9,
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 48,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE0E0E0),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE0E0E0),
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
-              const SizedBox(height: 24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+            ),
+            const SizedBox(height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.course.title,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      if (widget.course.description != null) ...[
+                        const SizedBox(height: 8),
                         Text(
-                          widget.course.title,
+                          widget.course.description!,
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
+                            fontSize: 14,
+                            color: Color(0xFF8A8A8A),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                        if (widget.course.description != null) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            widget.course.description!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF8A8A8A),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.edit_outlined, color: Color(0xFF555555)),
-                    onPressed: () {
-                      _showEditCourseDialog(
-                        context: context,
-                        ref: ref,
-                        course: widget.course,
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: state.isDeleting ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: state.isDeleting
-                        ? null
-                        : () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('코스 삭제', style: TextStyle(fontWeight: FontWeight.w800)),
-                                content: const Text('정말로 이 코스를 삭제하시겠습니까?\n주차, 과제, 수강생 등의 모든 데이터가 함께 삭제되며 복구할 수 없습니다.', style: TextStyle(height: 1.5)),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      ref.read(tasksManagementBlocProvider.notifier).add(
-                                        TasksManagementCourseDeletedRequested(courseSlug: widget.course.slug),
-                                      );
-                                    },
-                                    child: const Text('삭제', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              TabBar(
-                controller: _tabController,
-                indicatorColor: const Color(0xFF1A1A1A),
-                labelColor: const Color(0xFF1A1A1A),
-                unselectedLabelColor: const Color(0xFF8A8A8A),
-                labelStyle: const TextStyle(fontWeight: FontWeight.w700),
-                tabs: const [
-                  Tab(text: '수강생 목록'),
-                  Tab(text: '주차 관리'),
-                  Tab(text: '과제 관리'),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _EnrollmentsTab(
-                      courseSlug: widget.course.slug,
-                      isLoading: state.isLoadingDetails,
-                      enrollments: enrollments,
-                    ),
-                    _WeeksTab(
-                      courseSlug: widget.course.slug,
-                    ),
-                    _AssignmentsTab(
-                      courseSlug: widget.course.slug,
-                      isLoading: state.isLoadingDetails,
-                      assignments: state.selectedCourseAssignments,
-                    ),
-                  ],
                 ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    color: Color(0xFF555555),
+                  ),
+                  onPressed: () {
+                    _showEditCourseDialog(
+                      context: context,
+                      ref: ref,
+                      course: widget.course,
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: state.isDeleting
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: state.isDeleting
+                      ? null
+                      : () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                '코스 삭제',
+                                style: TextStyle(fontWeight: FontWeight.w800),
+                              ),
+                              content: const Text(
+                                '정말로 이 코스를 삭제하시겠습니까?\n주차, 과제, 수강생 등의 모든 데이터가 함께 삭제되며 복구할 수 없습니다.',
+                                style: TextStyle(height: 1.5),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text(
+                                    '취소',
+                                    style: TextStyle(color: Color(0xFF8A8A8A)),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    ref
+                                        .read(
+                                          tasksManagementBlocProvider.notifier,
+                                        )
+                                        .add(
+                                          TasksManagementCourseDeletedRequested(
+                                            courseSlug: widget.course.slug,
+                                          ),
+                                        );
+                                  },
+                                  child: const Text(
+                                    '삭제',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            TabBar(
+              controller: _tabController,
+              indicatorColor: const Color(0xFF1A1A1A),
+              labelColor: const Color(0xFF1A1A1A),
+              unselectedLabelColor: const Color(0xFF8A8A8A),
+              labelStyle: const TextStyle(fontWeight: FontWeight.w700),
+              tabs: const [
+                Tab(text: '수강생 목록'),
+                Tab(text: '과제 관리'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _EnrollmentsTab(
+                    courseSlug: widget.course.slug,
+                    isLoading: state.isLoadingDetails,
+                    enrollments: enrollments,
+                  ),
+                  _AssignmentsTab(
+                    courseSlug: widget.course.slug,
+                    isLoading: state.isLoadingDetails,
+                    assignments: state.selectedCourseAssignments,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   void _showEditCourseDialog({
@@ -236,7 +278,10 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('코스 수정', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          '코스 수정',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         content: SizedBox(
           width: 440,
           child: SingleChildScrollView(
@@ -276,9 +321,15 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
                             border: OutlineInputBorder(),
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'BASIC', child: Text('BASIC')),
+                            DropdownMenuItem(
+                              value: 'BASIC',
+                              child: Text('BASIC'),
+                            ),
                             DropdownMenuItem(value: 'CS', child: Text('CS')),
-                            DropdownMenuItem(value: 'FRAMEWORK', child: Text('FRAMEWORK')),
+                            DropdownMenuItem(
+                              value: 'FRAMEWORK',
+                              child: Text('FRAMEWORK'),
+                            ),
                           ],
                           onChanged: (v) => phase = v ?? phase,
                           onSaved: (v) => phase = v ?? phase,
@@ -312,7 +363,10 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
                     ),
                     items: const [
                       DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
-                      DropdownMenuItem(value: 'PUBLISHED', child: Text('PUBLISHED')),
+                      DropdownMenuItem(
+                        value: 'PUBLISHED',
+                        child: Text('PUBLISHED'),
+                      ),
                     ],
                     onChanged: (v) => status = v ?? status,
                     onSaved: (v) => status = v ?? status,
@@ -358,20 +412,22 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
 
-                ref.read(tasksManagementBlocProvider.notifier).add(
-                  TasksManagementUpdateCourseRequested(
-                    courseSlug: course.slug,
-                    request: UpdateCourseRequest(
-                      fieldTag: fieldTag,
-                      startDate: startDate,
-                      endDate: endDate,
-                      title: title,
-                      description: description,
-                      phase: phase,
-                      status: status,
-                    ),
-                  ),
-                );
+                ref
+                    .read(tasksManagementBlocProvider.notifier)
+                    .add(
+                      TasksManagementUpdateCourseRequested(
+                        courseSlug: course.slug,
+                        request: UpdateCourseRequest(
+                          fieldTag: fieldTag,
+                          startDate: startDate,
+                          endDate: endDate,
+                          title: title,
+                          description: description,
+                          phase: phase,
+                          status: status,
+                        ),
+                      ),
+                    );
                 Navigator.pop(dialogContext);
               }
             },
@@ -401,12 +457,15 @@ class _EnrollmentsTab extends ConsumerStatefulWidget {
 class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
   String _userId = '';
+  bool _isUpdatingEnrollmentStatus = false;
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = AddEnrollmentRequest(userId: _userId);
-      ref.read(tasksManagementBlocProvider.notifier).add(
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(
             TasksManagementAddEnrollmentRequested(
               courseSlug: widget.courseSlug,
               request: request,
@@ -432,7 +491,10 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text('등록된 수강생이 없습니다.', style: TextStyle(color: Color(0xFF8A8A8A))),
+                child: Text(
+                  '등록된 수강생이 없습니다.',
+                  style: TextStyle(color: Color(0xFF8A8A8A)),
+                ),
               ),
             )
           else
@@ -450,11 +512,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                     border: Border.all(color: const Color(0xFFEAEAEA)),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CircleAvatar(
                         backgroundColor: const Color(0xFFF0F0F0),
                         child: Text(
-                          enrollment.userId.isNotEmpty ? enrollment.userId.substring(0, 1).toUpperCase() : '?',
+                          enrollment.userId.isNotEmpty
+                              ? enrollment.userId.substring(0, 1).toUpperCase()
+                              : '?',
                           style: const TextStyle(
                             color: Color(0xFF1A1A1A),
                             fontWeight: FontWeight.w700,
@@ -478,11 +543,55 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                               '상태: ${enrollment.status}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: enrollment.status == 'ENROLLED' ? Colors.green[700] : const Color(0xFF8A8A8A),
+                                color: enrollment.status == 'ENROLLED'
+                                    ? Colors.green[700]
+                                    : enrollment.status == 'BANNED'
+                                    ? Colors.red[700]
+                                    : const Color(0xFF8A8A8A),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            if (enrollment.banReason != null &&
+                                enrollment.banReason!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '제한 사유: ${enrollment.banReason}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF8A8A8A),
+                                ),
+                              ),
+                            ],
                           ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      PopupMenuButton<_EnrollmentActionStatus>(
+                        tooltip: '상태 변경',
+                        enabled: !_isUpdatingEnrollmentStatus,
+                        onSelected: (value) {
+                          _showEnrollmentStatusDialog(
+                            enrollment: enrollment,
+                            status: value,
+                          );
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(
+                            value: _EnrollmentActionStatus.enrolled,
+                            child: Text('ENROLLED'),
+                          ),
+                          PopupMenuItem(
+                            value: _EnrollmentActionStatus.dropped,
+                            child: Text('DROPPED'),
+                          ),
+                          PopupMenuItem(
+                            value: _EnrollmentActionStatus.banned,
+                            child: Text('BANNED'),
+                          ),
+                        ],
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(Icons.more_vert),
                         ),
                       ),
                     ],
@@ -503,15 +612,23 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('수강생 등록 / 복구', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  const Text(
+                    '수강생 등록 / 복구',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
-                          decoration: const InputDecoration(labelText: 'User ID', filled: true, fillColor: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'User ID',
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
                           onSaved: (v) => _userId = v?.trim() ?? '',
-                          validator: (v) => v == null || v.trim().isEmpty ? '필수' : null,
+                          validator: (v) =>
+                              v == null || v.trim().isEmpty ? '필수' : null,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -521,9 +638,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                           onPressed: _submit,
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          child: const Text('등록', style: TextStyle(fontWeight: FontWeight.w700)),
+                          child: const Text(
+                            '등록',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ),
                     ],
@@ -536,140 +658,129 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
       ),
     );
   }
-}
 
-class _WeeksTab extends ConsumerStatefulWidget {
-  const _WeeksTab({
-    required this.courseSlug,
-  });
+  Future<void> _showEnrollmentStatusDialog({
+    required Enrollment enrollment,
+    required _EnrollmentActionStatus status,
+  }) async {
+    final shouldRequireBanReason = status == _EnrollmentActionStatus.banned;
+    final formKey = GlobalKey<FormState>();
+    String banReason = enrollment.banReason ?? '';
 
-  final String courseSlug;
-
-  @override
-  ConsumerState<_WeeksTab> createState() => _WeeksTabState();
-}
-
-class _WeeksTabState extends ConsumerState<_WeeksTab> {
-  final _formKey = GlobalKey<FormState>();
-  
-  int _weekNo = 1;
-  String _title = '';
-  String _startDate = '';
-  String _endDate = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 32),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFEAEAEA)),
-          color: const Color(0xFFFAFAFA),
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '새 주차(과제) 추가/수정',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '같은 주차 번호가 있으면 자동으로 갱신됩니다.',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF8A8A8A),
-                ),
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: '주차 번호 (예: 1)',
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                keyboardType: TextInputType.number,
-                onSaved: (value) => _weekNo = int.tryParse(value ?? '1') ?? 1,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) return '주차 번호를 입력해주세요.';
-                  if (int.tryParse(value) == null) return '숫자만 입력 가능합니다.';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: '주차 제목 (예: 1주차 - Kotlin 기본)',
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                onSaved: (value) => _title = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '제목을 입력해주세요.' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: '시작일 (예: 2026-03-02)',
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                onSaved: (value) => _startDate = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '시작일을 입력해주세요.' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: '종료일 (예: 2026-03-08)',
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                onSaved: (value) => _endDate = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '종료일을 입력해주세요.' : null,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      _formKey.currentState?.save();
-                      ref.read(tasksManagementBlocProvider.notifier).add(
-                            TasksManagementCreateWeekRequested(
-                              courseSlug: widget.courseSlug,
-                              weekNo: _weekNo,
-                              title: _title,
-                              startDate: _startDate,
-                              endDate: _endDate,
-                            ),
-                          );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('주차 생성(수정) 요청을 보냈습니다.')),
-                      );
-                      _formKey.currentState?.reset();
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('주차 등록 / 갱신', style: TextStyle(fontWeight: FontWeight.w700)),
-                ),
-              ),
-            ],
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            '수강 상태 변경',
+            style: TextStyle(fontWeight: FontWeight.w800),
           ),
-        ),
-      ),
+          content: SizedBox(
+            width: 420,
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '대상: ${enrollment.userId}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '변경 상태: ${switch (status) {
+                      _EnrollmentActionStatus.enrolled => 'ENROLLED',
+                      _EnrollmentActionStatus.dropped => 'DROPPED',
+                      _EnrollmentActionStatus.banned => 'BANNED',
+                    }}',
+                  ),
+                  if (shouldRequireBanReason) ...[
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      initialValue: banReason,
+                      decoration: const InputDecoration(
+                        labelText: '제한 사유',
+                        hintText: '운영 정책 위반',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      onSaved: (value) => banReason = value?.trim() ?? '',
+                      validator: (value) {
+                        if (!shouldRequireBanReason) {
+                          return null;
+                        }
+                        if (value == null || value.trim().isEmpty) {
+                          return 'BANNED 상태에서는 제한 사유를 입력해주세요.';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text(
+                '취소',
+                style: TextStyle(color: Color(0xFF8A8A8A)),
+              ),
+            ),
+            FilledButton(
+              onPressed: () async {
+                if (!(formKey.currentState?.validate() ?? true)) {
+                  return;
+                }
+                formKey.currentState?.save();
+                Navigator.of(dialogContext).pop();
+
+                setState(() {
+                  _isUpdatingEnrollmentStatus = true;
+                });
+
+                final targetStatus = switch (status) {
+                  _EnrollmentActionStatus.enrolled => 'ENROLLED',
+                  _EnrollmentActionStatus.dropped => 'DROPPED',
+                  _EnrollmentActionStatus.banned => 'BANNED',
+                };
+
+                ref
+                    .read(tasksManagementBlocProvider.notifier)
+                    .add(
+                      TasksManagementUpdateEnrollmentStatusRequested(
+                        courseSlug: widget.courseSlug,
+                        userId: enrollment.userId,
+                        request: UpdateEnrollmentStatusRequest(
+                          status: targetStatus,
+                          banReason: targetStatus == 'BANNED'
+                              ? banReason
+                              : null,
+                        ),
+                      ),
+                    );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${enrollment.userId} 상태를 $targetStatus(으)로 변경 요청했습니다.',
+                    ),
+                  ),
+                );
+
+                if (mounted) {
+                  setState(() {
+                    _isUpdatingEnrollmentStatus = false;
+                  });
+                }
+              },
+              child: const Text('변경'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -709,10 +820,12 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
         children: [
           // List existing assignments
           if (widget.isLoading && widget.assignments == null)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(24.0),
-              child: CircularProgressIndicator(),
-            ))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: CircularProgressIndicator(),
+              ),
+            )
           else if (widget.assignments != null && widget.assignments!.isNotEmpty)
             ListView.separated(
               shrinkWrap: true,
@@ -736,20 +849,29 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           Expanded(
                             child: Text(
                               '${assignment.weekNo}주차 - ${assignment.metadata.title}',
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF0F0F0),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               assignment.status,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -761,7 +883,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           Expanded(
                             child: Text(
                               '난이도: ${assignment.metadata.difficulty} | 기한: ${assignment.startAt.split('T').first} ~ ${assignment.endAt.split('T').first}',
-                              style: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 13),
+                              style: const TextStyle(
+                                color: Color(0xFF8A8A8A),
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                           Row(
@@ -771,18 +896,29 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
-                                    builder: (context) => AssignmentDetailsDialog(
-                                      courseSlug: widget.courseSlug,
-                                      assignmentId: assignment.id,
-                                    ),
+                                    builder: (context) =>
+                                        AssignmentDetailsDialog(
+                                          courseSlug: widget.courseSlug,
+                                          assignmentId: assignment.id,
+                                        ),
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: const Text('상세 보기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                child: const Text(
+                                  '상세 보기',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -795,11 +931,21 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: const Text('수정', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                child: const Text(
+                                  '수정',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -807,97 +953,175 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                     context: context,
                                     builder: (context) => AlertDialog(
                                       title: const Text('과제 삭제'),
-                                      content: const Text('과제와 연관 데이터(요구사항/예시/배포)를 모두 삭제합니다. 계속하시겠습니까?'),
+                                      content: const Text(
+                                        '과제와 연관 데이터(요구사항/예시/배포)를 모두 삭제합니다. 계속하시겠습니까?',
+                                      ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.of(context).pop(),
-                                          child: const Text('취소', style: TextStyle(color: Colors.grey)),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: const Text(
+                                            '취소',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed: () {
                                             Navigator.of(context).pop();
-                                            ref.read(tasksManagementBlocProvider.notifier).add(
-                                              TasksManagementAssignmentDeletedRequested(
-                                                courseSlug: widget.courseSlug,
-                                                assignmentId: assignment.id,
-                                              ),
-                                            );
+                                            ref
+                                                .read(
+                                                  tasksManagementBlocProvider
+                                                      .notifier,
+                                                )
+                                                .add(
+                                                  TasksManagementAssignmentDeletedRequested(
+                                                    courseSlug:
+                                                        widget.courseSlug,
+                                                    assignmentId: assignment.id,
+                                                  ),
+                                                );
                                           },
-                                          child: const Text('삭제', style: TextStyle(color: Colors.red)),
+                                          child: const Text(
+                                            '삭제',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
                                         ),
                                       ],
                                     ),
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: const Text('삭제', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.red)),
+                                child: const Text(
+                                  '삭제',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                               if (assignment.status == 'DRAFT')
-                            TextButton(
-                              onPressed: () {
-                                ref.read(tasksManagementBlocProvider.notifier).add(
-                                  TasksManagementPublishAssignmentRequested(
-                                    courseSlug: widget.courseSlug,
-                                    assignmentId: assignment.id,
-                                  ),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('과제 게시 요청을 보냈습니다.')));
-                              },
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: const Text('게시하기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                            )
-                          else if (assignment.status != 'DRAFT')
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
                                 TextButton(
                                   onPressed: () {
-                                    ref.read(tasksManagementBlocProvider.notifier).add(
-                                      TasksManagementDeliverAssignmentRequested(
-                                        courseSlug: widget.courseSlug,
-                                        assignmentId: assignment.id,
-                                      ),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('과제 배포 요청을 보냈습니다.')));
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    foregroundColor: Colors.blue,
-                                  ),
-                                  child: const Text('배포하기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                                ),
-                                const SizedBox(width: 8),
-                                TextButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AssignmentDeliveriesDialog(
-                                        courseSlug: widget.courseSlug,
-                                        assignmentId: assignment.id,
+                                    ref
+                                        .read(
+                                          tasksManagementBlocProvider.notifier,
+                                        )
+                                        .add(
+                                          TasksManagementPublishAssignmentRequested(
+                                            courseSlug: widget.courseSlug,
+                                            assignmentId: assignment.id,
+                                          ),
+                                        );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('과제 게시 요청을 보냈습니다.'),
                                       ),
                                     );
                                   },
                                   style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
-                                  child: const Text('배포 결과 보기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                  child: const Text(
+                                    '게시하기',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                )
+                              else if (assignment.status != 'DRAFT')
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(
+                                              tasksManagementBlocProvider
+                                                  .notifier,
+                                            )
+                                            .add(
+                                              TasksManagementDeliverAssignmentRequested(
+                                                courseSlug: widget.courseSlug,
+                                                assignmentId: assignment.id,
+                                              ),
+                                            );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('과제 배포 요청을 보냈습니다.'),
+                                          ),
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        foregroundColor: Colors.blue,
+                                      ),
+                                      child: const Text(
+                                        '배포하기',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TextButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              AssignmentDeliveriesDialog(
+                                                courseSlug: widget.courseSlug,
+                                                assignmentId: assignment.id,
+                                              ),
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      child: const Text(
+                                        '배포 결과 보기',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                         ],
                       ),
                     ],
@@ -909,7 +1133,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text('등록된 과제가 없습니다.', style: TextStyle(color: Color(0xFF8A8A8A))),
+                child: Text(
+                  '등록된 과제가 없습니다.',
+                  style: TextStyle(color: Color(0xFF8A8A8A)),
+                ),
               ),
             ),
           const SizedBox(height: 32),
@@ -925,45 +1152,71 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('새 과제 추가', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  const Text(
+                    '새 과제 추가',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
-                          decoration: const InputDecoration(labelText: '주차 (weekNo)', filled: true, fillColor: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: '주차 (weekNo)',
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
                           keyboardType: TextInputType.number,
                           onSaved: (v) => _weekNo = int.tryParse(v ?? '1') ?? 1,
-                          validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                          validator: (v) =>
+                              v == null || v.isEmpty ? '필수' : null,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextFormField(
-                          decoration: const InputDecoration(labelText: '순서 (order)', filled: true, fillColor: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: '순서 (order)',
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
                           keyboardType: TextInputType.number,
-                          onSaved: (v) => _orderInWeek = int.tryParse(v ?? '1') ?? 1,
-                          validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                          onSaved: (v) =>
+                              _orderInWeek = int.tryParse(v ?? '1') ?? 1,
+                          validator: (v) =>
+                              v == null || v.isEmpty ? '필수' : null,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: '과제 제목', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: '과제 제목',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     onSaved: (v) => _title = v?.trim() ?? '',
                     validator: (v) => v == null || v.isEmpty ? '필수' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: '과제 설명', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: '과제 설명',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     maxLines: 3,
                     onSaved: (v) => _description = v?.trim() ?? '',
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _difficulty,
-                    decoration: const InputDecoration(labelText: '난이도', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: '난이도',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     items: const [
                       DropdownMenuItem(value: 'LOW', child: Text('LOW')),
                       DropdownMenuItem(value: 'MID', child: Text('MID')),
@@ -973,13 +1226,21 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: '시작일시 (예: 2026-03-03T09:00:00+09:00)', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: '시작일시 (예: 2026-03-03T09:00:00+09:00)',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     onSaved: (v) => _startAt = v?.trim() ?? '',
                     validator: (v) => v == null || v.isEmpty ? '필수' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: '종료일시 (예: 2026-03-11T08:59:59+09:00)', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: '종료일시 (예: 2026-03-11T08:59:59+09:00)',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     onSaved: (v) => _endAt = v?.trim() ?? '',
                     validator: (v) => v == null || v.isEmpty ? '필수' : null,
                   ),
@@ -990,32 +1251,41 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
                           _formKey.currentState?.save();
-                          ref.read(tasksManagementBlocProvider.notifier).add(
-                            TasksManagementCreateAssignmentRequested(
-                              courseSlug: widget.courseSlug,
-                              request: CreateAssignmentRequest(
-                                weekNo: _weekNo,
-                                orderInWeek: _orderInWeek,
-                                startAt: _startAt,
-                                endAt: _endAt,
-                                metadata: AssignmentMetadata(
-                                  title: _title,
-                                  description: _description,
-                                  difficulty: _difficulty,
+                          ref
+                              .read(tasksManagementBlocProvider.notifier)
+                              .add(
+                                TasksManagementCreateAssignmentRequested(
+                                  courseSlug: widget.courseSlug,
+                                  request: CreateAssignmentRequest(
+                                    weekNo: _weekNo,
+                                    orderInWeek: _orderInWeek,
+                                    startAt: _startAt,
+                                    endAt: _endAt,
+                                    metadata: AssignmentMetadata(
+                                      title: _title,
+                                      description: _description,
+                                      difficulty: _difficulty,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')),
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')));
                           _formKey.currentState?.reset();
                         }
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFF1A1A1A),
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const Text('과제 등록', style: TextStyle(fontWeight: FontWeight.w700)),
+                      child: const Text(
+                        '과제 등록',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ),
                 ],

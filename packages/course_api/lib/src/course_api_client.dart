@@ -18,8 +18,15 @@ class CourseApiClient {
       accessToken: accessToken,
     );
 
-    final listData = _readListData(response.body, statusCode: response.statusCode);
-    return listData.whereType<Map<String, dynamic>>().map(_mapCourseJson).map(CourseSummary.fromJson).toList();
+    final listData = _readListData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return listData
+        .whereType<Map<String, dynamic>>()
+        .map(_mapCourseJson)
+        .map(CourseSummary.fromJson)
+        .toList();
   }
 
   Future<CourseSummary> createCourse({
@@ -38,11 +45,14 @@ class CourseApiClient {
           'title': request.title,
           'description': request.description,
           'phase': request.phase,
-        }
+        },
       },
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return CourseSummary.fromJson(_mapCourseJson(mapData));
   }
 
@@ -58,7 +68,10 @@ class CourseApiClient {
       data: request.toJson(),
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return CourseWeek.fromJson(mapData);
   }
 
@@ -72,8 +85,14 @@ class CourseApiClient {
       path: '$_coursesPath/$courseSlug/enrollments',
     );
 
-    final listData = _readListData(response.body, statusCode: response.statusCode);
-    return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
+    final listData = _readListData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return listData
+        .whereType<Map<String, dynamic>>()
+        .map(Enrollment.fromJson)
+        .toList();
   }
 
   Future<Enrollment> addEnrollment({
@@ -88,9 +107,33 @@ class CourseApiClient {
       data: request.toJson(),
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return Enrollment.fromJson(mapData);
   }
+
+  Future<Enrollment> updateEnrollmentStatus({
+    required String accessToken,
+    required String courseSlug,
+    required String userId,
+    required UpdateEnrollmentStatusRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'PATCH',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/enrollments/$userId',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return Enrollment.fromJson(mapData);
+  }
+
   Future<Assignment> getAssignment({
     required String accessToken,
     required String courseSlug,
@@ -102,10 +145,12 @@ class CourseApiClient {
       path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return Assignment.fromJson(mapData);
   }
-
 
   Future<List<Assignment>> getAssignments({
     required String accessToken,
@@ -127,8 +172,14 @@ class CourseApiClient {
       path: '$_coursesPath/$courseSlug/assignments$queryString',
     );
 
-    final listData = _readListData(response.body, statusCode: response.statusCode);
-    return listData.whereType<Map<String, dynamic>>().map(Assignment.fromJson).toList();
+    final listData = _readListData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return listData
+        .whereType<Map<String, dynamic>>()
+        .map(Assignment.fromJson)
+        .toList();
   }
 
   Future<Assignment> createAssignment({
@@ -143,7 +194,10 @@ class CourseApiClient {
       data: request.toJson(),
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return Assignment.fromJson(mapData);
   }
 
@@ -156,7 +210,11 @@ class CourseApiClient {
       method: 'POST',
       accessToken: accessToken,
       path: '$_coursesPath/$courseSlug/assignments/$assignmentId/publish',
-      data: const <String, dynamic>{}, // required for Content-Type: application/json
+      data:
+          const <
+            String,
+            dynamic
+          >{}, // required for Content-Type: application/json
     );
   }
 
@@ -169,10 +227,17 @@ class CourseApiClient {
       method: 'POST',
       accessToken: accessToken,
       path: '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries',
-      data: const <String, dynamic>{}, // required for Content-Type: application/json
+      data:
+          const <
+            String,
+            dynamic
+          >{}, // required for Content-Type: application/json
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return DeliverAssignmentResult.fromJson(mapData);
   }
 
@@ -187,18 +252,27 @@ class CourseApiClient {
       queryParams['status'] = status;
     }
 
-    final queryString = queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
+    final queryString = queryParams.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
     final queryPart = queryString.isNotEmpty ? '?$queryString' : '';
 
     final response = await _requestJson(
       method: 'GET',
       accessToken: accessToken,
-      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries$queryPart',
+      path:
+          '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries$queryPart',
       allowEmptySuccessBody: true,
     );
 
-    final listData = _readListData(response.body, statusCode: response.statusCode);
-    return listData.whereType<Map<String, dynamic>>().map(AssignmentDelivery.fromJson).toList();
+    final listData = _readListData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return listData
+        .whereType<Map<String, dynamic>>()
+        .map(AssignmentDelivery.fromJson)
+        .toList();
   }
 
   Future<CourseSummary> updateCourse({
@@ -224,7 +298,10 @@ class CourseApiClient {
       },
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return CourseSummary.fromJson(_mapCourseJson(mapData));
   }
 
@@ -266,7 +343,10 @@ class CourseApiClient {
       data: request.toJson(),
     );
 
-    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
     return Assignment.fromJson(mapData);
   }
 
@@ -326,15 +406,24 @@ class CourseApiClient {
   List _readListData(Map<String, dynamic> decoded, {required int statusCode}) {
     final data = decoded['data'];
     if (data is! List) {
-      throw CourseApiException('Response data is missing', statusCode: statusCode);
+      throw CourseApiException(
+        'Response data is missing',
+        statusCode: statusCode,
+      );
     }
     return data;
   }
 
-  Map<String, dynamic> _readMapData(Map<String, dynamic> decoded, {required int statusCode}) {
+  Map<String, dynamic> _readMapData(
+    Map<String, dynamic> decoded, {
+    required int statusCode,
+  }) {
     final data = decoded['data'];
     if (data is! Map<String, dynamic>) {
-      throw CourseApiException('Response data is missing', statusCode: statusCode);
+      throw CourseApiException(
+        'Response data is missing',
+        statusCode: statusCode,
+      );
     }
     return data;
   }
@@ -355,38 +444,59 @@ class CourseApiClient {
       Map<String, dynamic> value => value,
       Map value => value.map((key, value) => MapEntry(key.toString(), value)),
       String value => _decodeJsonString(value, statusCode: statusCode),
-      _ => throw CourseApiException('Invalid response shape', statusCode: statusCode),
+      _ => throw CourseApiException(
+        'Invalid response shape',
+        statusCode: statusCode,
+      ),
     };
 
     return decoded;
   }
 
-  Map<String, dynamic> _decodeJsonString(String value, {required int statusCode}) {
+  Map<String, dynamic> _decodeJsonString(
+    String value, {
+    required int statusCode,
+  }) {
     try {
       final decoded = jsonDecode(value);
       if (decoded is Map<String, dynamic>) return decoded;
-      if (decoded is Map) return decoded.map((key, value) => MapEntry(key.toString(), value));
-      throw CourseApiException('Invalid response shape', statusCode: statusCode);
+      if (decoded is Map)
+        return decoded.map((key, value) => MapEntry(key.toString(), value));
+      throw CourseApiException(
+        'Invalid response shape',
+        statusCode: statusCode,
+      );
     } on FormatException {
-      throw CourseApiException('Invalid response shape', statusCode: statusCode);
+      throw CourseApiException(
+        'Invalid response shape',
+        statusCode: statusCode,
+      );
     }
   }
 
   bool _isEmptyBody(dynamic responseData) {
-    return responseData == null || (responseData is String && responseData.trim().isEmpty);
+    return responseData == null ||
+        (responseData is String && responseData.trim().isEmpty);
   }
 
   bool _isSuccessfulStatus(int statusCode) {
     return statusCode >= 200 && statusCode < 300;
   }
 
-  void _throwIfRequestFailed({required int statusCode, required Map<String, dynamic> decoded}) {
+  void _throwIfRequestFailed({
+    required int statusCode,
+    required Map<String, dynamic> decoded,
+  }) {
     final success = decoded['success'] == true;
     final error = decoded['error'];
     if (_isSuccessfulStatus(statusCode) && success) return;
 
-    final message = error is Map<String, dynamic> ? (error['message']?.toString() ?? '요청에 실패했습니다.') : '요청에 실패했습니다.';
-    final code = error is Map<String, dynamic> ? error['code']?.toString() : null;
+    final message = error is Map<String, dynamic>
+        ? (error['message']?.toString() ?? '요청에 실패했습니다.')
+        : '요청에 실패했습니다.';
+    final code = error is Map<String, dynamic>
+        ? error['code']?.toString()
+        : null;
     throw CourseApiException(message, statusCode: statusCode, code: code);
   }
 }
