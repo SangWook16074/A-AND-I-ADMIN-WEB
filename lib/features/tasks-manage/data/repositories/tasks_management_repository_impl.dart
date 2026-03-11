@@ -123,6 +123,19 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<Assignment> getAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
   Future<Assignment> createAssignment({
     required String courseSlug,
     required CreateAssignmentRequest request,
@@ -173,6 +186,34 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       accessToken: token,
       courseSlug: courseSlug,
       assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<void> deleteAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    await _apiClient.deleteAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
+  Future<Assignment> updateAssignment({
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.updateAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+      request: request,
     );
   }
 }

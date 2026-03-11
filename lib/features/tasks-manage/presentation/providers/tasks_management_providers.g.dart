@@ -438,5 +438,63 @@ class _AssignmentDeliveriesProviderElement
   String? get status => (origin as AssignmentDeliveriesProvider).status;
 }
 
+String _$getAssignmentDetailsUseCaseHash() =>
+    r'328affea87f6605a31357add16c1accb9b6b2a65';
+
+/// See also [getAssignmentDetailsUseCase].
+@ProviderFor(getAssignmentDetailsUseCase)
+final getAssignmentDetailsUseCaseProvider =
+    Provider<GetAssignmentDetailsUseCase>.internal(
+      getAssignmentDetailsUseCase,
+      name: r'getAssignmentDetailsUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$getAssignmentDetailsUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetAssignmentDetailsUseCaseRef =
+    ProviderRef<GetAssignmentDetailsUseCase>;
+String _$deleteAssignmentUseCaseHash() =>
+    r'09d146b3bc86f9a9ce727f00b7db2da058470165';
+
+/// See also [deleteAssignmentUseCase].
+@ProviderFor(deleteAssignmentUseCase)
+final deleteAssignmentUseCaseProvider =
+    Provider<DeleteAssignmentUseCase>.internal(
+      deleteAssignmentUseCase,
+      name: r'deleteAssignmentUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$deleteAssignmentUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DeleteAssignmentUseCaseRef = ProviderRef<DeleteAssignmentUseCase>;
+String _$updateAssignmentUseCaseHash() =>
+    r'e1a0c884a5076b8d85015dc8dd2600d635dfa4ea';
+
+/// See also [updateAssignmentUseCase].
+@ProviderFor(updateAssignmentUseCase)
+final updateAssignmentUseCaseProvider =
+    Provider<UpdateAssignmentUseCase>.internal(
+      updateAssignmentUseCase,
+      name: r'updateAssignmentUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$updateAssignmentUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UpdateAssignmentUseCaseRef = ProviderRef<UpdateAssignmentUseCase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

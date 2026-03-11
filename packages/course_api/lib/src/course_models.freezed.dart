@@ -3161,6 +3161,314 @@ $AssignmentMetadataCopyWith<$Res> get metadata {
 
 
 /// @nodoc
+mixin _$UpdateAssignmentRequest {
+
+ int get orderInWeek; String get startAt; String get endAt; AssignmentMetadata get metadata; List<AssignmentRequirement> get requirements; List<AssignmentExample> get examples;
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateAssignmentRequestCopyWith<UpdateAssignmentRequest> get copyWith => _$UpdateAssignmentRequestCopyWithImpl<UpdateAssignmentRequest>(this as UpdateAssignmentRequest, _$identity);
+
+  /// Serializes this UpdateAssignmentRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&const DeepCollectionEquality().equals(other.requirements, requirements)&&const DeepCollectionEquality().equals(other.examples, examples));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata,const DeepCollectionEquality().hash(requirements),const DeepCollectionEquality().hash(examples));
+
+@override
+String toString() {
+  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata, requirements: $requirements, examples: $examples)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UpdateAssignmentRequestCopyWith<$Res>  {
+  factory $UpdateAssignmentRequestCopyWith(UpdateAssignmentRequest value, $Res Function(UpdateAssignmentRequest) _then) = _$UpdateAssignmentRequestCopyWithImpl;
+@useResult
+$Res call({
+ int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata, List<AssignmentRequirement> requirements, List<AssignmentExample> examples
+});
+
+
+$AssignmentMetadataCopyWith<$Res> get metadata;
+
+}
+/// @nodoc
+class _$UpdateAssignmentRequestCopyWithImpl<$Res>
+    implements $UpdateAssignmentRequestCopyWith<$Res> {
+  _$UpdateAssignmentRequestCopyWithImpl(this._self, this._then);
+
+  final UpdateAssignmentRequest _self;
+  final $Res Function(UpdateAssignmentRequest) _then;
+
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,Object? requirements = null,Object? examples = null,}) {
+  return _then(_self.copyWith(
+orderInWeek: null == orderInWeek ? _self.orderInWeek : orderInWeek // ignore: cast_nullable_to_non_nullable
+as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as String,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as AssignmentMetadata,requirements: null == requirements ? _self.requirements : requirements // ignore: cast_nullable_to_non_nullable
+as List<AssignmentRequirement>,examples: null == examples ? _self.examples : examples // ignore: cast_nullable_to_non_nullable
+as List<AssignmentExample>,
+  ));
+}
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AssignmentMetadataCopyWith<$Res> get metadata {
+  
+  return $AssignmentMetadataCopyWith<$Res>(_self.metadata, (value) {
+    return _then(_self.copyWith(metadata: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [UpdateAssignmentRequest].
+extension UpdateAssignmentRequestPatterns on UpdateAssignmentRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateAssignmentRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateAssignmentRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateAssignmentRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest() when $default != null:
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.requirements,_that.examples);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples)  $default,) {final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest():
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.requirements,_that.examples);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdateAssignmentRequest() when $default != null:
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.requirements,_that.examples);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _UpdateAssignmentRequest implements UpdateAssignmentRequest {
+  const _UpdateAssignmentRequest({required this.orderInWeek, required this.startAt, required this.endAt, required this.metadata, final  List<AssignmentRequirement> requirements = const [], final  List<AssignmentExample> examples = const []}): _requirements = requirements,_examples = examples;
+  factory _UpdateAssignmentRequest.fromJson(Map<String, dynamic> json) => _$UpdateAssignmentRequestFromJson(json);
+
+@override final  int orderInWeek;
+@override final  String startAt;
+@override final  String endAt;
+@override final  AssignmentMetadata metadata;
+ final  List<AssignmentRequirement> _requirements;
+@override@JsonKey() List<AssignmentRequirement> get requirements {
+  if (_requirements is EqualUnmodifiableListView) return _requirements;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_requirements);
+}
+
+ final  List<AssignmentExample> _examples;
+@override@JsonKey() List<AssignmentExample> get examples {
+  if (_examples is EqualUnmodifiableListView) return _examples;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_examples);
+}
+
+
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateAssignmentRequestCopyWith<_UpdateAssignmentRequest> get copyWith => __$UpdateAssignmentRequestCopyWithImpl<_UpdateAssignmentRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateAssignmentRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&const DeepCollectionEquality().equals(other._requirements, _requirements)&&const DeepCollectionEquality().equals(other._examples, _examples));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata,const DeepCollectionEquality().hash(_requirements),const DeepCollectionEquality().hash(_examples));
+
+@override
+String toString() {
+  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata, requirements: $requirements, examples: $examples)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateAssignmentRequestCopyWith<$Res> implements $UpdateAssignmentRequestCopyWith<$Res> {
+  factory _$UpdateAssignmentRequestCopyWith(_UpdateAssignmentRequest value, $Res Function(_UpdateAssignmentRequest) _then) = __$UpdateAssignmentRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata, List<AssignmentRequirement> requirements, List<AssignmentExample> examples
+});
+
+
+@override $AssignmentMetadataCopyWith<$Res> get metadata;
+
+}
+/// @nodoc
+class __$UpdateAssignmentRequestCopyWithImpl<$Res>
+    implements _$UpdateAssignmentRequestCopyWith<$Res> {
+  __$UpdateAssignmentRequestCopyWithImpl(this._self, this._then);
+
+  final _UpdateAssignmentRequest _self;
+  final $Res Function(_UpdateAssignmentRequest) _then;
+
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,Object? requirements = null,Object? examples = null,}) {
+  return _then(_UpdateAssignmentRequest(
+orderInWeek: null == orderInWeek ? _self.orderInWeek : orderInWeek // ignore: cast_nullable_to_non_nullable
+as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as String,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as AssignmentMetadata,requirements: null == requirements ? _self._requirements : requirements // ignore: cast_nullable_to_non_nullable
+as List<AssignmentRequirement>,examples: null == examples ? _self._examples : examples // ignore: cast_nullable_to_non_nullable
+as List<AssignmentExample>,
+  ));
+}
+
+/// Create a copy of UpdateAssignmentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AssignmentMetadataCopyWith<$Res> get metadata {
+  
+  return $AssignmentMetadataCopyWith<$Res>(_self.metadata, (value) {
+    return _then(_self.copyWith(metadata: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$DeliverAssignmentResult {
 
  String get assignmentId; String get courseSlug; int get targetCount; int get deliveredCount; int get failedCount;

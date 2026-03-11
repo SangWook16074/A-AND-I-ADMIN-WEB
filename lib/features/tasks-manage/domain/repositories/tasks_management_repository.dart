@@ -37,6 +37,11 @@ abstract interface class TasksManagementRepository {
     String? status,
   });
 
+  Future<Assignment> getAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  });
+
   Future<Assignment> createAssignment({
     required String courseSlug,
     required CreateAssignmentRequest request,
@@ -56,5 +61,16 @@ abstract interface class TasksManagementRepository {
     required String courseSlug,
     required String assignmentId,
     String? status,
+  });
+
+  Future<void> deleteAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  });
+
+  Future<Assignment> updateAssignment({
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
   });
 }

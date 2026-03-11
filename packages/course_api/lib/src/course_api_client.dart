@@ -75,6 +75,21 @@ class CourseApiClient {
     final listData = _readListData(response.body, statusCode: response.statusCode);
     return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
   }
+  Future<Assignment> getAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
+  }
+
 
   Future<List<Assignment>> getAssignments({
     required String accessToken,
@@ -207,6 +222,36 @@ class CourseApiClient {
       path: '$_coursesPath/$courseSlug',
       allowEmptySuccessBody: true,
     );
+  }
+
+  Future<void> deleteAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+      allowEmptySuccessBody: true,
+    );
+  }
+
+  Future<Assignment> updateAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'PATCH',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
   }
 
   Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {

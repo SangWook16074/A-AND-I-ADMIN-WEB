@@ -4,6 +4,9 @@ import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
 import 'assignment_deliveries_dialog.dart';
+import 'assignment_details_dialog.dart';
+import 'edit_assignment_dialog.dart';
+
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
     context: context,
@@ -688,7 +691,79 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               style: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 13),
                             ),
                           ),
-                          if (assignment.status == 'DRAFT')
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AssignmentDetailsDialog(
+                                      courseSlug: widget.courseSlug,
+                                      assignmentId: assignment.id,
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('상세 보기', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => EditAssignmentDialog(
+                                      courseSlug: widget.courseSlug,
+                                      assignment: assignment,
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('수정', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('과제 삭제'),
+                                      content: const Text('과제와 연관 데이터(요구사항/예시/배포)를 모두 삭제합니다. 계속하시겠습니까?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(),
+                                          child: const Text('취소', style: TextStyle(color: Colors.grey)),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            ref.read(tasksManagementBlocProvider.notifier).add(
+                                              TasksManagementAssignmentDeletedRequested(
+                                                courseSlug: widget.courseSlug,
+                                                assignmentId: assignment.id,
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('삭제', style: TextStyle(color: Colors.red)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('삭제', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.red)),
+                              ),
+                              if (assignment.status == 'DRAFT')
                             TextButton(
                               onPressed: () {
                                 ref.read(tasksManagementBlocProvider.notifier).add(
@@ -748,6 +823,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                 ),
                               ],
                             ),
+                          ],
+                        ),
                         ],
                       ),
                     ],
@@ -812,7 +889,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _difficulty,
+                    initialValue: _difficulty,
                     decoration: const InputDecoration(labelText: '난이도', filled: true, fillColor: Colors.white),
                     items: const [
                       DropdownMenuItem(value: 'LOW', child: Text('LOW')),

@@ -12,11 +12,14 @@ import '../../domain/usecases/get_courses_use_case.dart';
 import '../../domain/usecases/get_enrollments_use_case.dart';
 import '../../domain/usecases/get_assignments_use_case.dart';
 import '../../domain/usecases/create_assignment_use_case.dart';
+import '../../domain/usecases/delete_assignment_use_case.dart';
 import '../../domain/usecases/publish_assignment_use_case.dart';
 import '../../domain/usecases/get_assignment_deliveries_use_case.dart';
+import '../../domain/usecases/get_assignment_details_use_case.dart';
 import '../../domain/usecases/deliver_assignment_use_case.dart';
 import '../../domain/usecases/delete_course_use_case.dart';
 import '../../domain/usecases/update_course_use_case.dart';
+import '../../domain/usecases/update_assignment_use_case.dart';
 
 part 'tasks_management_providers.g.dart';
 
@@ -112,4 +115,19 @@ Future<List<AssignmentDelivery>> assignmentDeliveries(
     assignmentId: assignmentId,
     status: status,
   );
+}
+
+@Riverpod(keepAlive: true)
+GetAssignmentDetailsUseCase getAssignmentDetailsUseCase(Ref ref) {
+  return GetAssignmentDetailsUseCase(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+DeleteAssignmentUseCase deleteAssignmentUseCase(Ref ref) {
+  return DeleteAssignmentUseCase(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+UpdateAssignmentUseCase updateAssignmentUseCase(Ref ref) {
+  return UpdateAssignmentUseCase(ref.watch(tasksManagementRepositoryProvider));
 }

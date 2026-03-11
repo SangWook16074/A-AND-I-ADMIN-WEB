@@ -175,6 +175,21 @@ abstract class CreateAssignmentRequest with _$CreateAssignmentRequest {
 }
 
 @freezed
+abstract class UpdateAssignmentRequest with _$UpdateAssignmentRequest {
+  const factory UpdateAssignmentRequest({
+    required int orderInWeek,
+    required String startAt,
+    required String endAt,
+    required AssignmentMetadata metadata,
+    @Default([]) List<AssignmentRequirement> requirements,
+    @Default([]) List<AssignmentExample> examples,
+  }) = _UpdateAssignmentRequest;
+
+  factory UpdateAssignmentRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateAssignmentRequestFromJson(json);
+}
+
+@freezed
 abstract class DeliverAssignmentResult with _$DeliverAssignmentResult {
   const factory DeliverAssignmentResult({
     required String assignmentId,

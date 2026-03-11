@@ -12,6 +12,7 @@ class TasksManagementState {
     this.selectedCourse,
     this.selectedCourseEnrollments,
     this.selectedCourseAssignments,
+    this.selectedAssignment,
     this.isLoadingDetails = false,
     this.lastDeliveryResult,
   });
@@ -25,6 +26,7 @@ class TasksManagementState {
         selectedCourse = null,
         selectedCourseEnrollments = null,
         selectedCourseAssignments = null,
+        selectedAssignment = null,
         isLoadingDetails = false,
         lastDeliveryResult = null;
 
@@ -37,6 +39,7 @@ class TasksManagementState {
   final CourseSummary? selectedCourse;
   final List<Enrollment>? selectedCourseEnrollments;
   final List<Assignment>? selectedCourseAssignments;
+  final Assignment? selectedAssignment;
   final bool isLoadingDetails;
   final DeliverAssignmentResult? lastDeliveryResult;
 
@@ -49,6 +52,7 @@ class TasksManagementState {
     CourseSummary? selectedCourse,
     List<Enrollment>? selectedCourseEnrollments,
     List<Assignment>? selectedCourseAssignments,
+    Assignment? selectedAssignment,
     bool? isLoadingDetails,
     DeliverAssignmentResult? lastDeliveryResult,
     bool clearError = false,
@@ -63,6 +67,7 @@ class TasksManagementState {
       selectedCourse: selectedCourse ?? this.selectedCourse,
       selectedCourseEnrollments: selectedCourseEnrollments ?? this.selectedCourseEnrollments,
       selectedCourseAssignments: selectedCourseAssignments ?? this.selectedCourseAssignments,
+      selectedAssignment: selectedAssignment ?? this.selectedAssignment,
       isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
       lastDeliveryResult: clearDeliveryResult ? null : (lastDeliveryResult ?? this.lastDeliveryResult),
     );

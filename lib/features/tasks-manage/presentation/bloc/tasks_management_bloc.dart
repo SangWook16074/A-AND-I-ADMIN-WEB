@@ -57,8 +57,20 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _createAssignment(courseSlug: event.courseSlug, request: event.request);
     });
 
+    on<TasksManagementAssignmentDetailsRequested>((event) async {
+      await _loadAssignmentDetails(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+    });
+
+    on<TasksManagementUpdateAssignmentRequested>((event) async {
+      await _updateAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId, request: event.request);
+    });
+
     on<TasksManagementPublishAssignmentRequested>((event) async {
       await _publishAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
+    });
+
+    on<TasksManagementAssignmentDeletedRequested>((event) async {
+      await _deleteAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
     });
 
     on<TasksManagementDeliverAssignmentRequested>((event) async {
@@ -209,6 +221,36 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
+  Future<void> _loadAssignmentDetails({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    state = state.copyWith(isLoadingDetails: true, clearError: true);
+    try {
+      final assignment = await ref.read(getAssignmentDetailsUseCaseProvider)(
+        courseSlug: courseSlug,
+        assignmentId: assignmentId,
+      );
+
+      if (state.selectedCourse?.slug == courseSlug) {
+        state = state.copyWith(
+          selectedAssignment: assignment,
+          isLoadingDetails: false,
+        );
+      }
+    } catch (e) {
+      String errorMessage = '과제 상세 정보를 불러오는데 실패했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage = '과제 정보 로드 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isLoadingDetails: false,
+        errorMessage: errorMessage,
+      );
+    }
+  }
+
   Future<void> _createAssignment({
     required String courseSlug,
     required CreateAssignmentRequest request,
@@ -227,6 +269,60 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         status: TasksManagementStatus.failure,
         isCreating: false,
         errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _updateAssignment({
+    required String courseSlug,
+    required String assignmentId,
+    required UpdateAssignmentRequest request,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      await ref.read(updateAssignmentUseCaseProvider).execute(
+        courseSlug: courseSlug,
+        assignmentId: assignmentId,
+        request: request,
+      );
+
+      state = state.copyWith(isCreating: false);
+      add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
+    } catch (e) {
+      String errorMessage = '과제 수정 중 오류가 발생했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage = '과제 수정 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: errorMessage,
+      );
+    }
+  }
+
+  Future<void> _deleteAssignment({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      await ref.read(deleteAssignmentUseCaseProvider).execute(
+        courseSlug: courseSlug,
+        assignmentId: assignmentId,
+      );
+
+      state = state.copyWith(isCreating: false);
+      add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
+    } catch (e) {
+      String errorMessage = '과제 삭제 중 오류가 발생했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage = '과제 삭제 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: errorMessage,
       );
     }
   }
