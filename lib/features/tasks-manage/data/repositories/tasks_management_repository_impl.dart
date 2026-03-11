@@ -108,6 +108,19 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<Enrollment> addEnrollment({
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.addEnrollment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
+  }
+
+  @override
   Future<List<Assignment>> getAssignments({
     required String courseSlug,
     int? weekNo,

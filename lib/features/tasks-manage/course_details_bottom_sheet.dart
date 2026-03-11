@@ -198,6 +198,7 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
                   controller: _tabController,
                   children: [
                     _EnrollmentsTab(
+                      courseSlug: widget.course.slug,
                       isLoading: state.isLoadingDetails,
                       enrollments: enrollments,
                     ),
@@ -382,85 +383,157 @@ class _CourseDetailsBottomSheetState extends ConsumerState<_CourseDetailsBottomS
   }
 }
 
-class _EnrollmentsTab extends StatelessWidget {
+class _EnrollmentsTab extends ConsumerStatefulWidget {
   const _EnrollmentsTab({
+    required this.courseSlug,
     required this.isLoading,
     required this.enrollments,
   });
 
+  final String courseSlug;
   final bool isLoading;
   final List<Enrollment>? enrollments;
 
   @override
+  ConsumerState<_EnrollmentsTab> createState() => _EnrollmentsTabState();
+}
+
+class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
+  final _formKey = GlobalKey<FormState>();
+  String _userId = '';
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final request = AddEnrollmentRequest(userId: _userId);
+      ref.read(tasksManagementBlocProvider.notifier).add(
+            TasksManagementAddEnrollmentRequested(
+              courseSlug: widget.courseSlug,
+              request: request,
+            ),
+          );
+      _formKey.currentState!.reset();
+      FocusScope.of(context).unfocus();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading && enrollments == null) {
+    if (widget.isLoading && widget.enrollments == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (enrollments == null || enrollments!.isEmpty) {
-      return const Center(
-        child: Text(
-          '등록된 수강생이 없습니다.',
-          style: TextStyle(
-            color: Color(0xFF8A8A8A),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
-
-    return ListView.separated(
+    return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
-      itemCount: enrollments!.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final enrollment = enrollments![index];
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFEAEAEA)),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFFF0F0F0),
-                child: Text(
-                  enrollment.userId.substring(0, 1).toUpperCase(),
-                  style: const TextStyle(
-                    color: Color(0xFF1A1A1A),
-                    fontWeight: FontWeight.w700,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.enrollments == null || widget.enrollments!.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Text('등록된 수강생이 없습니다.', style: TextStyle(color: Color(0xFF8A8A8A))),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.enrollments!.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final enrollment = widget.enrollments![index];
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFEAEAEA)),
                   ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'User ID: ${enrollment.userId}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: const Color(0xFFF0F0F0),
+                        child: Text(
+                          enrollment.userId.isNotEmpty ? enrollment.userId.substring(0, 1).toUpperCase() : '?',
+                          style: const TextStyle(
+                            color: Color(0xFF1A1A1A),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '상태: ${enrollment.status}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: enrollment.status == 'ENROLLED' ? Colors.green[700] : const Color(0xFF8A8A8A),
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'User ID: ${enrollment.userId}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '상태: ${enrollment.status}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: enrollment.status == 'ENROLLED' ? Colors.green[700] : const Color(0xFF8A8A8A),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFEAEAEA)),
+              color: const Color(0xFFFAFAFA),
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('수강생 등록 / 복구', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          decoration: const InputDecoration(labelText: 'User ID', filled: true, fillColor: Colors.white),
+                          onSaved: (v) => _userId = v?.trim() ?? '',
+                          validator: (v) => v == null || v.trim().isEmpty ? '필수' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton(
+                          onPressed: _submit,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text('등록', style: TextStyle(fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

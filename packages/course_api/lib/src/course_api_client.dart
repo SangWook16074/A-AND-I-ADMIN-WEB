@@ -75,6 +75,22 @@ class CourseApiClient {
     final listData = _readListData(response.body, statusCode: response.statusCode);
     return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
   }
+
+  Future<Enrollment> addEnrollment({
+    required String accessToken,
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/enrollments',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Enrollment.fromJson(mapData);
+  }
   Future<Assignment> getAssignment({
     required String accessToken,
     required String courseSlug,

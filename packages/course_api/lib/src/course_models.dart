@@ -215,3 +215,13 @@ abstract class AssignmentDelivery with _$AssignmentDelivery {
   factory AssignmentDelivery.fromJson(Map<String, dynamic> json) =>
       _$AssignmentDeliveryFromJson(json);
 }
+
+@freezed
+abstract class AddEnrollmentRequest with _$AddEnrollmentRequest {
+  const factory AddEnrollmentRequest({
+    required String userId,
+  }) = _AddEnrollmentRequest;
+
+  factory AddEnrollmentRequest.fromJson(Map<String, dynamic> json) =>
+      _$AddEnrollmentRequestFromJson(json);
+}

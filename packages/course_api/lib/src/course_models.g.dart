@@ -342,3 +342,11 @@ Map<String, dynamic> _$AssignmentDeliveryToJson(_AssignmentDelivery instance) =>
       'deliveredAt': instance.deliveredAt,
       'failureReason': instance.failureReason,
     };
+
+_AddEnrollmentRequest _$AddEnrollmentRequestFromJson(
+  Map<String, dynamic> json,
+) => _AddEnrollmentRequest(userId: json['userId'] as String);
+
+Map<String, dynamic> _$AddEnrollmentRequestToJson(
+  _AddEnrollmentRequest instance,
+) => <String, dynamic>{'userId': instance.userId};

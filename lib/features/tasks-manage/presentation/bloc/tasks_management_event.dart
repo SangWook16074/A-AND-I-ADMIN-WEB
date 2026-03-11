@@ -76,4 +76,9 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String assignmentId,
     required UpdateAssignmentRequest request,
   }) = TasksManagementUpdateAssignmentRequested;
+
+  const factory TasksManagementEvent.addEnrollmentRequested({
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) = TasksManagementAddEnrollmentRequested;
 }

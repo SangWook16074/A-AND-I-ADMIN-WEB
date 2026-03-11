@@ -10,6 +10,7 @@ import '../../domain/usecases/create_course_use_case.dart';
 import '../../domain/usecases/create_or_update_week_use_case.dart';
 import '../../domain/usecases/get_courses_use_case.dart';
 import '../../domain/usecases/get_enrollments_use_case.dart';
+import '../../domain/usecases/add_enrollment_use_case.dart';
 import '../../domain/usecases/get_assignments_use_case.dart';
 import '../../domain/usecases/create_assignment_use_case.dart';
 import '../../domain/usecases/delete_assignment_use_case.dart';
@@ -130,4 +131,9 @@ DeleteAssignmentUseCase deleteAssignmentUseCase(Ref ref) {
 @Riverpod(keepAlive: true)
 UpdateAssignmentUseCase updateAssignmentUseCase(Ref ref) {
   return UpdateAssignmentUseCase(ref.watch(tasksManagementRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
+AddEnrollmentUseCase addEnrollmentUseCase(Ref ref) {
+  return AddEnrollmentUseCase(ref.watch(tasksManagementRepositoryProvider));
 }

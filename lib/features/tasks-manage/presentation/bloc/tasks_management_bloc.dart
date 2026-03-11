@@ -61,6 +61,10 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _loadAssignmentDetails(courseSlug: event.courseSlug, assignmentId: event.assignmentId);
     });
 
+    on<TasksManagementAddEnrollmentRequested>((event) async {
+      await _addEnrollment(courseSlug: event.courseSlug, request: event.request);
+    });
+
     on<TasksManagementUpdateAssignmentRequested>((event) async {
       await _updateAssignment(courseSlug: event.courseSlug, assignmentId: event.assignmentId, request: event.request);
     });
@@ -198,6 +202,31 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         status: TasksManagementStatus.failure,
         isCreating: false,
         errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _addEnrollment({
+    required String courseSlug,
+    required AddEnrollmentRequest request,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      await ref.read(addEnrollmentUseCaseProvider).execute(
+            courseSlug: courseSlug,
+            request: request,
+          );
+      state = state.copyWith(isCreating: false);
+      add(TasksManagementEnrollmentsRequested(courseSlug));
+    } catch (e) {
+      String errorMessage = '수강생 등록 중 오류가 발생했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage = '수강생 등록 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: errorMessage,
       );
     }
   }

@@ -55,7 +55,7 @@ extension TasksManagementEventPatterns on TasksManagementEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( TasksManagementStarted value)?  started,TResult Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult Function( TasksManagementCourseSelected value)?  courseSelected,TResult Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( TasksManagementStarted value)?  started,TResult Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult Function( TasksManagementCourseSelected value)?  courseSelected,TResult Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,TResult Function( TasksManagementAddEnrollmentRequested value)?  addEnrollmentRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
@@ -73,7 +73,8 @@ return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested()
 return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
 return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
 return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
-return updateAssignmentRequested(_that);case _:
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that);case _:
   return orElse();
 
 }
@@ -91,7 +92,7 @@ return updateAssignmentRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( TasksManagementStarted value)  started,required TResult Function( TasksManagementRefreshRequested value)  refreshRequested,required TResult Function( TasksManagementCourseSelected value)  courseSelected,required TResult Function( TasksManagementEnrollmentsRequested value)  enrollmentsRequested,required TResult Function( TasksManagementCreateWeekRequested value)  createWeekRequested,required TResult Function( TasksManagementCreateCourseRequested value)  createCourseRequested,required TResult Function( TasksManagementAssignmentsRequested value)  assignmentsRequested,required TResult Function( TasksManagementCreateAssignmentRequested value)  createAssignmentRequested,required TResult Function( TasksManagementPublishAssignmentRequested value)  publishAssignmentRequested,required TResult Function( TasksManagementDeliverAssignmentRequested value)  deliverAssignmentRequested,required TResult Function( TasksManagementCourseDeletedRequested value)  courseDeletedRequested,required TResult Function( TasksManagementUpdateCourseRequested value)  updateCourseRequested,required TResult Function( TasksManagementAssignmentDetailsRequested value)  assignmentDetailsRequested,required TResult Function( TasksManagementAssignmentDeletedRequested value)  assignmentDeletedRequested,required TResult Function( TasksManagementUpdateAssignmentRequested value)  updateAssignmentRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( TasksManagementStarted value)  started,required TResult Function( TasksManagementRefreshRequested value)  refreshRequested,required TResult Function( TasksManagementCourseSelected value)  courseSelected,required TResult Function( TasksManagementEnrollmentsRequested value)  enrollmentsRequested,required TResult Function( TasksManagementCreateWeekRequested value)  createWeekRequested,required TResult Function( TasksManagementCreateCourseRequested value)  createCourseRequested,required TResult Function( TasksManagementAssignmentsRequested value)  assignmentsRequested,required TResult Function( TasksManagementCreateAssignmentRequested value)  createAssignmentRequested,required TResult Function( TasksManagementPublishAssignmentRequested value)  publishAssignmentRequested,required TResult Function( TasksManagementDeliverAssignmentRequested value)  deliverAssignmentRequested,required TResult Function( TasksManagementCourseDeletedRequested value)  courseDeletedRequested,required TResult Function( TasksManagementUpdateCourseRequested value)  updateCourseRequested,required TResult Function( TasksManagementAssignmentDetailsRequested value)  assignmentDetailsRequested,required TResult Function( TasksManagementAssignmentDeletedRequested value)  assignmentDeletedRequested,required TResult Function( TasksManagementUpdateAssignmentRequested value)  updateAssignmentRequested,required TResult Function( TasksManagementAddEnrollmentRequested value)  addEnrollmentRequested,}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted():
@@ -109,7 +110,8 @@ return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested()
 return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested():
 return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested():
 return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested():
-return updateAssignmentRequested(_that);}
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested():
+return addEnrollmentRequested(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -123,7 +125,7 @@ return updateAssignmentRequested(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( TasksManagementStarted value)?  started,TResult? Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult? Function( TasksManagementCourseSelected value)?  courseSelected,TResult? Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult? Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult? Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult? Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult? Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult? Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult? Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult? Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult? Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult? Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult? Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult? Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( TasksManagementStarted value)?  started,TResult? Function( TasksManagementRefreshRequested value)?  refreshRequested,TResult? Function( TasksManagementCourseSelected value)?  courseSelected,TResult? Function( TasksManagementEnrollmentsRequested value)?  enrollmentsRequested,TResult? Function( TasksManagementCreateWeekRequested value)?  createWeekRequested,TResult? Function( TasksManagementCreateCourseRequested value)?  createCourseRequested,TResult? Function( TasksManagementAssignmentsRequested value)?  assignmentsRequested,TResult? Function( TasksManagementCreateAssignmentRequested value)?  createAssignmentRequested,TResult? Function( TasksManagementPublishAssignmentRequested value)?  publishAssignmentRequested,TResult? Function( TasksManagementDeliverAssignmentRequested value)?  deliverAssignmentRequested,TResult? Function( TasksManagementCourseDeletedRequested value)?  courseDeletedRequested,TResult? Function( TasksManagementUpdateCourseRequested value)?  updateCourseRequested,TResult? Function( TasksManagementAssignmentDetailsRequested value)?  assignmentDetailsRequested,TResult? Function( TasksManagementAssignmentDeletedRequested value)?  assignmentDeletedRequested,TResult? Function( TasksManagementUpdateAssignmentRequested value)?  updateAssignmentRequested,TResult? Function( TasksManagementAddEnrollmentRequested value)?  addEnrollmentRequested,}){
 final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
@@ -141,7 +143,8 @@ return courseDeletedRequested(_that);case TasksManagementUpdateCourseRequested()
 return updateCourseRequested(_that);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
 return assignmentDetailsRequested(_that);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
 return assignmentDeletedRequested(_that);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
-return updateAssignmentRequested(_that);case _:
+return updateAssignmentRequested(_that);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that);case _:
   return null;
 
 }
@@ -158,7 +161,7 @@ return updateAssignmentRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  refreshRequested,TResult Function( CourseSummary course)?  courseSelected,TResult Function( String courseSlug)?  enrollmentsRequested,TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult Function( String courseSlug)?  courseDeletedRequested,TResult Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  refreshRequested,TResult Function( CourseSummary course)?  courseSelected,TResult Function( String courseSlug)?  enrollmentsRequested,TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult Function( String courseSlug)?  courseDeletedRequested,TResult Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,TResult Function( String courseSlug,  AddEnrollmentRequest request)?  addEnrollmentRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started();case TasksManagementRefreshRequested() when refreshRequested != null:
@@ -175,7 +178,8 @@ return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourse
 return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
 return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
 return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
-return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case _:
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that.courseSlug,_that.request);case _:
   return orElse();
 
 }
@@ -193,7 +197,7 @@ return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.reque
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  refreshRequested,required TResult Function( CourseSummary course)  courseSelected,required TResult Function( String courseSlug)  enrollmentsRequested,required TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)  createWeekRequested,required TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)  createCourseRequested,required TResult Function( String courseSlug,  int? weekNo,  String? status)  assignmentsRequested,required TResult Function( String courseSlug,  CreateAssignmentRequest request)  createAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  publishAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  deliverAssignmentRequested,required TResult Function( String courseSlug)  courseDeletedRequested,required TResult Function( String courseSlug,  UpdateCourseRequest request)  updateCourseRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDetailsRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDeletedRequested,required TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)  updateAssignmentRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  refreshRequested,required TResult Function( CourseSummary course)  courseSelected,required TResult Function( String courseSlug)  enrollmentsRequested,required TResult Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)  createWeekRequested,required TResult Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)  createCourseRequested,required TResult Function( String courseSlug,  int? weekNo,  String? status)  assignmentsRequested,required TResult Function( String courseSlug,  CreateAssignmentRequest request)  createAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  publishAssignmentRequested,required TResult Function( String courseSlug,  String assignmentId)  deliverAssignmentRequested,required TResult Function( String courseSlug)  courseDeletedRequested,required TResult Function( String courseSlug,  UpdateCourseRequest request)  updateCourseRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDetailsRequested,required TResult Function( String courseSlug,  String assignmentId)  assignmentDeletedRequested,required TResult Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)  updateAssignmentRequested,required TResult Function( String courseSlug,  AddEnrollmentRequest request)  addEnrollmentRequested,}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted():
 return started();case TasksManagementRefreshRequested():
@@ -210,7 +214,8 @@ return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourse
 return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested():
 return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested():
 return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested():
-return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);}
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested():
+return addEnrollmentRequested(_that.courseSlug,_that.request);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -224,7 +229,7 @@ return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.reque
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  refreshRequested,TResult? Function( CourseSummary course)?  courseSelected,TResult? Function( String courseSlug)?  enrollmentsRequested,TResult? Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult? Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult? Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult? Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult? Function( String courseSlug)?  courseDeletedRequested,TResult? Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult? Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  refreshRequested,TResult? Function( CourseSummary course)?  courseSelected,TResult? Function( String courseSlug)?  enrollmentsRequested,TResult? Function( String courseSlug,  int weekNo,  String title,  String startDate,  String endDate)?  createWeekRequested,TResult? Function( String slug,  String title,  String? description,  String phase,  String targetTrack,  String startDate,  String endDate)?  createCourseRequested,TResult? Function( String courseSlug,  int? weekNo,  String? status)?  assignmentsRequested,TResult? Function( String courseSlug,  CreateAssignmentRequest request)?  createAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  publishAssignmentRequested,TResult? Function( String courseSlug,  String assignmentId)?  deliverAssignmentRequested,TResult? Function( String courseSlug)?  courseDeletedRequested,TResult? Function( String courseSlug,  UpdateCourseRequest request)?  updateCourseRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDetailsRequested,TResult? Function( String courseSlug,  String assignmentId)?  assignmentDeletedRequested,TResult? Function( String courseSlug,  String assignmentId,  UpdateAssignmentRequest request)?  updateAssignmentRequested,TResult? Function( String courseSlug,  AddEnrollmentRequest request)?  addEnrollmentRequested,}) {final _that = this;
 switch (_that) {
 case TasksManagementStarted() when started != null:
 return started();case TasksManagementRefreshRequested() when refreshRequested != null:
@@ -241,7 +246,8 @@ return courseDeletedRequested(_that.courseSlug);case TasksManagementUpdateCourse
 return updateCourseRequested(_that.courseSlug,_that.request);case TasksManagementAssignmentDetailsRequested() when assignmentDetailsRequested != null:
 return assignmentDetailsRequested(_that.courseSlug,_that.assignmentId);case TasksManagementAssignmentDeletedRequested() when assignmentDeletedRequested != null:
 return assignmentDeletedRequested(_that.courseSlug,_that.assignmentId);case TasksManagementUpdateAssignmentRequested() when updateAssignmentRequested != null:
-return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case _:
+return updateAssignmentRequested(_that.courseSlug,_that.assignmentId,_that.request);case TasksManagementAddEnrollmentRequested() when addEnrollmentRequested != null:
+return addEnrollmentRequested(_that.courseSlug,_that.request);case _:
   return null;
 
 }
@@ -1242,6 +1248,83 @@ as UpdateAssignmentRequest,
 $UpdateAssignmentRequestCopyWith<$Res> get request {
   
   return $UpdateAssignmentRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class TasksManagementAddEnrollmentRequested implements TasksManagementEvent {
+  const TasksManagementAddEnrollmentRequested({required this.courseSlug, required this.request});
+  
+
+ final  String courseSlug;
+ final  AddEnrollmentRequest request;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TasksManagementAddEnrollmentRequestedCopyWith<TasksManagementAddEnrollmentRequested> get copyWith => _$TasksManagementAddEnrollmentRequestedCopyWithImpl<TasksManagementAddEnrollmentRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TasksManagementAddEnrollmentRequested&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.request, request) || other.request == request));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,courseSlug,request);
+
+@override
+String toString() {
+  return 'TasksManagementEvent.addEnrollmentRequested(courseSlug: $courseSlug, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TasksManagementAddEnrollmentRequestedCopyWith<$Res> implements $TasksManagementEventCopyWith<$Res> {
+  factory $TasksManagementAddEnrollmentRequestedCopyWith(TasksManagementAddEnrollmentRequested value, $Res Function(TasksManagementAddEnrollmentRequested) _then) = _$TasksManagementAddEnrollmentRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String courseSlug, AddEnrollmentRequest request
+});
+
+
+$AddEnrollmentRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$TasksManagementAddEnrollmentRequestedCopyWithImpl<$Res>
+    implements $TasksManagementAddEnrollmentRequestedCopyWith<$Res> {
+  _$TasksManagementAddEnrollmentRequestedCopyWithImpl(this._self, this._then);
+
+  final TasksManagementAddEnrollmentRequested _self;
+  final $Res Function(TasksManagementAddEnrollmentRequested) _then;
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? courseSlug = null,Object? request = null,}) {
+  return _then(TasksManagementAddEnrollmentRequested(
+courseSlug: null == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as AddEnrollmentRequest,
+  ));
+}
+
+/// Create a copy of TasksManagementEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AddEnrollmentRequestCopyWith<$Res> get request {
+  
+  return $AddEnrollmentRequestCopyWith<$Res>(_self.request, (value) {
     return _then(_self.copyWith(request: value));
   });
 }
