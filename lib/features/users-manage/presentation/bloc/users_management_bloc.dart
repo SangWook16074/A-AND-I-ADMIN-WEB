@@ -90,10 +90,11 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         status: UsersManagementStatus.failure,
         errorMessage: e.message,
       );
-    } catch (_) {
+    } catch (e, st) {
+      print('UsersManagementBloc.loadUsers error: $e\\n$st');
       state = state.copyWith(
         status: UsersManagementStatus.failure,
-        errorMessage: '사용자 목록을 불러오지 못했습니다.',
+        errorMessage: '사용자 목록을 불러오지 못했습니다. 에러: $e',
       );
     }
   }

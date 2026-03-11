@@ -8,7 +8,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:a_and_i_admin_web_serivce/app/app.dart';
+import 'package:a_and_i_admin_web_serivce/app.dart';
 
 void main() {
   testWidgets('Unauthenticated users are redirected to login page', (

@@ -1,6 +1,11 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 enum AuthRole {
+  @JsonValue('USER')
   user,
+  @JsonValue('ORGANIZER')
   organizer,
+  @JsonValue('ADMIN')
   admin;
 
   static AuthRole fromApi(String role) {

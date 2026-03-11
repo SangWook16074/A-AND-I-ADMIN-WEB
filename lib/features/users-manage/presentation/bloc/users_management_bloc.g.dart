@@ -7,7 +7,7 @@ part of 'users_management_bloc.dart';
 // **************************************************************************
 
 String _$usersManagementApiClientHash() =>
-    r'82dce7b704532f662fb137f25e5caf1e6121cd9a';
+    r'2b1058ba79ebb2eef18f49727d9064351ec1e5a3';
 
 /// See also [usersManagementApiClient].
 @ProviderFor(usersManagementApiClient)
@@ -63,7 +63,7 @@ final getAdminUsersUseCaseProvider = Provider<GetAdminUsersUseCase>.internal(
 // ignore: unused_element
 typedef GetAdminUsersUseCaseRef = ProviderRef<GetAdminUsersUseCase>;
 String _$usersManagementBlocHash() =>
-    r'88ad937b8d11d4579791243ad96744d7c28914e8';
+    r'255dfa4051301f65859c693b93ca477d44d097a5';
 
 /// See also [UsersManagementBloc].
 @ProviderFor(UsersManagementBloc)
