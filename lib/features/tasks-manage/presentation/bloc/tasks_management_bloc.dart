@@ -1,83 +1,51 @@
-import 'package:aandi_auth/aandi_auth.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:aandi_course_api/aandi_course_api.dart';
-
-import '../../data/repositories/tasks_management_repository_impl.dart';
-import '../../domain/repositories/tasks_management_repository.dart';
-import '../../domain/usecases/create_course_use_case.dart';
-import '../../domain/usecases/get_courses_use_case.dart';
+import '../providers/tasks_management_providers.dart';
 import 'tasks_management_event.dart';
 import 'tasks_management_state.dart';
 
 part 'tasks_management_bloc.g.dart';
 
-@Riverpod(keepAlive: true)
-CourseApiClient tasksCourseApiClient(Ref ref) {
-  return CourseApiClient(
-    baseUrl: ref.watch(authBaseUrlProvider),
-    dio: Dio(),
-  );
-}
-
-@Riverpod(keepAlive: true)
-TasksManagementRepository tasksManagementRepository(Ref ref) {
-  return TasksManagementRepositoryImpl(
-    apiClient: ref.watch(tasksCourseApiClientProvider),
-    tokenStore: ref.watch(tokenStoreProvider),
-  );
-}
-
-@Riverpod(keepAlive: true)
-GetCoursesUseCase getCoursesUseCase(Ref ref) {
-  return GetCoursesUseCaseImp(ref.watch(tasksManagementRepositoryProvider));
-}
-
-@Riverpod(keepAlive: true)
-CreateCourseUseCase createCourseUseCase(Ref ref) {
-  return CreateCourseUseCase(
-    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
-  );
-}
-
 @riverpod
 class TasksManagementBloc extends _$TasksManagementBloc {
-  @override
-  TasksManagementState build() {
-    Future.microtask(() => onEvent(const TasksManagementStarted()));
-    return const TasksManagementState.initial();
+  final Map<Type, Future<void> Function(dynamic)> _handlers = {};
+
+  void on<T extends TasksManagementEvent>(Future<void> Function(T event) handler) {
+    _handlers[T] = (event) => handler(event as T);
   }
 
-  Future<void> onEvent(TasksManagementEvent event) async {
-    switch (event) {
-      case TasksManagementStarted():
-      case TasksManagementRefreshRequested():
-        await _loadCourses();
-      case TasksManagementCreateCourseRequested(
-          slug: final slug,
-          title: final title,
-          description: final description,
-          phase: final phase,
-          targetTrack: final targetTrack,
-          startDate: final startDate,
-          endDate: final endDate,
-        ):
-        await _createCourse(
-          slug: slug,
-          title: title,
-          description: description,
-          phase: phase,
-          targetTrack: targetTrack,
-          startDate: startDate,
-          endDate: endDate,
-        );
+  void add(TasksManagementEvent event) {
+    final handler = _handlers[event.runtimeType];
+    if (handler != null) {
+      handler(event);
     }
   }
 
+  @override
+  TasksManagementState build() {
+    on<TasksManagementStarted>((event) async => _loadCourses());
+    on<TasksManagementRefreshRequested>((event) async => _loadCourses());
+    on<TasksManagementCreateCourseRequested>((event) async {
+      await _createCourse(
+        slug: event.slug,
+        title: event.title,
+        description: event.description,
+        phase: event.phase,
+        targetTrack: event.targetTrack,
+        startDate: event.startDate,
+        endDate: event.endDate,
+      );
+    });
+
+    Future.microtask(() => add(const TasksManagementStarted()));
+    return const TasksManagementState.initial();
+  }
+
   Future<void> _loadCourses() async {
-    state = state.copyWith(status: TasksManagementStatus.loading, clearError: true);
+    state = state.copyWith(
+      status: TasksManagementStatus.loading,
+      clearError: true,
+    );
     try {
       final useCase = ref.read(getCoursesUseCaseProvider);
       final courses = await useCase();

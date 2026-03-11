@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'presentation/bloc/tasks_management_bloc.dart';
-import 'presentation/bloc/tasks_management_event.dart';
-import 'presentation/bloc/tasks_management_state.dart';
+import 'task_management.dart';
 
 class TaskManagementView extends ConsumerWidget {
   const TaskManagementView({
@@ -290,7 +288,7 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
             if (formKey.currentState?.validate() ?? false) {
               formKey.currentState?.save();
 
-              ref.read(tasksManagementBlocProvider.notifier).onEvent(
+              ref.read(tasksManagementBlocProvider.notifier).add(
                     TasksManagementCreateCourseRequested(
                       slug: slug,
                       title: title,

@@ -58,3 +58,63 @@ Map<String, dynamic> _$CreateCourseRequestToJson(
   'startDate': instance.startDate,
   'endDate': instance.endDate,
 };
+
+_CourseWeek _$CourseWeekFromJson(Map<String, dynamic> json) => _CourseWeek(
+  id: json['id'] as String,
+  weekNo: (json['weekNo'] as num).toInt(),
+  title: json['title'] as String,
+  startDate: json['startDate'] as String,
+  endDate: json['endDate'] as String,
+);
+
+Map<String, dynamic> _$CourseWeekToJson(_CourseWeek instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'weekNo': instance.weekNo,
+      'title': instance.title,
+      'startDate': instance.startDate,
+      'endDate': instance.endDate,
+    };
+
+_CreateWeekRequest _$CreateWeekRequestFromJson(Map<String, dynamic> json) =>
+    _CreateWeekRequest(
+      weekNo: (json['weekNo'] as num).toInt(),
+      title: json['title'] as String,
+      startDate: json['startDate'] as String,
+      endDate: json['endDate'] as String,
+    );
+
+Map<String, dynamic> _$CreateWeekRequestToJson(_CreateWeekRequest instance) =>
+    <String, dynamic>{
+      'weekNo': instance.weekNo,
+      'title': instance.title,
+      'startDate': instance.startDate,
+      'endDate': instance.endDate,
+    };
+
+_Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
+  id: json['id'] as String,
+  userId: json['userId'] as String,
+  status: json['status'] as String,
+  joinedAt: DateTime.parse(json['joinedAt'] as String),
+  droppedAt: json['droppedAt'] == null
+      ? null
+      : DateTime.parse(json['droppedAt'] as String),
+  bannedAt: json['bannedAt'] == null
+      ? null
+      : DateTime.parse(json['bannedAt'] as String),
+  banReason: json['banReason'] as String?,
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
+);
+
+Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'userId': instance.userId,
+      'status': instance.status,
+      'joinedAt': instance.joinedAt.toIso8601String(),
+      'droppedAt': instance.droppedAt?.toIso8601String(),
+      'bannedAt': instance.bannedAt?.toIso8601String(),
+      'banReason': instance.banReason,
+      'updatedAt': instance.updatedAt.toIso8601String(),
+    };

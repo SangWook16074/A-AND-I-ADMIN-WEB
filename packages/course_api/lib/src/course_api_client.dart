@@ -46,6 +46,36 @@ class CourseApiClient {
     return CourseSummary.fromJson(_mapCourseJson(mapData));
   }
 
+  Future<CourseWeek> createOrUpdateWeek({
+    required String accessToken,
+    required String courseSlug,
+    required CreateWeekRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/weeks',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return CourseWeek.fromJson(mapData);
+  }
+
+  Future<List<Enrollment>> getEnrollments({
+    required String accessToken,
+    required String courseSlug,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/enrollments',
+    );
+
+    final listData = _readListData(response.body, statusCode: response.statusCode);
+    return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
+  }
+
   Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {
     return {
       'id': json['id'],
@@ -65,11 +95,13 @@ class CourseApiClient {
   Future<({int statusCode, Map<String, dynamic> body})> _requestJson({
     required String method,
     required String accessToken,
+    String? path,
     Object? data,
     bool allowEmptySuccessBody = false,
   }) async {
+    final requestPath = path ?? _coursesPath;
     final response = await dio.requestUri<dynamic>(
-      Uri.parse('$baseUrl$_coursesPath'),
+      Uri.parse('$baseUrl$requestPath'),
       data: data,
       options: Options(
         method: method,

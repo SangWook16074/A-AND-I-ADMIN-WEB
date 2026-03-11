@@ -52,4 +52,36 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       ),
     );
   }
+
+  @override
+  Future<CourseWeek> createOrUpdateWeek({
+    required String courseSlug,
+    required int weekNo,
+    required String title,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.createOrUpdateWeek(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: CreateWeekRequest(
+        weekNo: weekNo,
+        title: title,
+        startDate: startDate,
+        endDate: endDate,
+      ),
+    );
+  }
+
+  @override
+  Future<List<Enrollment>> getEnrollments({
+    required String courseSlug,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getEnrollments(
+      accessToken: token,
+      courseSlug: courseSlug,
+    );
+  }
 }

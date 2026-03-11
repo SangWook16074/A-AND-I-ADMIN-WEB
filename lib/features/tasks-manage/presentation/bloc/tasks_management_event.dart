@@ -1,31 +1,20 @@
-sealed class TasksManagementEvent {
-  const TasksManagementEvent();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class TasksManagementStarted extends TasksManagementEvent {
-  const TasksManagementStarted();
-}
+part 'tasks_management_event.freezed.dart';
 
-class TasksManagementRefreshRequested extends TasksManagementEvent {
-  const TasksManagementRefreshRequested();
-}
+@freezed
+sealed class TasksManagementEvent with _$TasksManagementEvent {
+  const factory TasksManagementEvent.started() = TasksManagementStarted;
 
-class TasksManagementCreateCourseRequested extends TasksManagementEvent {
-  const TasksManagementCreateCourseRequested({
-    required this.slug,
-    required this.title,
-    this.description,
-    required this.phase,
-    required this.targetTrack,
-    required this.startDate,
-    required this.endDate,
-  });
+  const factory TasksManagementEvent.refreshRequested() = TasksManagementRefreshRequested;
 
-  final String slug;
-  final String title;
-  final String? description;
-  final String phase;
-  final String targetTrack;
-  final String startDate;
-  final String endDate;
+  const factory TasksManagementEvent.createCourseRequested({
+    required String slug,
+    required String title,
+    String? description,
+    required String phase,
+    required String targetTrack,
+    required String startDate,
+    required String endDate,
+  }) = TasksManagementCreateCourseRequested;
 }
