@@ -36,6 +36,7 @@ packages/**/build/
 /coverage/
 .omx/
 .omc/
+scripts/package_repos.env
 
 # Symbolication related
 app.*.symbols

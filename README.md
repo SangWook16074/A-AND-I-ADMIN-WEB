@@ -106,7 +106,8 @@ dart run melos run build
 │  ├─ auth/                # 공통 인증 패키지 (aandi_auth)
 │  ├─ admin_api/           # 관리자 API 패키지 (aandi_admin_api)
 │  ├─ course_api/          # 코스 API 패키지 (aandi_course_api)
-│  └─ oj_api/              # OJ API 패키지 (aandi_oj_api)
+│  ├─ oj_api/              # OJ API 패키지 (aandi_oj_api)
+│  └─ tech_blog/           # 기술 블로그 API 패키지 (aandi_tech_blog)
 ├─ test/
 ├─ firebase.json
 └─ .github/workflows/firebase-hosting-deploy.yml
@@ -157,7 +158,154 @@ flutter test
 - `test/features/users_manage/views/users_management_table_view_test.dart`
 - `test/widget_test.dart`
 
-## 8. 배포 (Firebase Hosting)
+## 8. Melos 버전 관리 (모노레포)
+
+이 레포는 `melos` + Dart workspace 기반으로 버전 관리를 수행합니다.
+
+워크스페이스 패키지:
+
+- `packages/auth` (`aandi_auth`)
+- `packages/admin_api` (`aandi_admin_api`)
+- `packages/tech_blog` (`aandi_tech_blog`)
+
+각 패키지는 자체 `CHANGELOG.md`를 유지합니다.
+
+- `packages/auth/CHANGELOG.md`
+- `packages/admin_api/CHANGELOG.md`
+- `packages/tech_blog/CHANGELOG.md`
+
+초기 1회(마이그레이션 시점) 기준 태그 생성:
+
+```bash
+git tag aandi_auth-v0.1.0
+git tag aandi_admin_api-v0.1.0
+git tag aandi_tech_blog-v0.1.0
+git push origin aandi_auth-v0.1.0 aandi_admin_api-v0.1.0 aandi_tech_blog-v0.1.0
+```
+
+일반 릴리즈(버전/체인지로그/태그):
+
+```bash
+dart pub get
+dart run melos bootstrap
+dart run melos version --all
+git push
+git push --tags
+```
+
+Conventional Commits 기준:
+
+- `feat:` -> minor bump
+- `fix:`/`refactor:` 등 -> patch bump
+- `feat!:` 또는 `BREAKING CHANGE:` -> major bump
+
+`melos version --all` 실행 시:
+
+- 패키지별 `pubspec.yaml` version 업데이트
+- 패키지별 `CHANGELOG.md` 및 워크스페이스 changelog 갱신
+- release 커밋/태그(`{package}-v{version}`) 생성
+
+### 8.1 패키지별 GitHub 저장소 분리 푸시
+
+사전 조건:
+
+- 로컬에 `git subtree` 명령 사용 가능해야 함
+
+1) 설정 파일 생성:
+
+```bash
+cp scripts/package_repos.example.env scripts/package_repos.env
+```
+
+2) `scripts/package_repos.env`에 저장소 설정:
+
+```bash
+TARGET_BRANCH=main
+AUTH_REPO_URL=<org>/<auth-repo>
+ADMIN_API_REPO_URL=<org>/<admin-api-repo>
+TECH_BLOG_REPO_URL=<org>/<tech-blog-repo>
+```
+
+3) 분리 푸시 실행:
+
+```bash
+bash scripts/sync_package_repos.sh --require-all
+```
+
+또는 melos 스크립트로 실행:
+
+```bash
+dart run melos run sync_packages
+```
+
+릴리즈 + 분리 푸시를 한 번에 실행:
+
+```bash
+dart run melos run release_and_sync_packages
+```
+
+동작 원리:
+
+- `git subtree split`으로 패키지별 커밋 히스토리 분리
+- 각 패키지 저장소 `main` 브랜치로 푸시
+- 모노레포 태그 `aandi_auth-vX.Y.Z`를 패키지 저장소 태그 `vX.Y.Z`로 동기화
+
+### 8.2 GitHub Actions 자동 동기화
+
+워크플로:
+
+- `.github/workflows/sync-package-repos.yml`
+
+필요 시크릿:
+
+- `AUTH_REPO_URL`
+- `ADMIN_API_REPO_URL`
+- `TECH_BLOG_REPO_URL`
+- `PACKAGE_REPO_TOKEN` (선택, `<org>/<repo>` 형식 URL 사용 시 권장)
+
+워크플로 트리거:
+
+- `main` 브랜치 push
+- `aandi_*-v*` 태그 push
+- `workflow_dispatch`
+
+### 8.3 패키지 최신화 운영 방법
+
+기준 원칙:
+
+- 소스 오브 트루스는 모노레포(`A-AND-I-ADMIN-WEB`)입니다.
+- 개별 패키지 저장소(`A-AND-I-AUTH-API` 등)는 분리 미러입니다.
+
+전체 패키지 최신화(권장 루틴):
+
+```bash
+git checkout main
+git pull origin main
+dart pub get
+dart run melos bootstrap
+dart run melos test
+dart run melos version --all
+git push origin main
+git push --tags
+bash scripts/sync_package_repos.sh --require-all
+```
+
+특정 패키지만 코드 변경한 경우:
+
+- 위 루틴을 그대로 실행해도 됩니다. 변경 없는 패키지는 `Everything up-to-date`로 처리됩니다.
+- 또는 빠르게 동기화만 하려면 `bash scripts/sync_package_repos.sh`를 실행하세요.
+
+최신화 확인 방법:
+
+- 모노레포에서 `git log --oneline -n 1 -- packages/<package>`
+- 패키지 저장소에서 `main` 최신 커밋 확인 (`git ls-remote --heads <repo-url>`)
+
+주의:
+
+- 개별 패키지 저장소에서 직접 개발하면 모노레포와 이력 분기가 생길 수 있습니다.
+- 가능하면 모노레포에서만 변경하고, 분리 푸시는 `sync_package_repos.sh`로만 수행하세요.
+
+## 9. 배포 (Firebase Hosting)
 
 워크플로:
 
@@ -185,7 +333,7 @@ flutter test
 - Firebase project: `aandi-report-web`
 - Hosting site: `admin-aandi-web`
 
-## 9. 팀 개발 규칙
+## 10. 팀 개발 규칙
 
 - 관리자 API 변경 시 `packages/admin_api`부터 수정
 - 기능 추가 시 관련 테스트 같이 업데이트
@@ -196,7 +344,7 @@ flutter test
 2. `firebase.json`
 3. `.firebaserc`
 
-## 10. 트러블슈팅
+## 11. 트러블슈팅
 
 ### 배포 실패: Firebase project 조회 오류
 
@@ -212,3 +360,9 @@ flutter test
 
 - 프론트에서 해결할 수 없습니다.
 - API 서버에서 허용 도메인(CORS allowlist)을 설정해야 합니다.
+
+### 패키지 분리 푸시 실패
+
+- `scripts/package_repos.env`의 저장소 URL(`*_REPO_URL`) 설정을 확인하세요.
+- 대상 저장소에 push 권한이 있는 토큰인지 확인하세요 (`PACKAGE_REPO_TOKEN`).
+- 동일 버전 태그가 다른 커밋을 가리키면 동기화가 중단됩니다. 원격 태그 정합성을 먼저 맞춘 뒤 재시도하세요.
