@@ -25,10 +25,7 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   @override
   Future<void> deleteCourse({required String slug}) async {
     final token = await _getAccessToken();
-    return _apiClient.deleteCourse(
-      accessToken: token,
-      courseSlug: slug,
-    );
+    return _apiClient.deleteCourse(accessToken: token, courseSlug: slug);
   }
 
   @override
@@ -76,30 +73,7 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
-  Future<CourseWeek> createOrUpdateWeek({
-    required String courseSlug,
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  }) async {
-    final token = await _getAccessToken();
-    return _apiClient.createOrUpdateWeek(
-      accessToken: token,
-      courseSlug: courseSlug,
-      request: CreateWeekRequest(
-        weekNo: weekNo,
-        title: title,
-        startDate: startDate,
-        endDate: endDate,
-      ),
-    );
-  }
-
-  @override
-  Future<List<Enrollment>> getEnrollments({
-    required String courseSlug,
-  }) async {
+  Future<List<Enrollment>> getEnrollments({required String courseSlug}) async {
     final token = await _getAccessToken();
     return _apiClient.getEnrollments(
       accessToken: token,
@@ -116,6 +90,21 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
     return _apiClient.addEnrollment(
       accessToken: token,
       courseSlug: courseSlug,
+      request: request,
+    );
+  }
+
+  @override
+  Future<Enrollment> updateEnrollmentStatus({
+    required String courseSlug,
+    required String userId,
+    required UpdateEnrollmentStatusRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.updateEnrollmentStatus(
+      accessToken: token,
+      courseSlug: courseSlug,
+      userId: userId,
       request: request,
     );
   }

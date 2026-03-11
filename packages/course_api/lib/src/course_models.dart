@@ -218,10 +218,21 @@ abstract class AssignmentDelivery with _$AssignmentDelivery {
 
 @freezed
 abstract class AddEnrollmentRequest with _$AddEnrollmentRequest {
-  const factory AddEnrollmentRequest({
-    required String userId,
-  }) = _AddEnrollmentRequest;
+  const factory AddEnrollmentRequest({required String userId}) =
+      _AddEnrollmentRequest;
 
   factory AddEnrollmentRequest.fromJson(Map<String, dynamic> json) =>
       _$AddEnrollmentRequestFromJson(json);
+}
+
+@freezed
+abstract class UpdateEnrollmentStatusRequest
+    with _$UpdateEnrollmentStatusRequest {
+  const factory UpdateEnrollmentStatusRequest({
+    required String status,
+    String? banReason,
+  }) = _UpdateEnrollmentStatusRequest;
+
+  factory UpdateEnrollmentStatusRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateEnrollmentStatusRequestFromJson(json);
 }

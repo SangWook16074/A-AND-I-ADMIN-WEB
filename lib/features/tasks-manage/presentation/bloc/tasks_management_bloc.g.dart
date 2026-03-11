@@ -7,7 +7,7 @@ part of 'tasks_management_bloc.dart';
 // **************************************************************************
 
 String _$tasksManagementBlocHash() =>
-    r'08b224fb8b8f3712dbf99afc3b341ad0b6e6cf6b';
+    r'2e55a2afc7946429c99dd997b949b889111df79d';
 
 /// See also [TasksManagementBloc].
 @ProviderFor(TasksManagementBloc)

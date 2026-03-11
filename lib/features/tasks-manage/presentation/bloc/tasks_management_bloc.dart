@@ -34,15 +34,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     on<TasksManagementEnrollmentsRequested>(
       (event) async => _loadEnrollments(event.courseSlug),
     );
-    on<TasksManagementCreateWeekRequested>((event) async {
-      await _createWeek(
-        courseSlug: event.courseSlug,
-        weekNo: event.weekNo,
-        title: event.title,
-        startDate: event.startDate,
-        endDate: event.endDate,
-      );
-    });
+
     on<TasksManagementCreateCourseRequested>((event) async {
       await _createCourse(
         slug: event.slug,
@@ -80,6 +72,14 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     on<TasksManagementAddEnrollmentRequested>((event) async {
       await _addEnrollment(
         courseSlug: event.courseSlug,
+        request: event.request,
+      );
+    });
+
+    on<TasksManagementUpdateEnrollmentStatusRequested>((event) async {
+      await _updateEnrollmentStatus(
+        courseSlug: event.courseSlug,
+        userId: event.userId,
         request: event.request,
       );
     });
@@ -211,35 +211,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
-  Future<void> _createWeek({
-    required String courseSlug,
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  }) async {
-    state = state.copyWith(isCreating: true, clearError: true);
-    try {
-      await ref.read(createOrUpdateWeekUseCaseProvider)(
-        courseSlug: courseSlug,
-        weekNo: weekNo,
-        title: title,
-        startDate: startDate,
-        endDate: endDate,
-      );
-
-      // Successfully created/updated, reload lists if needed
-      // To show immediate feedback, we could also fetch something else if needed
-      state = state.copyWith(isCreating: false);
-    } catch (e) {
-      state = state.copyWith(
-        status: TasksManagementStatus.failure,
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
   Future<void> _addEnrollment({
     required String courseSlug,
     required AddEnrollmentRequest request,
@@ -257,6 +228,34 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       if (e is CourseApiException) {
         errorMessage =
             '수강생 등록 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        status: TasksManagementStatus.failure,
+        isCreating: false,
+        errorMessage: errorMessage,
+      );
+    }
+  }
+
+  Future<void> _updateEnrollmentStatus({
+    required String courseSlug,
+    required String userId,
+    required UpdateEnrollmentStatusRequest request,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+    try {
+      await ref.read(updateEnrollmentStatusUseCaseProvider)(
+        courseSlug: courseSlug,
+        userId: userId,
+        request: request,
+      );
+      state = state.copyWith(isCreating: false);
+      add(TasksManagementEnrollmentsRequested(courseSlug));
+    } catch (e) {
+      String errorMessage = '수강생 상태 변경 중 오류가 발생했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage =
+            '수강생 상태 변경 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
       }
       state = state.copyWith(
         status: TasksManagementStatus.failure,

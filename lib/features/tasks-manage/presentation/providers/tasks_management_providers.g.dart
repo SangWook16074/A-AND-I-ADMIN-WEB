@@ -43,7 +43,7 @@ final tasksManagementRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TasksManagementRepositoryRef = ProviderRef<TasksManagementRepository>;
-String _$getCoursesUseCaseHash() => r'e0adb03d561e72bcb7978de2e2f3179c0e5860e7';
+String _$getCoursesUseCaseHash() => r'd77344543f7c38a37ce8ffb2538814737f8626d2';
 
 /// See also [getCoursesUseCase].
 @ProviderFor(getCoursesUseCase)
@@ -61,7 +61,7 @@ final getCoursesUseCaseProvider = Provider<GetCoursesUseCase>.internal(
 // ignore: unused_element
 typedef GetCoursesUseCaseRef = ProviderRef<GetCoursesUseCase>;
 String _$createCourseUseCaseHash() =>
-    r'7c22c6e0741535a818af83b2951856c106ee38aa';
+    r'd06aa69e6ecb4050b15a32411a999e7db4b8de41';
 
 /// See also [createCourseUseCase].
 @ProviderFor(createCourseUseCase)
@@ -79,7 +79,7 @@ final createCourseUseCaseProvider = Provider<CreateCourseUseCase>.internal(
 // ignore: unused_element
 typedef CreateCourseUseCaseRef = ProviderRef<CreateCourseUseCase>;
 String _$deleteCourseUseCaseHash() =>
-    r'b531c2befb8ab68882191cf6ab2e531be7dff9b2';
+    r'89ef9e29f5a25b0d509326766d4b1c9883478a4c';
 
 /// See also [deleteCourseUseCase].
 @ProviderFor(deleteCourseUseCase)
@@ -97,7 +97,7 @@ final deleteCourseUseCaseProvider = Provider<DeleteCourseUseCase>.internal(
 // ignore: unused_element
 typedef DeleteCourseUseCaseRef = ProviderRef<DeleteCourseUseCase>;
 String _$updateCourseUseCaseHash() =>
-    r'e3baba902c1f5a9711dfe8d22f1246faecf61535';
+    r'a2543ccb781158bbec0f4a01b70b689bed494ded';
 
 /// See also [updateCourseUseCase].
 @ProviderFor(updateCourseUseCase)
@@ -115,7 +115,7 @@ final updateCourseUseCaseProvider = Provider<UpdateCourseUseCase>.internal(
 // ignore: unused_element
 typedef UpdateCourseUseCaseRef = ProviderRef<UpdateCourseUseCase>;
 String _$getEnrollmentsUseCaseHash() =>
-    r'f3dcb52ea808f932cf740f633e425a77d7ad18c2';
+    r'989f60d814303c72ee5282036970e2db747769d2';
 
 /// See also [getEnrollmentsUseCase].
 @ProviderFor(getEnrollmentsUseCase)
@@ -132,27 +132,28 @@ final getEnrollmentsUseCaseProvider = Provider<GetEnrollmentsUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef GetEnrollmentsUseCaseRef = ProviderRef<GetEnrollmentsUseCase>;
-String _$createOrUpdateWeekUseCaseHash() =>
-    r'55de330eb565f0364015c151a5fb4d5ff48abce0';
+String _$updateEnrollmentStatusUseCaseHash() =>
+    r'6639fa8580b5fe94f1923828332fd73b30943906';
 
-/// See also [createOrUpdateWeekUseCase].
-@ProviderFor(createOrUpdateWeekUseCase)
-final createOrUpdateWeekUseCaseProvider =
-    Provider<CreateOrUpdateWeekUseCase>.internal(
-      createOrUpdateWeekUseCase,
-      name: r'createOrUpdateWeekUseCaseProvider',
+/// See also [updateEnrollmentStatusUseCase].
+@ProviderFor(updateEnrollmentStatusUseCase)
+final updateEnrollmentStatusUseCaseProvider =
+    Provider<UpdateEnrollmentStatusUseCase>.internal(
+      updateEnrollmentStatusUseCase,
+      name: r'updateEnrollmentStatusUseCaseProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$createOrUpdateWeekUseCaseHash,
+          : _$updateEnrollmentStatusUseCaseHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CreateOrUpdateWeekUseCaseRef = ProviderRef<CreateOrUpdateWeekUseCase>;
+typedef UpdateEnrollmentStatusUseCaseRef =
+    ProviderRef<UpdateEnrollmentStatusUseCase>;
 String _$getAssignmentsUseCaseHash() =>
-    r'0a20ca70d1ca0d679e12a12512dc6f7dde1cb698';
+    r'baa0bb7b16971db11c757bbc456d7382d7293fe7';
 
 /// See also [getAssignmentsUseCase].
 @ProviderFor(getAssignmentsUseCase)
@@ -170,7 +171,7 @@ final getAssignmentsUseCaseProvider = Provider<GetAssignmentsUseCase>.internal(
 // ignore: unused_element
 typedef GetAssignmentsUseCaseRef = ProviderRef<GetAssignmentsUseCase>;
 String _$createAssignmentUseCaseHash() =>
-    r'6d65cd5fdbc737a9f369c659deb7be2502437fe7';
+    r'ca5379445cd43e49fe9ee5eb6b28c21b64e44e10';
 
 /// See also [createAssignmentUseCase].
 @ProviderFor(createAssignmentUseCase)
@@ -189,7 +190,7 @@ final createAssignmentUseCaseProvider =
 // ignore: unused_element
 typedef CreateAssignmentUseCaseRef = ProviderRef<CreateAssignmentUseCase>;
 String _$publishAssignmentUseCaseHash() =>
-    r'53d0311cc0bb209d775509e2801de5974280cde8';
+    r'6012e478e937bf8f27a100029ca71dab48fe8fcc';
 
 /// See also [publishAssignmentUseCase].
 @ProviderFor(publishAssignmentUseCase)
@@ -208,7 +209,7 @@ final publishAssignmentUseCaseProvider =
 // ignore: unused_element
 typedef PublishAssignmentUseCaseRef = ProviderRef<PublishAssignmentUseCase>;
 String _$deliverAssignmentUseCaseHash() =>
-    r'140d13277c6dcb0c5ad11f80588e50447cf6902c';
+    r'04046afc6b71f156374f7ae46049b6d60aa3fc20';
 
 /// See also [deliverAssignmentUseCase].
 @ProviderFor(deliverAssignmentUseCase)
@@ -227,7 +228,7 @@ final deliverAssignmentUseCaseProvider =
 // ignore: unused_element
 typedef DeliverAssignmentUseCaseRef = ProviderRef<DeliverAssignmentUseCase>;
 String _$getAssignmentDeliveriesUseCaseHash() =>
-    r'33342e139e4fea36ea49e2e5de2514ea98d59c86';
+    r'37243277f04f4c450c1216ba120790864c65d95b';
 
 /// See also [getAssignmentDeliveriesUseCase].
 @ProviderFor(getAssignmentDeliveriesUseCase)
@@ -439,7 +440,7 @@ class _AssignmentDeliveriesProviderElement
 }
 
 String _$getAssignmentDetailsUseCaseHash() =>
-    r'328affea87f6605a31357add16c1accb9b6b2a65';
+    r'b45a6a93db0ceb7c8de8e43f7817b2acfdc857aa';
 
 /// See also [getAssignmentDetailsUseCase].
 @ProviderFor(getAssignmentDetailsUseCase)
@@ -459,7 +460,7 @@ final getAssignmentDetailsUseCaseProvider =
 typedef GetAssignmentDetailsUseCaseRef =
     ProviderRef<GetAssignmentDetailsUseCase>;
 String _$deleteAssignmentUseCaseHash() =>
-    r'09d146b3bc86f9a9ce727f00b7db2da058470165';
+    r'b52e55e22918c0e56e7852d276e52e4944801aba';
 
 /// See also [deleteAssignmentUseCase].
 @ProviderFor(deleteAssignmentUseCase)
@@ -478,7 +479,7 @@ final deleteAssignmentUseCaseProvider =
 // ignore: unused_element
 typedef DeleteAssignmentUseCaseRef = ProviderRef<DeleteAssignmentUseCase>;
 String _$updateAssignmentUseCaseHash() =>
-    r'e1a0c884a5076b8d85015dc8dd2600d635dfa4ea';
+    r'ba22ff979aa1bd86d2fa7717f833bf190e0a1a91';
 
 /// See also [updateAssignmentUseCase].
 @ProviderFor(updateAssignmentUseCase)
@@ -497,7 +498,7 @@ final updateAssignmentUseCaseProvider =
 // ignore: unused_element
 typedef UpdateAssignmentUseCaseRef = ProviderRef<UpdateAssignmentUseCase>;
 String _$addEnrollmentUseCaseHash() =>
-    r'2c30f0c902eba230531a22676d4dba6a4b2d8728';
+    r'e882987f9362d5901b6cd22cd03630094e5439c1';
 
 /// See also [addEnrollmentUseCase].
 @ProviderFor(addEnrollmentUseCase)
