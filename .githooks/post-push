@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REMOTE_NAME="${1:-origin}"
+REMOTE_URL="${2:-}"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SCRIPT_PATH="${REPO_ROOT}/scripts/auto_create_pr_on_push.py"
+
+if [[ ! -f "${SCRIPT_PATH}" ]]; then
+  exit 0
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[auto-pr] Skip: python3 not found."
+  exit 0
+fi
+
+python3 "${SCRIPT_PATH}" --remote-name "${REMOTE_NAME}" --remote-url "${REMOTE_URL}"

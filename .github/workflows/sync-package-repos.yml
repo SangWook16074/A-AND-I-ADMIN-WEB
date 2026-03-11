@@ -1,0 +1,38 @@
+name: Sync Package Repositories
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "aandi_*-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    if: ${{ secrets.AUTH_REPO_URL != '' && secrets.ADMIN_API_REPO_URL != '' && secrets.TECH_BLOG_REPO_URL != '' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync split package repos
+        env:
+          PACKAGE_REPO_TOKEN: ${{ secrets.PACKAGE_REPO_TOKEN }}
+          AUTH_REPO_URL: ${{ secrets.AUTH_REPO_URL }}
+          ADMIN_API_REPO_URL: ${{ secrets.ADMIN_API_REPO_URL }}
+          TECH_BLOG_REPO_URL: ${{ secrets.TECH_BLOG_REPO_URL }}
+          TARGET_BRANCH: main
+        run: bash scripts/sync_package_repos.sh --require-all
