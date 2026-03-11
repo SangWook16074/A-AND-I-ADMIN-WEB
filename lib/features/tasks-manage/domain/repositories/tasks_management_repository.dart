@@ -23,4 +23,15 @@ abstract interface class TasksManagementRepository {
   Future<List<Enrollment>> getEnrollments({
     required String courseSlug,
   });
+
+  Future<List<Assignment>> getAssignments({
+    required String courseSlug,
+    int? weekNo,
+    String? status,
+  });
+
+  Future<Assignment> createAssignment({
+    required String courseSlug,
+    required CreateAssignmentRequest request,
+  });
 }

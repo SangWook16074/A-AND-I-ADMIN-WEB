@@ -8,24 +8,41 @@ class TasksManagementState {
     required this.courses,
     required this.isCreating,
     this.errorMessage,
+    this.selectedCourse,
+    this.selectedCourseEnrollments,
+    this.selectedCourseAssignments,
+    this.isLoadingDetails = false,
   });
 
   const TasksManagementState.initial()
       : status = TasksManagementStatus.initial,
         courses = const [],
         isCreating = false,
-        errorMessage = null;
+        errorMessage = null,
+        selectedCourse = null,
+        selectedCourseEnrollments = null,
+        selectedCourseAssignments = null,
+        isLoadingDetails = false;
 
   final TasksManagementStatus status;
   final List<CourseSummary> courses;
   final bool isCreating;
   final String? errorMessage;
+  
+  final CourseSummary? selectedCourse;
+  final List<Enrollment>? selectedCourseEnrollments;
+  final List<Assignment>? selectedCourseAssignments;
+  final bool isLoadingDetails;
 
   TasksManagementState copyWith({
     TasksManagementStatus? status,
     List<CourseSummary>? courses,
     bool? isCreating,
     String? errorMessage,
+    CourseSummary? selectedCourse,
+    List<Enrollment>? selectedCourseEnrollments,
+    List<Assignment>? selectedCourseAssignments,
+    bool? isLoadingDetails,
     bool clearError = false,
   }) {
     return TasksManagementState(
@@ -33,6 +50,10 @@ class TasksManagementState {
       courses: courses ?? this.courses,
       isCreating: isCreating ?? this.isCreating,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      selectedCourse: selectedCourse ?? this.selectedCourse,
+      selectedCourseEnrollments: selectedCourseEnrollments ?? this.selectedCourseEnrollments,
+      selectedCourseAssignments: selectedCourseAssignments ?? this.selectedCourseAssignments,
+      isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
     );
   }
 }

@@ -84,4 +84,32 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       courseSlug: courseSlug,
     );
   }
+
+  @override
+  Future<List<Assignment>> getAssignments({
+    required String courseSlug,
+    int? weekNo,
+    String? status,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignments(
+      accessToken: token,
+      courseSlug: courseSlug,
+      weekNo: weekNo,
+      status: status,
+    );
+  }
+
+  @override
+  Future<Assignment> createAssignment({
+    required String courseSlug,
+    required CreateAssignmentRequest request,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.createAssignment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      request: request,
+    );
+  }
 }

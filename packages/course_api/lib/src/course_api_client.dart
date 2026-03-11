@@ -76,6 +76,46 @@ class CourseApiClient {
     return listData.whereType<Map<String, dynamic>>().map(Enrollment.fromJson).toList();
   }
 
+  Future<List<Assignment>> getAssignments({
+    required String accessToken,
+    required String courseSlug,
+    int? weekNo,
+    String? status,
+  }) async {
+    final queryParams = <String, dynamic>{};
+    if (weekNo != null) queryParams['weekNo'] = weekNo.toString();
+    if (status != null) queryParams['status'] = status;
+
+    final queryString = queryParams.isEmpty
+        ? ''
+        : '?${queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value.toString())}').join('&')}';
+
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments$queryString',
+    );
+
+    final listData = _readListData(response.body, statusCode: response.statusCode);
+    return listData.whereType<Map<String, dynamic>>().map(Assignment.fromJson).toList();
+  }
+
+  Future<Assignment> createAssignment({
+    required String accessToken,
+    required String courseSlug,
+    required CreateAssignmentRequest request,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments',
+      data: request.toJson(),
+    );
+
+    final mapData = _readMapData(response.body, statusCode: response.statusCode);
+    return Assignment.fromJson(mapData);
+  }
+
   Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {
     return {
       'id': json['id'],

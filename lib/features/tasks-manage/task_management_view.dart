@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'course_details_bottom_sheet.dart';
 import 'task_management.dart';
 
 class TaskManagementView extends ConsumerWidget {
@@ -111,7 +112,10 @@ class TaskManagementView extends ConsumerWidget {
                           ),
                           subtitle: Text(course.description ?? '설명 없음'),
                           trailing: const Icon(Icons.chevron_right_rounded),
-                          onTap: () {},
+                          onTap: () {
+                            ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementCourseSelected(course));
+                            showCourseDetailsBottomSheet(context, course);
+                          },
                         );
                       },
                     );

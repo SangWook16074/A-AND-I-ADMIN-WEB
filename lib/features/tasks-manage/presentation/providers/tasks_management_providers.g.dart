@@ -78,5 +78,79 @@ final createCourseUseCaseProvider = Provider<CreateCourseUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CreateCourseUseCaseRef = ProviderRef<CreateCourseUseCase>;
+String _$getEnrollmentsUseCaseHash() =>
+    r'f3dcb52ea808f932cf740f633e425a77d7ad18c2';
+
+/// See also [getEnrollmentsUseCase].
+@ProviderFor(getEnrollmentsUseCase)
+final getEnrollmentsUseCaseProvider = Provider<GetEnrollmentsUseCase>.internal(
+  getEnrollmentsUseCase,
+  name: r'getEnrollmentsUseCaseProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$getEnrollmentsUseCaseHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetEnrollmentsUseCaseRef = ProviderRef<GetEnrollmentsUseCase>;
+String _$createOrUpdateWeekUseCaseHash() =>
+    r'55de330eb565f0364015c151a5fb4d5ff48abce0';
+
+/// See also [createOrUpdateWeekUseCase].
+@ProviderFor(createOrUpdateWeekUseCase)
+final createOrUpdateWeekUseCaseProvider =
+    Provider<CreateOrUpdateWeekUseCase>.internal(
+      createOrUpdateWeekUseCase,
+      name: r'createOrUpdateWeekUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$createOrUpdateWeekUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CreateOrUpdateWeekUseCaseRef = ProviderRef<CreateOrUpdateWeekUseCase>;
+String _$getAssignmentsUseCaseHash() =>
+    r'0a20ca70d1ca0d679e12a12512dc6f7dde1cb698';
+
+/// See also [getAssignmentsUseCase].
+@ProviderFor(getAssignmentsUseCase)
+final getAssignmentsUseCaseProvider = Provider<GetAssignmentsUseCase>.internal(
+  getAssignmentsUseCase,
+  name: r'getAssignmentsUseCaseProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$getAssignmentsUseCaseHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetAssignmentsUseCaseRef = ProviderRef<GetAssignmentsUseCase>;
+String _$createAssignmentUseCaseHash() =>
+    r'6d65cd5fdbc737a9f369c659deb7be2502437fe7';
+
+/// See also [createAssignmentUseCase].
+@ProviderFor(createAssignmentUseCase)
+final createAssignmentUseCaseProvider =
+    Provider<CreateAssignmentUseCase>.internal(
+      createAssignmentUseCase,
+      name: r'createAssignmentUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$createAssignmentUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CreateAssignmentUseCaseRef = ProviderRef<CreateAssignmentUseCase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

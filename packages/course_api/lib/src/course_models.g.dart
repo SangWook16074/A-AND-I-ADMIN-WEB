@@ -118,3 +118,134 @@ Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
       'banReason': instance.banReason,
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
+
+_AssignmentMetadata _$AssignmentMetadataFromJson(Map<String, dynamic> json) =>
+    _AssignmentMetadata(
+      title: json['title'] as String,
+      difficulty: json['difficulty'] as String? ?? 'MID',
+      description: json['description'] as String?,
+      timeLimitMinutes: (json['timeLimitMinutes'] as num?)?.toInt(),
+      learningGoals:
+          (json['learningGoals'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      attributes: json['attributes'] as Map<String, dynamic>? ?? const {},
+    );
+
+Map<String, dynamic> _$AssignmentMetadataToJson(_AssignmentMetadata instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'difficulty': instance.difficulty,
+      'description': instance.description,
+      'timeLimitMinutes': instance.timeLimitMinutes,
+      'learningGoals': instance.learningGoals,
+      'attributes': instance.attributes,
+    };
+
+_AssignmentRequirement _$AssignmentRequirementFromJson(
+  Map<String, dynamic> json,
+) => _AssignmentRequirement(
+  sortOrder: (json['sortOrder'] as num).toInt(),
+  requirementText: json['requirementText'] as String,
+);
+
+Map<String, dynamic> _$AssignmentRequirementToJson(
+  _AssignmentRequirement instance,
+) => <String, dynamic>{
+  'sortOrder': instance.sortOrder,
+  'requirementText': instance.requirementText,
+};
+
+_AssignmentExample _$AssignmentExampleFromJson(Map<String, dynamic> json) =>
+    _AssignmentExample(
+      seq: (json['seq'] as num).toInt(),
+      inputText: json['inputText'] as String?,
+      outputText: json['outputText'] as String?,
+      description: json['description'] as String?,
+    );
+
+Map<String, dynamic> _$AssignmentExampleToJson(_AssignmentExample instance) =>
+    <String, dynamic>{
+      'seq': instance.seq,
+      'inputText': instance.inputText,
+      'outputText': instance.outputText,
+      'description': instance.description,
+    };
+
+_Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(
+  id: json['id'] as String,
+  courseSlug: json['courseSlug'] as String?,
+  weekNo: (json['weekNo'] as num).toInt(),
+  orderInWeek: (json['orderInWeek'] as num).toInt(),
+  startAt: json['startAt'] as String,
+  endAt: json['endAt'] as String,
+  status: json['status'] as String,
+  publishedAt: json['publishedAt'] as String?,
+  metadata: AssignmentMetadata.fromJson(
+    json['metadata'] as Map<String, dynamic>,
+  ),
+  requirements:
+      (json['requirements'] as List<dynamic>?)
+          ?.map(
+            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  examples:
+      (json['examples'] as List<dynamic>?)
+          ?.map((e) => AssignmentExample.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$AssignmentToJson(_Assignment instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'courseSlug': instance.courseSlug,
+      'weekNo': instance.weekNo,
+      'orderInWeek': instance.orderInWeek,
+      'startAt': instance.startAt,
+      'endAt': instance.endAt,
+      'status': instance.status,
+      'publishedAt': instance.publishedAt,
+      'metadata': instance.metadata,
+      'requirements': instance.requirements,
+      'examples': instance.examples,
+    };
+
+_CreateAssignmentRequest _$CreateAssignmentRequestFromJson(
+  Map<String, dynamic> json,
+) => _CreateAssignmentRequest(
+  weekNo: (json['weekNo'] as num).toInt(),
+  orderInWeek: (json['orderInWeek'] as num).toInt(),
+  startAt: json['startAt'] as String,
+  endAt: json['endAt'] as String,
+  metadata: AssignmentMetadata.fromJson(
+    json['metadata'] as Map<String, dynamic>,
+  ),
+  requirements:
+      (json['requirements'] as List<dynamic>?)
+          ?.map(
+            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  examples:
+      (json['examples'] as List<dynamic>?)
+          ?.map((e) => AssignmentExample.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$CreateAssignmentRequestToJson(
+  _CreateAssignmentRequest instance,
+) => <String, dynamic>{
+  'weekNo': instance.weekNo,
+  'orderInWeek': instance.orderInWeek,
+  'startAt': instance.startAt,
+  'endAt': instance.endAt,
+  'metadata': instance.metadata,
+  'requirements': instance.requirements,
+  'examples': instance.examples,
+};
