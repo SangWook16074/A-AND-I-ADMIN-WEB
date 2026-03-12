@@ -99,7 +99,7 @@ class _CourseDetailsBottomSheetState
         } else {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('유저 상태가 변경되었습니다.')));
+          ).showSnackBar(const SnackBar(content: Text('과제가 성공적으로 반영되었습니다.')));
         }
       }
     });
@@ -810,15 +810,13 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _description = '';
   String _startAt = '';
   String _endAt = '';
-  
+
   int? _timeLimitMinutes;
   List<String> _learningGoals = [];
   String _language = 'kotlin';
-  
+
   String _requirementsText = '';
-  String _exampleInput = '';
-  String _exampleOutput = '';
-  String _exampleDescription = '';
+  final List<_ExampleData> _examples = [_ExampleData()];
 
   @override
   Widget build(BuildContext context) {
@@ -1271,7 +1269,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             fillColor: Colors.white,
                           ),
                           keyboardType: TextInputType.number,
-                          onSaved: (v) => _timeLimitMinutes = int.tryParse(v ?? ''),
+                          onSaved: (v) =>
+                              _timeLimitMinutes = int.tryParse(v ?? ''),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1298,7 +1297,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                     ),
                     onSaved: (v) {
                       if (v != null && v.trim().isNotEmpty) {
-                        _learningGoals = v.split(',').map((e) => e.trim()).toList();
+                        _learningGoals = v
+                            .split(',')
+                            .map((e) => e.trim())
+                            .toList();
                       } else {
                         _learningGoals = [];
                       }
@@ -1318,42 +1320,106 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   const SizedBox(height: 12),
                   const Divider(),
                   const SizedBox(height: 12),
-                  const Text(
-                    '테스트 예제 (1개)',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '테스트 예제',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _examples.add(_ExampleData());
+                          });
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('예제 추가'),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '예제 입력 (Input)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'ADD 1\\nCLOSE',
-                    ),
-                    maxLines: 2,
-                    onSaved: (v) => _exampleInput = v?.trim() ?? '',
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '예제 출력 (Output)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: '+1',
-                    ),
-                    maxLines: 2,
-                    onSaved: (v) => _exampleOutput = v?.trim() ?? '',
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '예제 설명 (Description)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: '기본 동작',
-                    ),
-                    onSaved: (v) => _exampleDescription = v?.trim() ?? '',
-                  ),
+                  ..._examples.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final example = entry.value;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFEAEAEA)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '예제 ${index + 1}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              if (_examples.length > 1)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.remove_circle_outline,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _examples.removeAt(index);
+                                    });
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            initialValue: example.input,
+                            decoration: const InputDecoration(
+                              labelText: '예제 입력 (Input)',
+                              filled: true,
+                              fillColor: Color(0xFFFAFAFA),
+                              hintText: 'ADD 1\\nCLOSE',
+                            ),
+                            maxLines: 2,
+                            onSaved: (v) => example.input = v?.trim() ?? '',
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            initialValue: example.output,
+                            decoration: const InputDecoration(
+                              labelText: '예제 출력 (Output)',
+                              filled: true,
+                              fillColor: Color(0xFFFAFAFA),
+                              hintText: '+1',
+                            ),
+                            maxLines: 2,
+                            onSaved: (v) => example.output = v?.trim() ?? '',
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            initialValue: example.description,
+                            decoration: const InputDecoration(
+                              labelText: '예제 설명 (Description)',
+                              filled: true,
+                              fillColor: Color(0xFFFAFAFA),
+                              hintText: '기본 동작',
+                            ),
+                            onSaved: (v) =>
+                                example.description = v?.trim() ?? '',
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
@@ -1361,16 +1427,46 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
                           _formKey.currentState?.save();
-                          
-                          final reqList = _requirementsText.isEmpty ? <AssignmentRequirement>[] : _requirementsText.split('\n').where((e) => e.trim().isNotEmpty).toList().asMap().entries.map((e) => AssignmentRequirement(sortOrder: e.key + 1, requirementText: e.value.trim())).toList();
-                          final exampleList = (_exampleInput.isEmpty && _exampleOutput.isEmpty && _exampleDescription.isEmpty) ? <AssignmentExample>[] : [
-                            AssignmentExample(
-                              seq: 1,
-                              inputText: _exampleInput.replaceAll('\\n', '\n'),
-                              outputText: _exampleOutput.replaceAll('\\n', '\n'),
-                              description: _exampleDescription,
-                            ),
-                          ];
+
+                          final reqList = _requirementsText.isEmpty
+                              ? <AssignmentRequirement>[]
+                              : _requirementsText
+                                    .split('\n')
+                                    .where((e) => e.trim().isNotEmpty)
+                                    .toList()
+                                    .asMap()
+                                    .entries
+                                    .map(
+                                      (e) => AssignmentRequirement(
+                                        sortOrder: e.key + 1,
+                                        requirementText: e.value.trim(),
+                                      ),
+                                    )
+                                    .toList();
+                          final exampleList = _examples
+                              .asMap()
+                              .entries
+                              .where(
+                                (e) =>
+                                    e.value.input.isNotEmpty ||
+                                    e.value.output.isNotEmpty ||
+                                    e.value.description.isNotEmpty,
+                              )
+                              .map(
+                                (e) => AssignmentExample(
+                                  seq: e.key + 1,
+                                  inputText: e.value.input.replaceAll(
+                                    '\\n',
+                                    '\n',
+                                  ),
+                                  outputText: e.value.output.replaceAll(
+                                    '\\n',
+                                    '\n',
+                                  ),
+                                  description: e.value.description,
+                                ),
+                              )
+                              .toList();
 
                           ref
                               .read(tasksManagementBlocProvider.notifier)
@@ -1388,7 +1484,9 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       difficulty: _difficulty,
                                       timeLimitMinutes: _timeLimitMinutes,
                                       learningGoals: _learningGoals,
-                                      attributes: _language.isNotEmpty ? {'language': _language} : {},
+                                      attributes: _language.isNotEmpty
+                                          ? {'language': _language}
+                                          : {},
                                     ),
                                     requirements: reqList,
                                     examples: exampleList,
@@ -1399,6 +1497,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')),
                           );
                           _formKey.currentState?.reset();
+                          setState(() {
+                            _examples.clear();
+                            _examples.add(_ExampleData());
+                          });
                         }
                       },
                       style: FilledButton.styleFrom(
@@ -1422,4 +1524,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       ),
     );
   }
+}
+
+class _ExampleData {
+  String input = '';
+  String output = '';
+  String description = '';
 }
