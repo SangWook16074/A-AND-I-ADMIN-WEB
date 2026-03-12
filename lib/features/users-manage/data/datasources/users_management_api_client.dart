@@ -127,4 +127,48 @@ class UsersManagementApiClient {
       );
     }
   }
+
+  Future<String> resetPassword({
+    required String accessToken,
+    required String userId,
+  }) async {
+    try {
+      return await apiClient.resetPassword(
+        accessToken: accessToken,
+        userId: userId,
+      );
+    } on admin_api.AdminApiException catch (e) {
+      throw UsersManagementApiException(
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
+      );
+    }
+  }
+
+  Future<void> inviteMail({
+    required String accessToken,
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  }) async {
+    try {
+      await apiClient.inviteMail(
+        accessToken: accessToken,
+        emails: emails,
+        role: role,
+        cohort: cohort,
+        cohortOrder: cohortOrder,
+        userTrack: userTrack,
+      );
+    } on admin_api.AdminApiException catch (e) {
+      throw UsersManagementApiException(
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
+      );
+    }
+  }
 }

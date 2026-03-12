@@ -17,4 +17,12 @@ abstract interface class UsersManagementRepository {
     required int cohort,
     required String nickname,
   });
+  Future<String> resetPassword({required String userId});
+  Future<void> inviteMail({
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  });
 }
