@@ -29,26 +29,60 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   late String _endAt;
   late String _learningGoals;
   late String _language;
+  late List<_ExampleData> _examples;
+
+  bool _isInit = false;
 
   @override
   void initState() {
     super.initState();
-    _orderInWeek = widget.assignment.orderInWeek;
-    _title = widget.assignment.metadata.title;
-    _difficulty = widget.assignment.metadata.difficulty;
-    _description = widget.assignment.metadata.description ?? '';
-    _startAt = widget.assignment.startAt;
-    _endAt = widget.assignment.endAt;
-    _learningGoals = widget.assignment.metadata.learningGoals.join(', ');
-    _language = widget.assignment.metadata.attributes['language'] ?? 'kotlin';
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(tasksManagementBlocProvider.notifier).add(
+            TasksManagementAssignmentDetailsRequested(
+              courseSlug: widget.courseSlug,
+              assignmentId: widget.assignment.id,
+            ),
+          );
+    });
   }
 
-  void _submit() {
+  void _initFields(Assignment fullAssignment) {
+    if (_isInit) return;
+    _isInit = true;
+    _orderInWeek = fullAssignment.orderInWeek;
+    _title = fullAssignment.metadata.title;
+    _difficulty = fullAssignment.metadata.difficulty;
+    _description = fullAssignment.metadata.description ?? '';
+    _startAt = fullAssignment.startAt;
+    _endAt = fullAssignment.endAt;
+    _learningGoals = fullAssignment.metadata.learningGoals.join(', ');
+    _language = fullAssignment.metadata.attributes['language'] ?? 'kotlin';
+    _examples = fullAssignment.examples.map((e) => _ExampleData(
+      input: e.inputText ?? '',
+      output: e.outputText ?? '',
+      description: e.description ?? '',
+    )).toList();
+    if (_examples.isEmpty) {
+      _examples.add(_ExampleData());
+    }
+  }
+
+  void _submit(Assignment fullAssignment) {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final requirements = widget.assignment.requirements;
-      final examples = widget.assignment.examples;
+      final requirements = fullAssignment.requirements;
+      final examples = _examples
+          .asMap()
+          .entries
+          .where((e) => e.value.input.isNotEmpty || e.value.output.isNotEmpty || e.value.description.isNotEmpty)
+          .map((e) => AssignmentExample(
+                seq: e.key + 1,
+                inputText: e.value.input.replaceAll('\\n', '\n'),
+                outputText: e.value.output.replaceAll('\\n', '\n'),
+                description: e.value.description,
+              ))
+          .toList();
       
       final request = UpdateAssignmentRequest(
         orderInWeek: _orderInWeek,
@@ -58,10 +92,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           title: _title,
           difficulty: _difficulty,
           description: _description.isEmpty ? null : _description,
-          timeLimitMinutes: widget.assignment.metadata.timeLimitMinutes,
+          timeLimitMinutes: fullAssignment.metadata.timeLimitMinutes,
           learningGoals: _learningGoals.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
           attributes: {
-            ...widget.assignment.metadata.attributes,
+            ...fullAssignment.metadata.attributes,
             'language': _language,
           },
         ),
@@ -82,6 +116,23 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(tasksManagementBlocProvider);
+    final isLoading = state.isLoadingDetails;
+    final fullAssignment = state.selectedAssignment;
+
+    if (isLoading || fullAssignment == null || fullAssignment.id != widget.assignment.id) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          width: 600,
+          padding: const EdgeInsets.all(48),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    _initFields(fullAssignment);
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -198,6 +249,104 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                         onSaved: (v) => _language = v?.trim() ?? 'kotlin',
                       ),
                       const SizedBox(height: 24),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '테스트 예제',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _examples.add(_ExampleData());
+                              });
+                            },
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('예제 추가'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ..._examples.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final example = entry.value;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color(0xFFEAEAEA)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '예제 ${index + 1}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  if (_examples.length > 1)
+                                    IconButton(
+                                      icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 20),
+                                      onPressed: () {
+                                        setState(() {
+                                          _examples.removeAt(index);
+                                        });
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                initialValue: example.input.replaceAll('\n', '\\n'),
+                                decoration: const InputDecoration(
+                                  labelText: '예제 입력 (Input)',
+                                  filled: true,
+                                  fillColor: Color(0xFFFAFAFA),
+                                  hintText: 'ADD 1\\nCLOSE',
+                                ),
+                                maxLines: 2,
+                                onSaved: (v) => example.input = v?.trim() ?? '',
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                initialValue: example.output.replaceAll('\n', '\\n'),
+                                decoration: const InputDecoration(
+                                  labelText: '예제 출력 (Output)',
+                                  filled: true,
+                                  fillColor: Color(0xFFFAFAFA),
+                                  hintText: '+1',
+                                ),
+                                maxLines: 2,
+                                onSaved: (v) => example.output = v?.trim() ?? '',
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                initialValue: example.description,
+                                decoration: const InputDecoration(
+                                  labelText: '예제 설명 (Description)',
+                                  filled: true,
+                                  fillColor: Color(0xFFFAFAFA),
+                                  hintText: '기본 동작',
+                                ),
+                                onSaved: (v) => example.description = v?.trim() ?? '',
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -205,7 +354,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
               Align(
                 alignment: Alignment.centerRight,
                 child: FilledButton(
-                  onPressed: _submit,
+                  onPressed: () => _submit(fullAssignment),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     backgroundColor: Colors.black,
@@ -219,4 +368,16 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       ),
     );
   }
+}
+
+class _ExampleData {
+  String input;
+  String output;
+  String description;
+
+  _ExampleData({
+    this.input = '',
+    this.output = '',
+    this.description = '',
+  });
 }
