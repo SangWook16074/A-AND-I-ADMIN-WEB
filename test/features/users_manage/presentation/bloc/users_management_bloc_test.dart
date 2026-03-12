@@ -70,11 +70,42 @@ class FakeUsersManagementRepository implements UsersManagementRepository {
       active: existing.active,
     );
   }
+
+  @override
+  Future<String> resetPassword({required String userId}) async {
+    return 'temp-password-123';
+  }
+
+  @override
+  Future<void> inviteMail({
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  }) async {
+    for (final email in emails) {
+      users.add(
+        AdminUser(
+          id: 'u-${DateTime.now().millisecondsSinceEpoch}',
+          username: email.split('@').first,
+          role: role,
+          nickname: '',
+          publicCode: 'code',
+          userTrack: userTrack,
+          cohort: cohort,
+          cohortOrder: cohortOrder,
+          forcePasswordChange: false,
+          active: true,
+        )
+      );
+    }
+  }
 }
 
 void main() {
   group('UsersManagementBloc', () {
-    test('create event adds user and reloads users list', () async {
+    test('invite event adds user and reloads users list', () async {
       final fakeRepo = FakeUsersManagementRepository();
       final container = ProviderContainer(
         overrides: [
@@ -86,18 +117,18 @@ void main() {
       final notifier = container.read(usersManagementBlocProvider.notifier);
 
       await notifier.onEvent(
-        const UsersManagementCreateRequested(
-          provisionType: AdminUserProvisionType.invite,
+        const UsersManagementInviteRequested(
+          emails: ['test@example.com'],
+          role: AuthRole.user,
           cohort: 4,
+          cohortOrder: 4,
+          userTrack: 'NO',
         ),
       );
 
       final state = container.read(usersManagementBlocProvider);
       expect(state.status, UsersManagementStatus.success);
-      expect(state.users.map((e) => e.username), contains('new-admin'));
-      final created = state.users.firstWhere((e) => e.id == 'u-2');
-      expect(created.role, AuthRole.user);
-      expect(created.cohort, 4);
+      expect(state.users.map((e) => e.username), contains('test'));
     });
 
     test('delete event removes user from state', () async {

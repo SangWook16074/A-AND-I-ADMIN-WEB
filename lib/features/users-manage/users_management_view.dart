@@ -3,13 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 
-import 'package:aandi_admin_api/aandi_admin_api.dart';
+
 import 'domain/entities/admin_user.dart';
 import 'presentation/bloc/users_management_bloc.dart';
 import 'presentation/bloc/users_management_event.dart';
 import 'presentation/bloc/users_management_state.dart';
 import 'views/users_management_pagination_view.dart';
 import 'views/users_management_table_view.dart';
+
+class _InviteUserData {
+  const _InviteUserData({
+    required this.emails,
+    required this.userTrack,
+  });
+
+  final List<String> emails;
+  final String userTrack;
+}
 
 class UsersManagementView extends ConsumerStatefulWidget {
   const UsersManagementView({
@@ -38,15 +48,18 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
   }
 
   Future<void> onCreateUserPressed() async {
-    final cohort = await showCreateUserCohortDialog();
-    if (cohort == null) return;
+    final inviteData = await showInviteUserDialog();
+    if (inviteData == null) return;
 
     await ref
         .read(usersManagementBlocProvider.notifier)
         .onEvent(
-          UsersManagementCreateRequested(
-            provisionType: AdminUserProvisionType.invite,
-            cohort: cohort,
+          UsersManagementInviteRequested(
+            emails: inviteData.emails,
+            role: AuthRole.user,
+            cohort: 4,
+            cohortOrder: 4,
+            userTrack: inviteData.userTrack,
           ),
         );
     if (!mounted) return;
@@ -59,44 +72,54 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
       SnackBar(
         content: Text(
           isSuccess
-              ? '사용자가 생성되었습니다.'
-              : (nextState.errorMessage ?? '사용자 생성에 실패했습니다.'),
+              ? '${inviteData.emails.length}명의 사용자에게 초대 메일을 발송했습니다.'
+              : (nextState.errorMessage ?? '초대 메일 발송에 실패했습니다.'),
         ),
       ),
     );
   }
-
-  Future<int?> showCreateUserCohortDialog() async {
-    return showDialog<int>(
+  Future<_InviteUserData?> showInviteUserDialog() async {
+    return showDialog<_InviteUserData>(
       context: context,
       builder: (dialogContext) {
-        var selectedCohort = 1;
+        final emailsController = TextEditingController();
+        var selectedTrack = 'NO';
+        
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('사용자 생성'),
+              title: const Text('사용자 초대'),
               content: SizedBox(
-                width: 320,
-                child: DropdownButtonFormField<int>(
-                  value: selectedCohort,
-                  items: List.generate(
-                    10,
-                    (index) => DropdownMenuItem(
-                      value: index + 1,
-                      child: Text('${index + 1}기'),
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: emailsController,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        labelText: '이메일 (콤마 또는 줄바꿈으로 구분)',
+                        border: OutlineInputBorder(),
+                        alignLabelWithHint: true,
+                      ),
                     ),
-                  ),
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setDialogState(() => selectedCohort = value);
-                  },
-                  decoration: InputDecoration(
-                    labelText: '기수',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: '트랙',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        isDense: true,
+                      ),
+                      value: selectedTrack,
+                      items: const [
+                        DropdownMenuItem(value: 'NO', child: Text('공통 (NO)')),
+                        DropdownMenuItem(value: 'SP', child: Text('스프링 (SP)')),
+                        DropdownMenuItem(value: 'FL', child: Text('플러터 (FL)')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setDialogState(() => selectedTrack = val);
+                      },
                     ),
-                    isDense: true,
-                  ),
+                  ],
                 ),
               ),
               actions: [
@@ -105,9 +128,19 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                   child: const Text('취소'),
                 ),
                 FilledButton(
-                  onPressed: () =>
-                      Navigator.of(dialogContext).pop(selectedCohort),
-                  child: const Text('생성'),
+                  onPressed: () {
+                    final text = emailsController.text;
+                    final emails = text
+                        .split(RegExp(r'[,\n]'))
+                        .map((e) => e.trim())
+                        .where((e) => e.isNotEmpty)
+                        .toList();
+                    if (emails.isEmpty) return;
+                    Navigator.of(dialogContext).pop(
+                      _InviteUserData(emails: emails, userTrack: selectedTrack),
+                    );
+                  },
+                  child: const Text('초대 발송'),
                 ),
               ],
             );
@@ -123,6 +156,7 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
       builder: (dialogContext) {
         var isDeleting = false;
         var isUpdating = false;
+        var isResettingPassword = false;
         var selectedRole = _editableRole(user.role);
         var selectedTrack = _editableTrack(user.userTrack);
         var selectedCohort = _editableCohort(user.cohort);
@@ -238,13 +272,13 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
               ),
               actions: [
                 TextButton(
-                  onPressed: isDeleting || isUpdating
+                  onPressed: isDeleting || isUpdating || isResettingPassword
                       ? null
                       : () => Navigator.of(dialogContext).pop(),
                   child: const Text('닫기'),
                 ),
                 FilledButton.icon(
-                  onPressed: isDeleting || isUpdating || user.inviteLink == null
+                  onPressed: isDeleting || isUpdating || isResettingPassword || user.inviteLink == null
                       ? null
                       : () async {
                           await Clipboard.setData(
@@ -260,7 +294,109 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                   label: const Text('링크 복사'),
                 ),
                 FilledButton.icon(
-                  onPressed: isDeleting || isUpdating
+                  onPressed: isDeleting || isUpdating || isResettingPassword
+                      ? null
+                      : () async {
+                          setDialogState(() => isResettingPassword = true);
+                          try {
+                            await ref
+                                .read(usersManagementBlocProvider.notifier)
+                                .onEvent(
+                                  UsersManagementResetPasswordRequested(
+                                    userId: user.id,
+                                  ),
+                                );
+                            if (!mounted) return;
+
+                            final nextState = ref.read(usersManagementBlocProvider);
+                            final isSuccess = nextState.status == UsersManagementStatus.success &&
+                                nextState.errorMessage == null;
+
+                            if (isSuccess && nextState.temporaryPassword != null) {
+                              final temporaryPassword = nextState.temporaryPassword!;
+                              await showDialog(
+                                context: context,
+                                builder: (popupContext) => AlertDialog(
+                                  title: const Text('임시 비밀번호 발급'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '아래 임시 비밀번호를 복사하여 사용자에게 전달해주세요.\n창을 닫으면 다시 확인할 수 없습니다.',
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF5F5F5),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: SelectableText(
+                                          temporaryPassword,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(popupContext).pop(),
+                                      child: const Text('닫기'),
+                                    ),
+                                    FilledButton.icon(
+                                      onPressed: () async {
+                                        await Clipboard.setData(
+                                          ClipboardData(text: temporaryPassword),
+                                        );
+                                        if (popupContext.mounted) {
+                                          ScaffoldMessenger.of(popupContext).showSnackBar(
+                                            const SnackBar(content: Text('비밀번호가 복사되었습니다.')),
+                                          );
+                                        }
+                                      },
+                                      icon: const Icon(Icons.copy_rounded, size: 16),
+                                      label: const Text('복사하기'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(nextState.errorMessage ?? '비밀번호 발급에 실패했습니다.'),
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (dialogBodyContext.mounted) {
+                              setDialogState(() => isResettingPassword = false);
+                            }
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E88E5), // Blue color for emphasis
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: isResettingPassword
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.password_rounded, size: 16),
+                  label: Text(isResettingPassword ? '발급 중...' : '임시 비번 발급'),
+                ),
+
+                FilledButton.icon(
+                  onPressed: isDeleting || isUpdating || isResettingPassword
                       ? null
                       : () async {
                           setDialogState(() => isUpdating = true);
@@ -316,7 +452,7 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                 ),
                 if (user.role != AuthRole.admin)
                   FilledButton.icon(
-                    onPressed: isDeleting || isUpdating
+                    onPressed: isDeleting || isUpdating || isResettingPassword
                         ? null
                         : () async {
                             final confirmed = await showDialog<bool>(

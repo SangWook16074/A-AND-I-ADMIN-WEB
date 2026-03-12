@@ -9,6 +9,8 @@ class UsersManagementState {
     required this.isCreating,
     required this.deletingUserId,
     required this.updatingUserId,
+    required this.resettingPasswordUserId,
+    this.temporaryPassword,
     this.errorMessage,
   });
 
@@ -18,6 +20,8 @@ class UsersManagementState {
       isCreating = false,
       deletingUserId = null,
       updatingUserId = null,
+      resettingPasswordUserId = null,
+      temporaryPassword = null,
       errorMessage = null;
 
   final UsersManagementStatus status;
@@ -25,6 +29,8 @@ class UsersManagementState {
   final bool isCreating;
   final String? deletingUserId;
   final String? updatingUserId;
+  final String? resettingPasswordUserId;
+  final String? temporaryPassword;
   final String? errorMessage;
 
   UsersManagementState copyWith({
@@ -35,6 +41,10 @@ class UsersManagementState {
     bool clearDeletingUserId = false,
     String? updatingUserId,
     bool clearUpdatingUserId = false,
+    String? resettingPasswordUserId,
+    bool clearResettingPasswordUserId = false,
+    String? temporaryPassword,
+    bool clearTemporaryPassword = false,
     String? errorMessage,
     bool clearError = false,
   }) {
@@ -48,6 +58,12 @@ class UsersManagementState {
       updatingUserId: clearUpdatingUserId
           ? null
           : (updatingUserId ?? this.updatingUserId),
+      resettingPasswordUserId: clearResettingPasswordUserId
+          ? null
+          : (resettingPasswordUserId ?? this.resettingPasswordUserId),
+      temporaryPassword: clearTemporaryPassword
+          ? null
+          : (temporaryPassword ?? this.temporaryPassword),
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
