@@ -80,4 +80,39 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
       nickname: nickname,
     );
   }
+
+  @override
+  Future<String> resetPassword({required String userId}) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    return await _apiClient.resetPassword(accessToken: accessToken, userId: userId);
+  }
+
+  @override
+  Future<void> inviteMail({
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  }) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    await _apiClient.inviteMail(
+      accessToken: accessToken,
+      emails: emails,
+      role: role,
+      cohort: cohort,
+      cohortOrder: cohortOrder,
+      userTrack: userTrack,
+    );
+  }
 }

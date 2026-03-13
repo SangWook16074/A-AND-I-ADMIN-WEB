@@ -61,6 +61,26 @@ class AdminApiClient {
     );
   }
 
+  Future<String> resetPassword({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      pathSuffix: '/$userId/reset-password',
+      data: const <String, dynamic>{},
+    );
+    final data = _readMapData(response.body, statusCode: response.statusCode);
+    if (data['temporaryPassword'] is! String) {
+      throw AdminApiException(
+        'Missing temporaryPassword in response',
+        statusCode: response.statusCode,
+      );
+    }
+    return data['temporaryPassword'] as String;
+  }
+
   Future<void> updateUser({
     required String accessToken,
     required String userId,
@@ -83,14 +103,38 @@ class AdminApiClient {
     );
   }
 
+  Future<void> inviteMail({
+    required String accessToken,
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  }) async {
+    await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '/v1/admin/invite-mail',
+      data: {
+        'emails': emails,
+        'role': role.toApi(),
+        'cohort': cohort,
+        'cohortOrder': cohortOrder,
+        'userTrack': userTrack,
+      },
+    );
+  }
+
   Future<({int statusCode, Map<String, dynamic> body})> _requestJson({
     required String method,
     required String accessToken,
     Object? data,
     bool allowEmptySuccessBody = false,
+    String? path,
+    String pathSuffix = '',
   }) async {
     final response = await dio.requestUri<dynamic>(
-      Uri.parse('$baseUrl$_usersPath'),
+      Uri.parse('$baseUrl${path ?? _usersPath}$pathSuffix'),
       data: data,
       options: Options(
         method: method,

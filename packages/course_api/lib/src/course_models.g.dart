@@ -350,3 +350,17 @@ _AddEnrollmentRequest _$AddEnrollmentRequestFromJson(
 Map<String, dynamic> _$AddEnrollmentRequestToJson(
   _AddEnrollmentRequest instance,
 ) => <String, dynamic>{'userId': instance.userId};
+
+_UpdateEnrollmentStatusRequest _$UpdateEnrollmentStatusRequestFromJson(
+  Map<String, dynamic> json,
+) => _UpdateEnrollmentStatusRequest(
+  status: json['status'] as String,
+  banReason: json['banReason'] as String?,
+);
+
+Map<String, dynamic> _$UpdateEnrollmentStatusRequestToJson(
+  _UpdateEnrollmentStatusRequest instance,
+) => <String, dynamic>{
+  'status': instance.status,
+  'banReason': instance.banReason,
+};

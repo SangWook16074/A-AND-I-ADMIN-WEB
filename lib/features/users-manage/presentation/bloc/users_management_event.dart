@@ -1,7 +1,6 @@
 import 'package:aandi_auth/aandi_auth.dart';
 
-import 'package:aandi_admin_api/aandi_admin_api.dart';
-
+// No need to import aandi_admin_api
 sealed class UsersManagementEvent {
   const UsersManagementEvent();
 }
@@ -14,14 +13,20 @@ class UsersManagementRefreshRequested extends UsersManagementEvent {
   const UsersManagementRefreshRequested();
 }
 
-class UsersManagementCreateRequested extends UsersManagementEvent {
-  const UsersManagementCreateRequested({
-    required this.provisionType,
+class UsersManagementInviteRequested extends UsersManagementEvent {
+  const UsersManagementInviteRequested({
+    required this.emails,
+    required this.role,
     required this.cohort,
+    required this.cohortOrder,
+    required this.userTrack,
   });
 
-  final AdminUserProvisionType provisionType;
+  final List<String> emails;
+  final AuthRole role;
   final int cohort;
+  final int cohortOrder;
+  final String userTrack;
 }
 
 class UsersManagementDeleteRequested extends UsersManagementEvent {
@@ -44,4 +49,10 @@ class UsersManagementUpdateRequested extends UsersManagementEvent {
   final String userTrack;
   final int cohort;
   final String nickname;
+}
+
+class UsersManagementResetPasswordRequested extends UsersManagementEvent {
+  const UsersManagementResetPasswordRequested({required this.userId});
+
+  final String userId;
 }

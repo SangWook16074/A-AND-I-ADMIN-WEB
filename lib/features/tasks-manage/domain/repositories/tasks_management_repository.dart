@@ -19,21 +19,17 @@ abstract interface class TasksManagementRepository {
     required String endDate,
   });
 
-  Future<CourseWeek> createOrUpdateWeek({
-    required String courseSlug,
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  });
-
-  Future<List<Enrollment>> getEnrollments({
-    required String courseSlug,
-  });
+  Future<List<Enrollment>> getEnrollments({required String courseSlug});
 
   Future<Enrollment> addEnrollment({
     required String courseSlug,
     required AddEnrollmentRequest request,
+  });
+
+  Future<Enrollment> updateEnrollmentStatus({
+    required String courseSlug,
+    required String userId,
+    required UpdateEnrollmentStatusRequest request,
   });
 
   Future<List<Assignment>> getAssignments({
