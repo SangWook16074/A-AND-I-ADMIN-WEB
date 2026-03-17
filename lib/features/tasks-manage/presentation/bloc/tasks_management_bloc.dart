@@ -203,8 +203,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         );
       }
     } catch (e) {
+      // Only record the error — don't flip the whole page to failure state.
       state = state.copyWith(
-        status: TasksManagementStatus.failure,
         isLoadingDetails: false,
         errorMessage: e.toString(),
       );
@@ -285,7 +285,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       }
     } catch (e) {
       state = state.copyWith(
-        status: TasksManagementStatus.failure,
         isLoadingDetails: false,
         errorMessage: e.toString(),
       );

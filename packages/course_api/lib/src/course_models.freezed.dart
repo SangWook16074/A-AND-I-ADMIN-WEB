@@ -13,9 +13,287 @@ part of 'course_models.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$CourseMetadata {
+
+ String get title; String? get description; String get phase; Map<String, dynamic> get attributes;
+/// Create a copy of CourseMetadata
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CourseMetadataCopyWith<CourseMetadata> get copyWith => _$CourseMetadataCopyWithImpl<CourseMetadata>(this as CourseMetadata, _$identity);
+
+  /// Serializes this CourseMetadata to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CourseMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other.attributes, attributes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,phase,const DeepCollectionEquality().hash(attributes));
+
+@override
+String toString() {
+  return 'CourseMetadata(title: $title, description: $description, phase: $phase, attributes: $attributes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CourseMetadataCopyWith<$Res>  {
+  factory $CourseMetadataCopyWith(CourseMetadata value, $Res Function(CourseMetadata) _then) = _$CourseMetadataCopyWithImpl;
+@useResult
+$Res call({
+ String title, String? description, String phase, Map<String, dynamic> attributes
+});
+
+
+
+
+}
+/// @nodoc
+class _$CourseMetadataCopyWithImpl<$Res>
+    implements $CourseMetadataCopyWith<$Res> {
+  _$CourseMetadataCopyWithImpl(this._self, this._then);
+
+  final CourseMetadata _self;
+  final $Res Function(CourseMetadata) _then;
+
+/// Create a copy of CourseMetadata
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = freezed,Object? phase = null,Object? attributes = null,}) {
+  return _then(_self.copyWith(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
+as String,attributes: null == attributes ? _self.attributes : attributes // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CourseMetadata].
+extension CourseMetadataPatterns on CourseMetadata {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CourseMetadata value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CourseMetadata() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CourseMetadata value)  $default,){
+final _that = this;
+switch (_that) {
+case _CourseMetadata():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CourseMetadata value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CourseMetadata() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String? description,  String phase,  Map<String, dynamic> attributes)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CourseMetadata() when $default != null:
+return $default(_that.title,_that.description,_that.phase,_that.attributes);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String? description,  String phase,  Map<String, dynamic> attributes)  $default,) {final _that = this;
+switch (_that) {
+case _CourseMetadata():
+return $default(_that.title,_that.description,_that.phase,_that.attributes);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String? description,  String phase,  Map<String, dynamic> attributes)?  $default,) {final _that = this;
+switch (_that) {
+case _CourseMetadata() when $default != null:
+return $default(_that.title,_that.description,_that.phase,_that.attributes);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CourseMetadata implements CourseMetadata {
+  const _CourseMetadata({this.title = '', this.description, this.phase = '', final  Map<String, dynamic> attributes = const {}}): _attributes = attributes;
+  factory _CourseMetadata.fromJson(Map<String, dynamic> json) => _$CourseMetadataFromJson(json);
+
+@override@JsonKey() final  String title;
+@override final  String? description;
+@override@JsonKey() final  String phase;
+ final  Map<String, dynamic> _attributes;
+@override@JsonKey() Map<String, dynamic> get attributes {
+  if (_attributes is EqualUnmodifiableMapView) return _attributes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_attributes);
+}
+
+
+/// Create a copy of CourseMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CourseMetadataCopyWith<_CourseMetadata> get copyWith => __$CourseMetadataCopyWithImpl<_CourseMetadata>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CourseMetadataToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CourseMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other._attributes, _attributes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,phase,const DeepCollectionEquality().hash(_attributes));
+
+@override
+String toString() {
+  return 'CourseMetadata(title: $title, description: $description, phase: $phase, attributes: $attributes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CourseMetadataCopyWith<$Res> implements $CourseMetadataCopyWith<$Res> {
+  factory _$CourseMetadataCopyWith(_CourseMetadata value, $Res Function(_CourseMetadata) _then) = __$CourseMetadataCopyWithImpl;
+@override @useResult
+$Res call({
+ String title, String? description, String phase, Map<String, dynamic> attributes
+});
+
+
+
+
+}
+/// @nodoc
+class __$CourseMetadataCopyWithImpl<$Res>
+    implements _$CourseMetadataCopyWith<$Res> {
+  __$CourseMetadataCopyWithImpl(this._self, this._then);
+
+  final _CourseMetadata _self;
+  final $Res Function(_CourseMetadata) _then;
+
+/// Create a copy of CourseMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = freezed,Object? phase = null,Object? attributes = null,}) {
+  return _then(_CourseMetadata(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
+as String,attributes: null == attributes ? _self._attributes : attributes // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$CourseSummary {
 
- String get id; String get title; String get slug; String? get description; String get phase; String get targetTrack; String get status; DateTime get createdAt; DateTime get updatedAt; String? get startDate; String? get endDate;
+ String get id; String get slug;@JsonKey(name: 'fieldTag') String get targetTrack; CourseMetadata get metadata; String get status; DateTime? get createdAt; DateTime? get updatedAt; String? get startDate; String? get endDate;
 /// Create a copy of CourseSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +306,16 @@ $CourseSummaryCopyWith<CourseSummary> get copyWith => _$CourseSummaryCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CourseSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.description, description) || other.description == description)&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.targetTrack, targetTrack) || other.targetTrack == targetTrack)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CourseSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.targetTrack, targetTrack) || other.targetTrack == targetTrack)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,slug,description,phase,targetTrack,status,createdAt,updatedAt,startDate,endDate);
+int get hashCode => Object.hash(runtimeType,id,slug,targetTrack,metadata,status,createdAt,updatedAt,startDate,endDate);
 
 @override
 String toString() {
-  return 'CourseSummary(id: $id, title: $title, slug: $slug, description: $description, phase: $phase, targetTrack: $targetTrack, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, startDate: $startDate, endDate: $endDate)';
+  return 'CourseSummary(id: $id, slug: $slug, targetTrack: $targetTrack, metadata: $metadata, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, startDate: $startDate, endDate: $endDate)';
 }
 
 
@@ -48,11 +326,11 @@ abstract mixin class $CourseSummaryCopyWith<$Res>  {
   factory $CourseSummaryCopyWith(CourseSummary value, $Res Function(CourseSummary) _then) = _$CourseSummaryCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String slug, String? description, String phase, String targetTrack, String status, DateTime createdAt, DateTime updatedAt, String? startDate, String? endDate
+ String id, String slug,@JsonKey(name: 'fieldTag') String targetTrack, CourseMetadata metadata, String status, DateTime? createdAt, DateTime? updatedAt, String? startDate, String? endDate
 });
 
 
-
+$CourseMetadataCopyWith<$Res> get metadata;
 
 }
 /// @nodoc
@@ -65,23 +343,30 @@ class _$CourseSummaryCopyWithImpl<$Res>
 
 /// Create a copy of CourseSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? slug = null,Object? description = freezed,Object? phase = null,Object? targetTrack = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,Object? startDate = freezed,Object? endDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? slug = null,Object? targetTrack = null,Object? metadata = null,Object? status = null,Object? createdAt = freezed,Object? updatedAt = freezed,Object? startDate = freezed,Object? endDate = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
-as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as String,targetTrack: null == targetTrack ? _self.targetTrack : targetTrack // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,startDate: freezed == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as CourseMetadata,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,startDate: freezed == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
-
+/// Create a copy of CourseSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CourseMetadataCopyWith<$Res> get metadata {
+  
+  return $CourseMetadataCopyWith<$Res>(_self.metadata, (value) {
+    return _then(_self.copyWith(metadata: value));
+  });
+}
 }
 
 
@@ -163,10 +448,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String slug,  String? description,  String phase,  String targetTrack,  String status,  DateTime createdAt,  DateTime updatedAt,  String? startDate,  String? endDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String slug, @JsonKey(name: 'fieldTag')  String targetTrack,  CourseMetadata metadata,  String status,  DateTime? createdAt,  DateTime? updatedAt,  String? startDate,  String? endDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CourseSummary() when $default != null:
-return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_that.targetTrack,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
+return $default(_that.id,_that.slug,_that.targetTrack,_that.metadata,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
   return orElse();
 
 }
@@ -184,10 +469,10 @@ return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String slug,  String? description,  String phase,  String targetTrack,  String status,  DateTime createdAt,  DateTime updatedAt,  String? startDate,  String? endDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String slug, @JsonKey(name: 'fieldTag')  String targetTrack,  CourseMetadata metadata,  String status,  DateTime? createdAt,  DateTime? updatedAt,  String? startDate,  String? endDate)  $default,) {final _that = this;
 switch (_that) {
 case _CourseSummary():
-return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_that.targetTrack,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
+return $default(_that.id,_that.slug,_that.targetTrack,_that.metadata,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +489,10 @@ return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String slug,  String? description,  String phase,  String targetTrack,  String status,  DateTime createdAt,  DateTime updatedAt,  String? startDate,  String? endDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String slug, @JsonKey(name: 'fieldTag')  String targetTrack,  CourseMetadata metadata,  String status,  DateTime? createdAt,  DateTime? updatedAt,  String? startDate,  String? endDate)?  $default,) {final _that = this;
 switch (_that) {
 case _CourseSummary() when $default != null:
-return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_that.targetTrack,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
+return $default(_that.id,_that.slug,_that.targetTrack,_that.metadata,_that.status,_that.createdAt,_that.updatedAt,_that.startDate,_that.endDate);case _:
   return null;
 
 }
@@ -219,18 +504,16 @@ return $default(_that.id,_that.title,_that.slug,_that.description,_that.phase,_t
 @JsonSerializable()
 
 class _CourseSummary implements CourseSummary {
-  const _CourseSummary({required this.id, required this.title, required this.slug, this.description, required this.phase, required this.targetTrack, required this.status, required this.createdAt, required this.updatedAt, this.startDate, this.endDate});
+  const _CourseSummary({this.id = '', this.slug = '', @JsonKey(name: 'fieldTag') this.targetTrack = 'NO', required this.metadata, this.status = 'DRAFT', this.createdAt, this.updatedAt, this.startDate, this.endDate});
   factory _CourseSummary.fromJson(Map<String, dynamic> json) => _$CourseSummaryFromJson(json);
 
-@override final  String id;
-@override final  String title;
-@override final  String slug;
-@override final  String? description;
-@override final  String phase;
-@override final  String targetTrack;
-@override final  String status;
-@override final  DateTime createdAt;
-@override final  DateTime updatedAt;
+@override@JsonKey() final  String id;
+@override@JsonKey() final  String slug;
+@override@JsonKey(name: 'fieldTag') final  String targetTrack;
+@override final  CourseMetadata metadata;
+@override@JsonKey() final  String status;
+@override final  DateTime? createdAt;
+@override final  DateTime? updatedAt;
 @override final  String? startDate;
 @override final  String? endDate;
 
@@ -247,16 +530,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CourseSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.description, description) || other.description == description)&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.targetTrack, targetTrack) || other.targetTrack == targetTrack)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CourseSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.targetTrack, targetTrack) || other.targetTrack == targetTrack)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,slug,description,phase,targetTrack,status,createdAt,updatedAt,startDate,endDate);
+int get hashCode => Object.hash(runtimeType,id,slug,targetTrack,metadata,status,createdAt,updatedAt,startDate,endDate);
 
 @override
 String toString() {
-  return 'CourseSummary(id: $id, title: $title, slug: $slug, description: $description, phase: $phase, targetTrack: $targetTrack, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, startDate: $startDate, endDate: $endDate)';
+  return 'CourseSummary(id: $id, slug: $slug, targetTrack: $targetTrack, metadata: $metadata, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, startDate: $startDate, endDate: $endDate)';
 }
 
 
@@ -267,11 +550,11 @@ abstract mixin class _$CourseSummaryCopyWith<$Res> implements $CourseSummaryCopy
   factory _$CourseSummaryCopyWith(_CourseSummary value, $Res Function(_CourseSummary) _then) = __$CourseSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String slug, String? description, String phase, String targetTrack, String status, DateTime createdAt, DateTime updatedAt, String? startDate, String? endDate
+ String id, String slug,@JsonKey(name: 'fieldTag') String targetTrack, CourseMetadata metadata, String status, DateTime? createdAt, DateTime? updatedAt, String? startDate, String? endDate
 });
 
 
-
+@override $CourseMetadataCopyWith<$Res> get metadata;
 
 }
 /// @nodoc
@@ -284,24 +567,31 @@ class __$CourseSummaryCopyWithImpl<$Res>
 
 /// Create a copy of CourseSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? slug = null,Object? description = freezed,Object? phase = null,Object? targetTrack = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,Object? startDate = freezed,Object? endDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? slug = null,Object? targetTrack = null,Object? metadata = null,Object? status = null,Object? createdAt = freezed,Object? updatedAt = freezed,Object? startDate = freezed,Object? endDate = freezed,}) {
   return _then(_CourseSummary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
-as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as String,targetTrack: null == targetTrack ? _self.targetTrack : targetTrack // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,startDate: freezed == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as CourseMetadata,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,startDate: freezed == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
 
-
+/// Create a copy of CourseSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CourseMetadataCopyWith<$Res> get metadata {
+  
+  return $CourseMetadataCopyWith<$Res>(_self.metadata, (value) {
+    return _then(_self.copyWith(metadata: value));
+  });
+}
 }
 
 
@@ -1417,7 +1707,7 @@ as String,
 /// @nodoc
 mixin _$Enrollment {
 
- String get id; String get userId; String get status; DateTime get joinedAt; DateTime? get droppedAt; DateTime? get bannedAt; String? get banReason; DateTime get updatedAt;
+ String get id; String get userId; String get status; DateTime? get joinedAt; DateTime? get droppedAt; DateTime? get bannedAt; String? get banReason; DateTime? get updatedAt;
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1450,7 +1740,7 @@ abstract mixin class $EnrollmentCopyWith<$Res>  {
   factory $EnrollmentCopyWith(Enrollment value, $Res Function(Enrollment) _then) = _$EnrollmentCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String status, DateTime joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime updatedAt
+ String id, String userId, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
 });
 
 
@@ -1467,17 +1757,17 @@ class _$EnrollmentCopyWithImpl<$Res>
 
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = null,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,joinedAt: null == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
+as String,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,bannedAt: freezed == bannedAt ? _self.bannedAt : bannedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
-as String?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -1562,7 +1852,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Enrollment() when $default != null:
 return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
@@ -1583,7 +1873,7 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Enrollment():
 return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
@@ -1603,7 +1893,7 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String status,  DateTime joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Enrollment() when $default != null:
 return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
@@ -1618,17 +1908,17 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 @JsonSerializable()
 
 class _Enrollment implements Enrollment {
-  const _Enrollment({required this.id, required this.userId, required this.status, required this.joinedAt, this.droppedAt, this.bannedAt, this.banReason, required this.updatedAt});
+  const _Enrollment({this.id = '', this.userId = '', this.status = 'ACTIVE', this.joinedAt, this.droppedAt, this.bannedAt, this.banReason, this.updatedAt});
   factory _Enrollment.fromJson(Map<String, dynamic> json) => _$EnrollmentFromJson(json);
 
-@override final  String id;
-@override final  String userId;
-@override final  String status;
-@override final  DateTime joinedAt;
+@override@JsonKey() final  String id;
+@override@JsonKey() final  String userId;
+@override@JsonKey() final  String status;
+@override final  DateTime? joinedAt;
 @override final  DateTime? droppedAt;
 @override final  DateTime? bannedAt;
 @override final  String? banReason;
-@override final  DateTime updatedAt;
+@override final  DateTime? updatedAt;
 
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
@@ -1663,7 +1953,7 @@ abstract mixin class _$EnrollmentCopyWith<$Res> implements $EnrollmentCopyWith<$
   factory _$EnrollmentCopyWith(_Enrollment value, $Res Function(_Enrollment) _then) = __$EnrollmentCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String status, DateTime joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime updatedAt
+ String id, String userId, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
 });
 
 
@@ -1680,17 +1970,17 @@ class __$EnrollmentCopyWithImpl<$Res>
 
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = null,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
   return _then(_Enrollment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,joinedAt: null == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
+as String,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,bannedAt: freezed == bannedAt ? _self.bannedAt : bannedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
-as String?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -1900,10 +2190,10 @@ return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMi
 @JsonSerializable()
 
 class _AssignmentMetadata implements AssignmentMetadata {
-  const _AssignmentMetadata({required this.title, this.difficulty = 'MID', this.description, this.timeLimitMinutes, final  List<String> learningGoals = const [], final  Map<String, dynamic> attributes = const {}}): _learningGoals = learningGoals,_attributes = attributes;
+  const _AssignmentMetadata({this.title = '', this.difficulty = 'MID', this.description, this.timeLimitMinutes, final  List<String> learningGoals = const [], final  Map<String, dynamic> attributes = const {}}): _learningGoals = learningGoals,_attributes = attributes;
   factory _AssignmentMetadata.fromJson(Map<String, dynamic> json) => _$AssignmentMetadataFromJson(json);
 
-@override final  String title;
+@override@JsonKey() final  String title;
 @override@JsonKey() final  String difficulty;
 @override final  String? description;
 @override final  int? timeLimitMinutes;
@@ -2742,16 +3032,16 @@ return $default(_that.id,_that.courseSlug,_that.weekNo,_that.orderInWeek,_that.s
 @JsonSerializable()
 
 class _Assignment implements Assignment {
-  const _Assignment({required this.id, this.courseSlug, required this.weekNo, required this.orderInWeek, required this.startAt, required this.endAt, required this.status, this.publishedAt, required this.metadata, final  List<AssignmentRequirement> requirements = const [], final  List<AssignmentExample> examples = const []}): _requirements = requirements,_examples = examples;
+  const _Assignment({this.id = '', this.courseSlug, this.weekNo = 0, this.orderInWeek = 0, this.startAt = '', this.endAt = '', this.status = 'DRAFT', this.publishedAt, required this.metadata, final  List<AssignmentRequirement> requirements = const [], final  List<AssignmentExample> examples = const []}): _requirements = requirements,_examples = examples;
   factory _Assignment.fromJson(Map<String, dynamic> json) => _$AssignmentFromJson(json);
 
-@override final  String id;
+@override@JsonKey() final  String id;
 @override final  String? courseSlug;
-@override final  int weekNo;
-@override final  int orderInWeek;
-@override final  String startAt;
-@override final  String endAt;
-@override final  String status;
+@override@JsonKey() final  int weekNo;
+@override@JsonKey() final  int orderInWeek;
+@override@JsonKey() final  String startAt;
+@override@JsonKey() final  String endAt;
+@override@JsonKey() final  String status;
 @override final  String? publishedAt;
 @override final  AssignmentMetadata metadata;
  final  List<AssignmentRequirement> _requirements;

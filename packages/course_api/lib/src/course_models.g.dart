@@ -6,17 +6,37 @@ part of 'course_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_CourseMetadata _$CourseMetadataFromJson(Map<String, dynamic> json) =>
+    _CourseMetadata(
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String?,
+      phase: json['phase'] as String? ?? '',
+      attributes: json['attributes'] as Map<String, dynamic>? ?? const {},
+    );
+
+Map<String, dynamic> _$CourseMetadataToJson(_CourseMetadata instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'description': instance.description,
+      'phase': instance.phase,
+      'attributes': instance.attributes,
+    };
+
 _CourseSummary _$CourseSummaryFromJson(Map<String, dynamic> json) =>
     _CourseSummary(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      slug: json['slug'] as String,
-      description: json['description'] as String?,
-      phase: json['phase'] as String,
-      targetTrack: json['targetTrack'] as String,
-      status: json['status'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      id: json['id'] as String? ?? '',
+      slug: json['slug'] as String? ?? '',
+      targetTrack: json['fieldTag'] as String? ?? 'NO',
+      metadata: CourseMetadata.fromJson(
+        json['metadata'] as Map<String, dynamic>,
+      ),
+      status: json['status'] as String? ?? 'DRAFT',
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
       startDate: json['startDate'] as String?,
       endDate: json['endDate'] as String?,
     );
@@ -24,14 +44,12 @@ _CourseSummary _$CourseSummaryFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$CourseSummaryToJson(_CourseSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
       'slug': instance.slug,
-      'description': instance.description,
-      'phase': instance.phase,
-      'targetTrack': instance.targetTrack,
+      'fieldTag': instance.targetTrack,
+      'metadata': instance.metadata,
       'status': instance.status,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
       'startDate': instance.startDate,
       'endDate': instance.endDate,
     };
@@ -116,10 +134,12 @@ Map<String, dynamic> _$CreateWeekRequestToJson(_CreateWeekRequest instance) =>
     };
 
 _Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
-  id: json['id'] as String,
-  userId: json['userId'] as String,
-  status: json['status'] as String,
-  joinedAt: DateTime.parse(json['joinedAt'] as String),
+  id: json['id'] as String? ?? '',
+  userId: json['userId'] as String? ?? '',
+  status: json['status'] as String? ?? 'ACTIVE',
+  joinedAt: json['joinedAt'] == null
+      ? null
+      : DateTime.parse(json['joinedAt'] as String),
   droppedAt: json['droppedAt'] == null
       ? null
       : DateTime.parse(json['droppedAt'] as String),
@@ -127,7 +147,9 @@ _Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
       ? null
       : DateTime.parse(json['bannedAt'] as String),
   banReason: json['banReason'] as String?,
-  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
@@ -135,16 +157,16 @@ Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
       'id': instance.id,
       'userId': instance.userId,
       'status': instance.status,
-      'joinedAt': instance.joinedAt.toIso8601String(),
+      'joinedAt': instance.joinedAt?.toIso8601String(),
       'droppedAt': instance.droppedAt?.toIso8601String(),
       'bannedAt': instance.bannedAt?.toIso8601String(),
       'banReason': instance.banReason,
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 _AssignmentMetadata _$AssignmentMetadataFromJson(Map<String, dynamic> json) =>
     _AssignmentMetadata(
-      title: json['title'] as String,
+      title: json['title'] as String? ?? '',
       difficulty: json['difficulty'] as String? ?? 'MID',
       description: json['description'] as String?,
       timeLimitMinutes: (json['timeLimitMinutes'] as num?)?.toInt(),
@@ -197,13 +219,13 @@ Map<String, dynamic> _$AssignmentExampleToJson(_AssignmentExample instance) =>
     };
 
 _Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(
-  id: json['id'] as String,
+  id: json['id'] as String? ?? '',
   courseSlug: json['courseSlug'] as String?,
-  weekNo: (json['weekNo'] as num).toInt(),
-  orderInWeek: (json['orderInWeek'] as num).toInt(),
-  startAt: json['startAt'] as String,
-  endAt: json['endAt'] as String,
-  status: json['status'] as String,
+  weekNo: (json['weekNo'] as num?)?.toInt() ?? 0,
+  orderInWeek: (json['orderInWeek'] as num?)?.toInt() ?? 0,
+  startAt: json['startAt'] as String? ?? '',
+  endAt: json['endAt'] as String? ?? '',
+  status: json['status'] as String? ?? 'DRAFT',
   publishedAt: json['publishedAt'] as String?,
   metadata: AssignmentMetadata.fromJson(
     json['metadata'] as Map<String, dynamic>,

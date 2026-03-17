@@ -4,17 +4,28 @@ part 'course_models.freezed.dart';
 part 'course_models.g.dart';
 
 @freezed
+abstract class CourseMetadata with _$CourseMetadata {
+  const factory CourseMetadata({
+    @Default('') String title,
+    String? description,
+    @Default('') String phase,
+    @Default({}) Map<String, dynamic> attributes,
+  }) = _CourseMetadata;
+
+  factory CourseMetadata.fromJson(Map<String, dynamic> json) =>
+      _$CourseMetadataFromJson(json);
+}
+
+@freezed
 abstract class CourseSummary with _$CourseSummary {
   const factory CourseSummary({
-    required String id,
-    required String title,
-    required String slug,
-    String? description,
-    required String phase,
-    required String targetTrack,
-    required String status,
-    required DateTime createdAt,
-    required DateTime updatedAt,
+    @Default('') String id,
+    @Default('') String slug,
+    @JsonKey(name: 'fieldTag') @Default('NO') String targetTrack,
+    required CourseMetadata metadata,
+    @Default('DRAFT') String status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     String? startDate,
     String? endDate,
   }) = _CourseSummary;
@@ -85,14 +96,14 @@ abstract class CreateWeekRequest with _$CreateWeekRequest {
 @freezed
 abstract class Enrollment with _$Enrollment {
   const factory Enrollment({
-    required String id,
-    required String userId,
-    required String status,
-    required DateTime joinedAt,
+    @Default('') String id,
+    @Default('') String userId,
+    @Default('ACTIVE') String status,
+    DateTime? joinedAt,
     DateTime? droppedAt,
     DateTime? bannedAt,
     String? banReason,
-    required DateTime updatedAt,
+    DateTime? updatedAt,
   }) = _Enrollment;
 
   factory Enrollment.fromJson(Map<String, dynamic> json) =>
@@ -102,7 +113,7 @@ abstract class Enrollment with _$Enrollment {
 @freezed
 abstract class AssignmentMetadata with _$AssignmentMetadata {
   const factory AssignmentMetadata({
-    required String title,
+    @Default('') String title,
     @Default('MID') String difficulty,
     String? description,
     int? timeLimitMinutes,
@@ -141,13 +152,13 @@ abstract class AssignmentExample with _$AssignmentExample {
 @freezed
 abstract class Assignment with _$Assignment {
   const factory Assignment({
-    required String id,
+    @Default('') String id,
     String? courseSlug,
-    required int weekNo,
-    required int orderInWeek,
-    required String startAt,
-    required String endAt,
-    required String status,
+    @Default(0) int weekNo,
+    @Default(0) int orderInWeek,
+    @Default('') String startAt,
+    @Default('') String endAt,
+    @Default('DRAFT') String status,
     String? publishedAt,
     required AssignmentMetadata metadata,
     @Default([]) List<AssignmentRequirement> requirements,

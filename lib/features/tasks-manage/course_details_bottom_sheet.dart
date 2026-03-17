@@ -133,21 +133,21 @@ class _CourseDetailsBottomSheetState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.course.title,
+                        widget.course.metadata.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
                         ),
                       ),
-                      if (widget.course.description != null) ...[
+                      if (widget.course.metadata.description?.isNotEmpty ??
+                          false) ...[
                         const SizedBox(height: 8),
                         Text(
-                          widget.course.description!,
+                          widget.course.metadata.description!,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF8A8A8A),
-                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF666666),
                           ),
                         ),
                       ],
@@ -267,9 +267,9 @@ class _CourseDetailsBottomSheetState
     required CourseSummary course,
   }) {
     final formKey = GlobalKey<FormState>();
-    String title = course.title;
-    String description = course.description ?? '';
-    String phase = course.phase;
+    String title = course.metadata.title;
+    String description = course.metadata.description ?? '';
+    String phase = course.metadata.phase;
     String fieldTag = course.targetTrack;
     String status = course.status;
     String startDate = course.startDate ?? '';
