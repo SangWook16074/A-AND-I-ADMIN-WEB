@@ -13,6 +13,7 @@ class TasksManagementState {
     this.selectedCourseEnrollments,
     this.selectedCourseAssignments,
     this.selectedAssignment,
+    this.assignmentSubmissionConfig,
     this.isLoadingDetails = false,
   });
 
@@ -26,6 +27,7 @@ class TasksManagementState {
         selectedCourseEnrollments = null,
         selectedCourseAssignments = null,
         selectedAssignment = null,
+        assignmentSubmissionConfig = null,
         isLoadingDetails = false;
 
   final TasksManagementStatus status;
@@ -38,6 +40,7 @@ class TasksManagementState {
   final List<Enrollment>? selectedCourseEnrollments;
   final List<Assignment>? selectedCourseAssignments;
   final Assignment? selectedAssignment;
+  final AssignmentSubmissionConfig? assignmentSubmissionConfig;
   final bool isLoadingDetails;
 
   TasksManagementState copyWith({
@@ -50,6 +53,7 @@ class TasksManagementState {
     List<Enrollment>? selectedCourseEnrollments,
     List<Assignment>? selectedCourseAssignments,
     Assignment? selectedAssignment,
+    AssignmentSubmissionConfig? assignmentSubmissionConfig,
     bool? isLoadingDetails,
     bool clearError = false,
   }) {
@@ -60,9 +64,13 @@ class TasksManagementState {
       isDeleting: isDeleting ?? this.isDeleting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       selectedCourse: selectedCourse ?? this.selectedCourse,
-      selectedCourseEnrollments: selectedCourseEnrollments ?? this.selectedCourseEnrollments,
-      selectedCourseAssignments: selectedCourseAssignments ?? this.selectedCourseAssignments,
+      selectedCourseEnrollments:
+          selectedCourseEnrollments ?? this.selectedCourseEnrollments,
+      selectedCourseAssignments:
+          selectedCourseAssignments ?? this.selectedCourseAssignments,
       selectedAssignment: selectedAssignment ?? this.selectedAssignment,
+      assignmentSubmissionConfig:
+          assignmentSubmissionConfig ?? this.assignmentSubmissionConfig,
       isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
     );
   }

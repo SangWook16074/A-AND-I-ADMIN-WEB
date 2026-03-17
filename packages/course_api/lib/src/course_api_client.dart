@@ -145,6 +145,24 @@ class CourseApiClient {
     return Assignment.fromJson(mapData);
   }
 
+  Future<AssignmentSubmissionConfig> getAssignmentSubmissionConfig({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/submission-config',
+    );
+
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return AssignmentSubmissionConfig.fromJson(mapData);
+  }
+
   Future<List<Assignment>> getAssignments({
     required String accessToken,
     required String courseSlug,

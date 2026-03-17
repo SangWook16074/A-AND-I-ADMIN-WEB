@@ -95,8 +95,6 @@ abstract class AssignmentMetadata with _$AssignmentMetadata {
     @Default([]) List<AssignmentExample> examples,
     @Default({}) Map<String, dynamic> attributes,
     Map<String, dynamic>? problemDetail,
-    Map<String, dynamic>? submissionGuide,
-    @Default([]) List<Map<String, dynamic>> codeTemplates,
   }) = _AssignmentMetadata;
 
   factory AssignmentMetadata.fromJson(Map<String, dynamic> json) =>
@@ -136,6 +134,45 @@ abstract class AssignmentExample with _$AssignmentExample {
 
   factory AssignmentExample.fromJson(Map<String, dynamic> json) =>
       _$AssignmentExampleFromJson(json);
+}
+
+@freezed
+abstract class SubmissionGuide with _$SubmissionGuide {
+  const factory SubmissionGuide({
+    @Default('') String title,
+    @Default('') String description,
+    @Default([]) List<String> commentSections,
+  }) = _SubmissionGuide;
+
+  factory SubmissionGuide.fromJson(Map<String, dynamic> json) =>
+      _$SubmissionGuideFromJson(json);
+}
+
+@freezed
+abstract class CodeTemplate with _$CodeTemplate {
+  const factory CodeTemplate({
+    @Default('') String language,
+    @Default('') String commentTemplate,
+    @Default('') String functionTemplate,
+    @Default('') String runnableTemplate,
+  }) = _CodeTemplate;
+
+  factory CodeTemplate.fromJson(Map<String, dynamic> json) =>
+      _$CodeTemplateFromJson(json);
+}
+
+@freezed
+abstract class AssignmentSubmissionConfig with _$AssignmentSubmissionConfig {
+  const factory AssignmentSubmissionConfig({
+    @Default('') String assignmentId,
+    @Default('') String courseSlug,
+    required SubmissionGuide submissionGuide,
+    @Default([]) List<CodeTemplate> codeTemplates,
+    @Default([]) List<String> supportedLanguages,
+  }) = _AssignmentSubmissionConfig;
+
+  factory AssignmentSubmissionConfig.fromJson(Map<String, dynamic> json) =>
+      _$AssignmentSubmissionConfigFromJson(json);
 }
 
 @freezed

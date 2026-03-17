@@ -14,15 +14,19 @@ class AssignmentDetailsDialog extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AssignmentDetailsDialog> createState() => _AssignmentDetailsDialogState();
+  ConsumerState<AssignmentDetailsDialog> createState() =>
+      _AssignmentDetailsDialogState();
 }
 
-class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialog> {
+class _AssignmentDetailsDialogState
+    extends ConsumerState<AssignmentDetailsDialog> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(tasksManagementBlocProvider.notifier).add(
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(
             TasksManagementAssignmentDetailsRequested(
               courseSlug: widget.courseSlug,
               assignmentId: widget.assignmentId,
@@ -51,10 +55,7 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
               children: [
                 const Text(
                   '과제 상세 정보',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -77,7 +78,10 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow('과제 ID', assignment.id),
-                      _buildDetailRow('주차 / 순서', '${assignment.weekNo}주차 / ${assignment.orderInWeek}번째'),
+                      _buildDetailRow(
+                        '주차 / 순서',
+                        '${assignment.weekNo}주차 / ${assignment.orderInWeek}번째',
+                      ),
                       _buildDetailRow('제목', assignment.metadata.title),
                       _buildDetailRow('상태', assignment.status),
                       _buildDetailRow('난이도', assignment.metadata.difficulty),
@@ -86,7 +90,10 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                       if (assignment.publishedAt != null)
                         _buildDetailRow('배포일', assignment.publishedAt!),
                       const SizedBox(height: 16),
-                      const Text('설명', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const Text(
+                        '설명',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -98,21 +105,33 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                       ),
                       const SizedBox(height: 16),
                       if (assignment.metadata.learningGoals.isNotEmpty) ...[
-                        const Text('학습 목표', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const Text(
+                          '학습 목표',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
-                        ...assignment.metadata.learningGoals.map((goal) => Text('• ${goal.learningGoalText}')),
+                        ...assignment.metadata.learningGoals.map(
+                          (goal) => Text('• ${goal.learningGoalText}'),
+                        ),
                         const SizedBox(height: 16),
                       ],
                       if (assignment.metadata.requirements.isNotEmpty) ...[
-                        const Text('요구사항', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const Text(
+                          '요구사항',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
                         ...assignment.metadata.requirements.map(
-                          (req) => Text('${req.sortOrder}. ${req.requirementText}'),
+                          (req) =>
+                              Text('${req.sortOrder}. ${req.requirementText}'),
                         ),
                         const SizedBox(height: 16),
                       ],
                       if (assignment.metadata.examples.isNotEmpty) ...[
-                        const Text('예시', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const Text(
+                          '예시',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
                         ...assignment.metadata.examples.map(
                           (ex) => Container(
@@ -125,18 +144,156 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Seq: ${ex.seq}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                                if (ex.description != null) Text('설명: ${ex.description}'),
+                                Text(
+                                  'Seq: ${ex.seq}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                if (ex.description != null)
+                                  Text('설명: ${ex.description}'),
                                 if (ex.inputText != null) ...[
                                   const SizedBox(height: 4),
-                                  const Text('Input:', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  const Text(
+                                    'Input:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   Text(ex.inputText!),
                                 ],
                                 if (ex.outputText != null) ...[
                                   const SizedBox(height: 4),
-                                  const Text('Output:', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  const Text(
+                                    'Output:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   Text(ex.outputText!),
                                 ],
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      if (state.assignmentSubmissionConfig != null) ...[
+                        const Divider(height: 32),
+                        const Text(
+                          '제출 가이드',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDetailRow(
+                          '가이드 제목',
+                          state
+                              .assignmentSubmissionConfig!
+                              .submissionGuide
+                              .title,
+                        ),
+                        const Text(
+                          '가이드 설명',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE3F2FD),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            state
+                                .assignmentSubmissionConfig!
+                                .submissionGuide
+                                .description,
+                          ),
+                        ),
+                        if (state
+                            .assignmentSubmissionConfig!
+                            .submissionGuide
+                            .commentSections
+                            .isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          const Text(
+                            '주석 섹션',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: state
+                                .assignmentSubmissionConfig!
+                                .submissionGuide
+                                .commentSections
+                                .map(
+                                  (section) => Chip(
+                                    label: Text(section),
+                                    backgroundColor: Colors.blue.shade50,
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        const Text(
+                          '코드 템플릿',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ...state.assignmentSubmissionConfig!.codeTemplates.map(
+                          (template) => Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.deepPurple.shade100,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.code,
+                                      color: Colors.deepPurple,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      template.language.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 16,
+                                        color: Colors.deepPurple,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(),
+                                _buildCodeBlock(
+                                  '주석 템플릿',
+                                  template.commentTemplate,
+                                ),
+                                _buildCodeBlock(
+                                  '함수 템플릿',
+                                  template.functionTemplate,
+                                ),
+                                _buildCodeBlock(
+                                  '실행 템플릿',
+                                  template.runnableTemplate,
+                                ),
                               ],
                             ),
                           ),
@@ -156,6 +313,36 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCodeBlock(String label, String code) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2D2D2D),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            code,
+            style: const TextStyle(
+              color: Color(0xFFF8F8F2),
+              fontFamily: 'monospace',
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
