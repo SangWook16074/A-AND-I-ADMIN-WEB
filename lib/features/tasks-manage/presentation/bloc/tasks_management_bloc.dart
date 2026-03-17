@@ -92,22 +92,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     });
 
-    on<TasksManagementPublishAssignmentRequested>((event) async {
-      await _publishAssignment(
-        courseSlug: event.courseSlug,
-        assignmentId: event.assignmentId,
-      );
-    });
-
     on<TasksManagementAssignmentDeletedRequested>((event) async {
       await _deleteAssignment(
-        courseSlug: event.courseSlug,
-        assignmentId: event.assignmentId,
-      );
-    });
-
-    on<TasksManagementDeliverAssignmentRequested>((event) async {
-      await _deliverAssignment(
         courseSlug: event.courseSlug,
         assignmentId: event.assignmentId,
       );
@@ -400,54 +386,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
-  Future<void> _publishAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    // Reusing isCreating or isLoadingDetails? Let's use isCreating as it means "performing action" and blocks forms.
-    // However, publish is an action on a specific assignment. Let's just use isCreating.
-    state = state.copyWith(isCreating: true, clearError: true);
-    try {
-      await ref.read(publishAssignmentUseCaseProvider)(
-        courseSlug: courseSlug,
-        assignmentId: assignmentId,
-      );
-
-      state = state.copyWith(isCreating: false);
-      add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
-    } catch (e) {
-      state = state.copyWith(
-        status: TasksManagementStatus.failure,
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
-  Future<void> _deliverAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    state = state.copyWith(
-      isCreating: true,
-      clearError: true,
-      clearDeliveryResult: true,
-    );
-    try {
-      final result = await ref.read(deliverAssignmentUseCaseProvider)(
-        courseSlug: courseSlug,
-        assignmentId: assignmentId,
-      );
-
-      state = state.copyWith(isCreating: false, lastDeliveryResult: result);
-    } catch (e) {
-      state = state.copyWith(
-        status: TasksManagementStatus.failure,
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
 
   Future<void> _deleteCourse({required String courseSlug}) async {
     state = state.copyWith(isDeleting: true, clearError: true);

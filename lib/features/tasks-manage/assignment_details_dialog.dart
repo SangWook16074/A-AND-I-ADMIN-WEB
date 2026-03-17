@@ -100,21 +100,21 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                       if (assignment.metadata.learningGoals.isNotEmpty) ...[
                         const Text('학습 목표', style: TextStyle(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 4),
-                        ...assignment.metadata.learningGoals.map((goal) => Text('• $goal')),
+                        ...assignment.metadata.learningGoals.map((goal) => Text('• ${goal.learningGoalText}')),
                         const SizedBox(height: 16),
                       ],
-                      if (assignment.requirements.isNotEmpty) ...[
+                      if (assignment.metadata.requirements.isNotEmpty) ...[
                         const Text('요구사항', style: TextStyle(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 4),
-                        ...assignment.requirements.map(
+                        ...assignment.metadata.requirements.map(
                           (req) => Text('${req.sortOrder}. ${req.requirementText}'),
                         ),
                         const SizedBox(height: 16),
                       ],
-                      if (assignment.examples.isNotEmpty) ...[
+                      if (assignment.metadata.examples.isNotEmpty) ...[
                         const Text('예시', style: TextStyle(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 4),
-                        ...assignment.examples.map(
+                        ...assignment.metadata.examples.map(
                           (ex) => Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),

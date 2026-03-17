@@ -110,6 +110,19 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<void> deleteEnrollment({
+    required String courseSlug,
+    required String userId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.deleteEnrollment(
+      accessToken: token,
+      courseSlug: courseSlug,
+      userId: userId,
+    );
+  }
+
+  @override
   Future<List<Assignment>> getAssignments({
     required String courseSlug,
     int? weekNo,
@@ -151,47 +164,6 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
-  Future<void> publishAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    final token = await _getAccessToken();
-    await _apiClient.publishAssignment(
-      accessToken: token,
-      courseSlug: courseSlug,
-      assignmentId: assignmentId,
-    );
-  }
-
-  @override
-  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
-    required String courseSlug,
-    required String assignmentId,
-    String? status,
-  }) async {
-    final token = await _getAccessToken();
-    return _apiClient.getAssignmentDeliveries(
-      accessToken: token,
-      courseSlug: courseSlug,
-      assignmentId: assignmentId,
-      status: status,
-    );
-  }
-
-  @override
-  Future<DeliverAssignmentResult> deliverAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    final token = await _getAccessToken();
-    return _apiClient.deliverAssignment(
-      accessToken: token,
-      courseSlug: courseSlug,
-      assignmentId: assignmentId,
-    );
-  }
-
-  @override
   Future<void> deleteAssignment({
     required String courseSlug,
     required String assignmentId,
@@ -203,6 +175,7 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       assignmentId: assignmentId,
     );
   }
+
 
   @override
   Future<Assignment> updateAssignment({
