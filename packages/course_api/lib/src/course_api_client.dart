@@ -24,7 +24,6 @@ class CourseApiClient {
     );
     return listData
         .whereType<Map<String, dynamic>>()
-        .map(_mapCourseJson)
         .map(CourseSummary.fromJson)
         .toList();
   }
@@ -53,7 +52,7 @@ class CourseApiClient {
       response.body,
       statusCode: response.statusCode,
     );
-    return CourseSummary.fromJson(_mapCourseJson(mapData));
+    return CourseSummary.fromJson(mapData);
   }
 
   Future<CourseWeek> createOrUpdateWeek({
@@ -302,7 +301,7 @@ class CourseApiClient {
       response.body,
       statusCode: response.statusCode,
     );
-    return CourseSummary.fromJson(_mapCourseJson(mapData));
+    return CourseSummary.fromJson(mapData);
   }
 
   Future<void> deleteCourse({
@@ -348,22 +347,6 @@ class CourseApiClient {
       statusCode: response.statusCode,
     );
     return Assignment.fromJson(mapData);
-  }
-
-  Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {
-    return {
-      'id': json['id'],
-      'slug': json['slug'],
-      'targetTrack': json['fieldTag'],
-      'startDate': json['startDate'],
-      'endDate': json['endDate'],
-      'status': json['status'],
-      'createdAt': json['createdAt'],
-      'updatedAt': json['updatedAt'],
-      'title': json['metadata']?['title'],
-      'description': json['metadata']?['description'],
-      'phase': json['metadata']?['phase'],
-    };
   }
 
   Future<({int statusCode, Map<String, dynamic> body})> _requestJson({

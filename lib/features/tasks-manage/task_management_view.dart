@@ -77,7 +77,9 @@ class TaskManagementView extends ConsumerWidget {
                   case TasksManagementStatus.failure:
                     return SizedBox(
                       height: 220,
-                      child: Center(child: Text('에러 발생: ${blocState.errorMessage}')),
+                      child: Center(
+                        child: Text('에러 발생: ${blocState.errorMessage}'),
+                      ),
                     );
                   case TasksManagementStatus.success:
                     if (courses.isEmpty) {
@@ -107,13 +109,17 @@ class TaskManagementView extends ConsumerWidget {
                             side: const BorderSide(color: Color(0xFFEAEAEA)),
                           ),
                           title: Text(
-                            course.title,
+                            course.metadata.title,
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          subtitle: Text(course.description ?? '설명 없음'),
+                          subtitle: Text(
+                            course.metadata.description ?? '설명 없음',
+                          ),
                           trailing: const Icon(Icons.chevron_right_rounded),
                           onTap: () {
-                            ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementCourseSelected(course));
+                            ref
+                                .read(tasksManagementBlocProvider.notifier)
+                                .add(TasksManagementCourseSelected(course));
                             showCourseDetailsBottomSheet(context, course);
                           },
                         );
@@ -227,8 +233,9 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
                   labelText: '제목 (예: Flutter 심화)',
                 ),
                 onSaved: (value) => title = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '제목을 입력해주세요.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? '제목을 입력해주세요.'
+                    : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -236,8 +243,9 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
                   labelText: '고유 슬러그 (예: flutter-adv)',
                 ),
                 onSaved: (value) => slug = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '슬러그를 입력해주세요.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? '슬러그를 입력해주세요.'
+                    : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -247,13 +255,14 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 initialValue: phase,
-                decoration: const InputDecoration(
-                  labelText: '단계 (Phase)',
-                ),
+                decoration: const InputDecoration(labelText: '단계 (Phase)'),
                 items: const [
                   DropdownMenuItem(value: 'BASIC', child: Text('BASIC')),
                   DropdownMenuItem(value: 'CS', child: Text('CS')),
-                  DropdownMenuItem(value: 'FRAMEWORK', child: Text('FRAMEWORK')),
+                  DropdownMenuItem(
+                    value: 'FRAMEWORK',
+                    child: Text('FRAMEWORK'),
+                  ),
                 ],
                 onChanged: (value) => phase = value ?? 'BASIC',
                 onSaved: (value) => phase = value ?? 'BASIC',
@@ -261,9 +270,7 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 initialValue: targetTrack,
-                decoration: const InputDecoration(
-                  labelText: '트랙 (Field Tag)',
-                ),
+                decoration: const InputDecoration(labelText: '트랙 (Field Tag)'),
                 items: const [
                   DropdownMenuItem(value: 'FL', child: Text('FL')),
                   DropdownMenuItem(value: 'SP', child: Text('SP')),
@@ -278,8 +285,9 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
                   labelText: '시작일 (예: 2026-03-02)',
                 ),
                 onSaved: (value) => startDate = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '시작일을 입력해주세요.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? '시작일을 입력해주세요.'
+                    : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -287,8 +295,9 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
                   labelText: '종료일 (예: 2026-03-30)',
                 ),
                 onSaved: (value) => endDate = value?.trim() ?? '',
-                validator: (value) =>
-                    (value == null || value.trim().isEmpty) ? '종료일을 입력해주세요.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? '종료일을 입력해주세요.'
+                    : null,
               ),
             ],
           ),
@@ -304,7 +313,9 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
             if (formKey.currentState?.validate() ?? false) {
               formKey.currentState?.save();
 
-              ref.read(tasksManagementBlocProvider.notifier).add(
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
                     TasksManagementCreateCourseRequested(
                       slug: slug,
                       title: title,
