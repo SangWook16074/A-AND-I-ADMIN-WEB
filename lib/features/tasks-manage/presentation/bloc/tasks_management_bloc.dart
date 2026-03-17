@@ -107,8 +107,46 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _updateCourse(courseSlug: event.courseSlug, request: event.request);
     });
 
+    on<TasksManagementAssignmentSubmissionConfigRequested>((event) async {
+      await _loadAssignmentSubmissionConfig(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
+    });
+
     Future.microtask(() => add(const TasksManagementStarted()));
     return const TasksManagementState.initial();
+  }
+
+  Future<void> _loadAssignmentSubmissionConfig({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    state = state.copyWith(isLoadingDetails: true, clearError: true);
+    try {
+      final config =
+          await ref.read(getAssignmentSubmissionConfigUseCaseProvider).execute(
+                courseSlug: courseSlug,
+                assignmentId: assignmentId,
+              );
+
+      if (state.selectedAssignment?.id == assignmentId) {
+        state = state.copyWith(
+          assignmentSubmissionConfig: config,
+          isLoadingDetails: false,
+        );
+      }
+    } catch (e) {
+      String errorMessage = '과제 제출 설정을 불러오는데 실패했습니다: $e';
+      if (e is CourseApiException) {
+        errorMessage =
+            '제출 설정 로드 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
+      }
+      state = state.copyWith(
+        isLoadingDetails: false,
+        errorMessage: errorMessage,
+      );
+    }
   }
 
   Future<void> _loadCourses() async {
@@ -293,6 +331,10 @@ class TasksManagementBloc extends _$TasksManagementBloc {
           selectedAssignment: assignment,
           isLoadingDetails: false,
         );
+        add(TasksManagementEvent.assignmentSubmissionConfigRequested(
+          courseSlug: courseSlug,
+          assignmentId: assignmentId,
+        ));
       }
     } catch (e) {
       String errorMessage = '과제 상세 정보를 불러오는데 실패했습니다: $e';
