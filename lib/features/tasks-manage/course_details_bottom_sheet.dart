@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
-import 'assignment_deliveries_dialog.dart';
 import 'assignment_details_dialog.dart';
 import 'edit_assignment_dialog.dart';
 
@@ -50,32 +49,6 @@ class _CourseDetailsBottomSheetState
   @override
   Widget build(BuildContext context) {
     ref.listen(tasksManagementBlocProvider, (previous, next) {
-      if (previous?.lastDeliveryResult != next.lastDeliveryResult &&
-          next.lastDeliveryResult != null) {
-        final result = next.lastDeliveryResult!;
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text(
-              '과제 배포 결과',
-              style: TextStyle(fontWeight: FontWeight.w800),
-            ),
-            content: Text(
-              '총 대상자: ${result.targetCount}명\n배포 성공: ${result.deliveredCount}명\n배포 실패: ${result.failedCount}명',
-              style: const TextStyle(height: 1.5),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  '확인',
-                  style: TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
 
       if (previous?.isDeleting == true && next.isDeleting == false) {
         if (next.errorMessage == null) {
@@ -1017,116 +990,6 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                   ),
                                 ),
                               ),
-                              if (assignment.status == 'DRAFT')
-                                TextButton(
-                                  onPressed: () {
-                                    ref
-                                        .read(
-                                          tasksManagementBlocProvider.notifier,
-                                        )
-                                        .add(
-                                          TasksManagementPublishAssignmentRequested(
-                                            courseSlug: widget.courseSlug,
-                                            assignmentId: assignment.id,
-                                          ),
-                                        );
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('과제 게시 요청을 보냈습니다.'),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  child: const Text(
-                                    '게시하기',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                )
-                              else if (assignment.status != 'DRAFT')
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        ref
-                                            .read(
-                                              tasksManagementBlocProvider
-                                                  .notifier,
-                                            )
-                                            .add(
-                                              TasksManagementDeliverAssignmentRequested(
-                                                courseSlug: widget.courseSlug,
-                                                assignmentId: assignment.id,
-                                              ),
-                                            );
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('과제 배포 요청을 보냈습니다.'),
-                                          ),
-                                        );
-                                      },
-                                      style: TextButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 4,
-                                        ),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        foregroundColor: Colors.blue,
-                                      ),
-                                      child: const Text(
-                                        '배포하기',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    TextButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              AssignmentDeliveriesDialog(
-                                                courseSlug: widget.courseSlug,
-                                                assignmentId: assignment.id,
-                                              ),
-                                        );
-                                      },
-                                      style: TextButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 4,
-                                        ),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                      ),
-                                      child: const Text(
-                                        '배포 결과 보기',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                             ],
                           ),
                         ],
@@ -1483,13 +1346,20 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       description: _description,
                                       difficulty: _difficulty,
                                       timeLimitMinutes: _timeLimitMinutes,
-                                      learningGoals: _learningGoals,
+                                      learningGoals: _learningGoals
+                                          .asMap()
+                                          .entries
+                                          .map((e) => LearningGoal(
+                                                sortOrder: e.key + 1,
+                                                learningGoalText: e.value,
+                                              ))
+                                          .toList(),
+                                      requirements: reqList,
+                                      examples: exampleList,
                                       attributes: _language.isNotEmpty
                                           ? {'language': _language}
                                           : {},
                                     ),
-                                    requirements: reqList,
-                                    examples: exampleList,
                                   ),
                                 ),
                               );

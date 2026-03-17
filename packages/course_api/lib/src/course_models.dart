@@ -67,33 +67,6 @@ abstract class UpdateCourseRequest with _$UpdateCourseRequest {
 }
 
 @freezed
-abstract class CourseWeek with _$CourseWeek {
-  const factory CourseWeek({
-    required String id,
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  }) = _CourseWeek;
-
-  factory CourseWeek.fromJson(Map<String, dynamic> json) =>
-      _$CourseWeekFromJson(json);
-}
-
-@freezed
-abstract class CreateWeekRequest with _$CreateWeekRequest {
-  const factory CreateWeekRequest({
-    required int weekNo,
-    required String title,
-    required String startDate,
-    required String endDate,
-  }) = _CreateWeekRequest;
-
-  factory CreateWeekRequest.fromJson(Map<String, dynamic> json) =>
-      _$CreateWeekRequestFromJson(json);
-}
-
-@freezed
 abstract class Enrollment with _$Enrollment {
   const factory Enrollment({
     @Default('') String id,
@@ -117,12 +90,28 @@ abstract class AssignmentMetadata with _$AssignmentMetadata {
     @Default('MID') String difficulty,
     String? description,
     int? timeLimitMinutes,
-    @Default([]) List<String> learningGoals,
+    @Default([]) List<LearningGoal> learningGoals,
+    @Default([]) List<AssignmentRequirement> requirements,
+    @Default([]) List<AssignmentExample> examples,
     @Default({}) Map<String, dynamic> attributes,
+    Map<String, dynamic>? problemDetail,
+    Map<String, dynamic>? submissionGuide,
+    @Default([]) List<Map<String, dynamic>> codeTemplates,
   }) = _AssignmentMetadata;
 
   factory AssignmentMetadata.fromJson(Map<String, dynamic> json) =>
       _$AssignmentMetadataFromJson(json);
+}
+
+@freezed
+abstract class LearningGoal with _$LearningGoal {
+  const factory LearningGoal({
+    required int sortOrder,
+    required String learningGoalText,
+  }) = _LearningGoal;
+
+  factory LearningGoal.fromJson(Map<String, dynamic> json) =>
+      _$LearningGoalFromJson(json);
 }
 
 @freezed
@@ -152,7 +141,7 @@ abstract class AssignmentExample with _$AssignmentExample {
 @freezed
 abstract class Assignment with _$Assignment {
   const factory Assignment({
-    @Default('') String id,
+    @JsonKey(name: 'assignmentId') @Default('') String id,
     String? courseSlug,
     @Default(0) int weekNo,
     @Default(0) int orderInWeek,
@@ -161,8 +150,6 @@ abstract class Assignment with _$Assignment {
     @Default('DRAFT') String status,
     String? publishedAt,
     required AssignmentMetadata metadata,
-    @Default([]) List<AssignmentRequirement> requirements,
-    @Default([]) List<AssignmentExample> examples,
   }) = _Assignment;
 
   factory Assignment.fromJson(Map<String, dynamic> json) =>
@@ -177,8 +164,6 @@ abstract class CreateAssignmentRequest with _$CreateAssignmentRequest {
     required String startAt,
     required String endAt,
     required AssignmentMetadata metadata,
-    @Default([]) List<AssignmentRequirement> requirements,
-    @Default([]) List<AssignmentExample> examples,
   }) = _CreateAssignmentRequest;
 
   factory CreateAssignmentRequest.fromJson(Map<String, dynamic> json) =>
@@ -192,39 +177,10 @@ abstract class UpdateAssignmentRequest with _$UpdateAssignmentRequest {
     required String startAt,
     required String endAt,
     required AssignmentMetadata metadata,
-    @Default([]) List<AssignmentRequirement> requirements,
-    @Default([]) List<AssignmentExample> examples,
   }) = _UpdateAssignmentRequest;
 
   factory UpdateAssignmentRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateAssignmentRequestFromJson(json);
-}
-
-@freezed
-abstract class DeliverAssignmentResult with _$DeliverAssignmentResult {
-  const factory DeliverAssignmentResult({
-    required String assignmentId,
-    required String courseSlug,
-    required int targetCount,
-    required int deliveredCount,
-    required int failedCount,
-  }) = _DeliverAssignmentResult;
-
-  factory DeliverAssignmentResult.fromJson(Map<String, dynamic> json) =>
-      _$DeliverAssignmentResultFromJson(json);
-}
-
-@freezed
-abstract class AssignmentDelivery with _$AssignmentDelivery {
-  const factory AssignmentDelivery({
-    required String userId,
-    required String status,
-    String? deliveredAt,
-    String? failureReason,
-  }) = _AssignmentDelivery;
-
-  factory AssignmentDelivery.fromJson(Map<String, dynamic> json) =>
-      _$AssignmentDeliveryFromJson(json);
 }
 
 @freezed

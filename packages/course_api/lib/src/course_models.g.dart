@@ -100,39 +100,6 @@ Map<String, dynamic> _$UpdateCourseRequestToJson(
   'status': instance.status,
 };
 
-_CourseWeek _$CourseWeekFromJson(Map<String, dynamic> json) => _CourseWeek(
-  id: json['id'] as String,
-  weekNo: (json['weekNo'] as num).toInt(),
-  title: json['title'] as String,
-  startDate: json['startDate'] as String,
-  endDate: json['endDate'] as String,
-);
-
-Map<String, dynamic> _$CourseWeekToJson(_CourseWeek instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'weekNo': instance.weekNo,
-      'title': instance.title,
-      'startDate': instance.startDate,
-      'endDate': instance.endDate,
-    };
-
-_CreateWeekRequest _$CreateWeekRequestFromJson(Map<String, dynamic> json) =>
-    _CreateWeekRequest(
-      weekNo: (json['weekNo'] as num).toInt(),
-      title: json['title'] as String,
-      startDate: json['startDate'] as String,
-      endDate: json['endDate'] as String,
-    );
-
-Map<String, dynamic> _$CreateWeekRequestToJson(_CreateWeekRequest instance) =>
-    <String, dynamic>{
-      'weekNo': instance.weekNo,
-      'title': instance.title,
-      'startDate': instance.startDate,
-      'endDate': instance.endDate,
-    };
-
 _Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
   id: json['id'] as String? ?? '',
   userId: json['userId'] as String? ?? '',
@@ -172,10 +139,32 @@ _AssignmentMetadata _$AssignmentMetadataFromJson(Map<String, dynamic> json) =>
       timeLimitMinutes: (json['timeLimitMinutes'] as num?)?.toInt(),
       learningGoals:
           (json['learningGoals'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.map((e) => LearningGoal.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      requirements:
+          (json['requirements'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    AssignmentRequirement.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
+      examples:
+          (json['examples'] as List<dynamic>?)
+              ?.map(
+                (e) => AssignmentExample.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           const [],
       attributes: json['attributes'] as Map<String, dynamic>? ?? const {},
+      problemDetail: json['problemDetail'] as Map<String, dynamic>?,
+      submissionGuide: json['submissionGuide'] as Map<String, dynamic>?,
+      codeTemplates:
+          (json['codeTemplates'] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$AssignmentMetadataToJson(_AssignmentMetadata instance) =>
@@ -185,7 +174,24 @@ Map<String, dynamic> _$AssignmentMetadataToJson(_AssignmentMetadata instance) =>
       'description': instance.description,
       'timeLimitMinutes': instance.timeLimitMinutes,
       'learningGoals': instance.learningGoals,
+      'requirements': instance.requirements,
+      'examples': instance.examples,
       'attributes': instance.attributes,
+      'problemDetail': instance.problemDetail,
+      'submissionGuide': instance.submissionGuide,
+      'codeTemplates': instance.codeTemplates,
+    };
+
+_LearningGoal _$LearningGoalFromJson(Map<String, dynamic> json) =>
+    _LearningGoal(
+      sortOrder: (json['sortOrder'] as num).toInt(),
+      learningGoalText: json['learningGoalText'] as String,
+    );
+
+Map<String, dynamic> _$LearningGoalToJson(_LearningGoal instance) =>
+    <String, dynamic>{
+      'sortOrder': instance.sortOrder,
+      'learningGoalText': instance.learningGoalText,
     };
 
 _AssignmentRequirement _$AssignmentRequirementFromJson(
@@ -219,7 +225,7 @@ Map<String, dynamic> _$AssignmentExampleToJson(_AssignmentExample instance) =>
     };
 
 _Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(
-  id: json['id'] as String? ?? '',
+  id: json['assignmentId'] as String? ?? '',
   courseSlug: json['courseSlug'] as String?,
   weekNo: (json['weekNo'] as num?)?.toInt() ?? 0,
   orderInWeek: (json['orderInWeek'] as num?)?.toInt() ?? 0,
@@ -230,23 +236,11 @@ _Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(
   metadata: AssignmentMetadata.fromJson(
     json['metadata'] as Map<String, dynamic>,
   ),
-  requirements:
-      (json['requirements'] as List<dynamic>?)
-          ?.map(
-            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
-          )
-          .toList() ??
-      const [],
-  examples:
-      (json['examples'] as List<dynamic>?)
-          ?.map((e) => AssignmentExample.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
 );
 
 Map<String, dynamic> _$AssignmentToJson(_Assignment instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'assignmentId': instance.id,
       'courseSlug': instance.courseSlug,
       'weekNo': instance.weekNo,
       'orderInWeek': instance.orderInWeek,
@@ -255,8 +249,6 @@ Map<String, dynamic> _$AssignmentToJson(_Assignment instance) =>
       'status': instance.status,
       'publishedAt': instance.publishedAt,
       'metadata': instance.metadata,
-      'requirements': instance.requirements,
-      'examples': instance.examples,
     };
 
 _CreateAssignmentRequest _$CreateAssignmentRequestFromJson(
@@ -269,18 +261,6 @@ _CreateAssignmentRequest _$CreateAssignmentRequestFromJson(
   metadata: AssignmentMetadata.fromJson(
     json['metadata'] as Map<String, dynamic>,
   ),
-  requirements:
-      (json['requirements'] as List<dynamic>?)
-          ?.map(
-            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
-          )
-          .toList() ??
-      const [],
-  examples:
-      (json['examples'] as List<dynamic>?)
-          ?.map((e) => AssignmentExample.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
 );
 
 Map<String, dynamic> _$CreateAssignmentRequestToJson(
@@ -291,8 +271,6 @@ Map<String, dynamic> _$CreateAssignmentRequestToJson(
   'startAt': instance.startAt,
   'endAt': instance.endAt,
   'metadata': instance.metadata,
-  'requirements': instance.requirements,
-  'examples': instance.examples,
 };
 
 _UpdateAssignmentRequest _$UpdateAssignmentRequestFromJson(
@@ -304,18 +282,6 @@ _UpdateAssignmentRequest _$UpdateAssignmentRequestFromJson(
   metadata: AssignmentMetadata.fromJson(
     json['metadata'] as Map<String, dynamic>,
   ),
-  requirements:
-      (json['requirements'] as List<dynamic>?)
-          ?.map(
-            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
-          )
-          .toList() ??
-      const [],
-  examples:
-      (json['examples'] as List<dynamic>?)
-          ?.map((e) => AssignmentExample.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
 );
 
 Map<String, dynamic> _$UpdateAssignmentRequestToJson(
@@ -325,45 +291,7 @@ Map<String, dynamic> _$UpdateAssignmentRequestToJson(
   'startAt': instance.startAt,
   'endAt': instance.endAt,
   'metadata': instance.metadata,
-  'requirements': instance.requirements,
-  'examples': instance.examples,
 };
-
-_DeliverAssignmentResult _$DeliverAssignmentResultFromJson(
-  Map<String, dynamic> json,
-) => _DeliverAssignmentResult(
-  assignmentId: json['assignmentId'] as String,
-  courseSlug: json['courseSlug'] as String,
-  targetCount: (json['targetCount'] as num).toInt(),
-  deliveredCount: (json['deliveredCount'] as num).toInt(),
-  failedCount: (json['failedCount'] as num).toInt(),
-);
-
-Map<String, dynamic> _$DeliverAssignmentResultToJson(
-  _DeliverAssignmentResult instance,
-) => <String, dynamic>{
-  'assignmentId': instance.assignmentId,
-  'courseSlug': instance.courseSlug,
-  'targetCount': instance.targetCount,
-  'deliveredCount': instance.deliveredCount,
-  'failedCount': instance.failedCount,
-};
-
-_AssignmentDelivery _$AssignmentDeliveryFromJson(Map<String, dynamic> json) =>
-    _AssignmentDelivery(
-      userId: json['userId'] as String,
-      status: json['status'] as String,
-      deliveredAt: json['deliveredAt'] as String?,
-      failureReason: json['failureReason'] as String?,
-    );
-
-Map<String, dynamic> _$AssignmentDeliveryToJson(_AssignmentDelivery instance) =>
-    <String, dynamic>{
-      'userId': instance.userId,
-      'status': instance.status,
-      'deliveredAt': instance.deliveredAt,
-      'failureReason': instance.failureReason,
-    };
 
 _AddEnrollmentRequest _$AddEnrollmentRequestFromJson(
   Map<String, dynamic> json,

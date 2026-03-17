@@ -14,7 +14,6 @@ class TasksManagementState {
     this.selectedCourseAssignments,
     this.selectedAssignment,
     this.isLoadingDetails = false,
-    this.lastDeliveryResult,
   });
 
   const TasksManagementState.initial()
@@ -27,8 +26,7 @@ class TasksManagementState {
         selectedCourseEnrollments = null,
         selectedCourseAssignments = null,
         selectedAssignment = null,
-        isLoadingDetails = false,
-        lastDeliveryResult = null;
+        isLoadingDetails = false;
 
   final TasksManagementStatus status;
   final List<CourseSummary> courses;
@@ -41,7 +39,6 @@ class TasksManagementState {
   final List<Assignment>? selectedCourseAssignments;
   final Assignment? selectedAssignment;
   final bool isLoadingDetails;
-  final DeliverAssignmentResult? lastDeliveryResult;
 
   TasksManagementState copyWith({
     TasksManagementStatus? status,
@@ -54,9 +51,7 @@ class TasksManagementState {
     List<Assignment>? selectedCourseAssignments,
     Assignment? selectedAssignment,
     bool? isLoadingDetails,
-    DeliverAssignmentResult? lastDeliveryResult,
     bool clearError = false,
-    bool clearDeliveryResult = false,
   }) {
     return TasksManagementState(
       status: status ?? this.status,
@@ -69,7 +64,6 @@ class TasksManagementState {
       selectedCourseAssignments: selectedCourseAssignments ?? this.selectedCourseAssignments,
       selectedAssignment: selectedAssignment ?? this.selectedAssignment,
       isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
-      lastDeliveryResult: clearDeliveryResult ? null : (lastDeliveryResult ?? this.lastDeliveryResult),
     );
   }
 }

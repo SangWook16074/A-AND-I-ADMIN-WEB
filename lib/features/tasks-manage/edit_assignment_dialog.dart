@@ -55,9 +55,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     _description = fullAssignment.metadata.description ?? '';
     _startAt = fullAssignment.startAt;
     _endAt = fullAssignment.endAt;
-    _learningGoals = fullAssignment.metadata.learningGoals.join(', ');
+    _learningGoals = fullAssignment.metadata.learningGoals.map((e) => e.learningGoalText).join(', ');
     _language = fullAssignment.metadata.attributes['language'] ?? 'kotlin';
-    _examples = fullAssignment.examples.map((e) => _ExampleData(
+    _examples = fullAssignment.metadata.examples.map((e) => _ExampleData(
       input: e.inputText ?? '',
       output: e.outputText ?? '',
       description: e.description ?? '',
@@ -71,7 +71,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final requirements = fullAssignment.requirements;
+      final requirements = fullAssignment.metadata.requirements;
       final examples = _examples
           .asMap()
           .entries
@@ -93,14 +93,22 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           difficulty: _difficulty,
           description: _description.isEmpty ? null : _description,
           timeLimitMinutes: fullAssignment.metadata.timeLimitMinutes,
-          learningGoals: _learningGoals.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+          learningGoals: _learningGoals
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList() // Added toList() before asMap()
+              .asMap()
+              .entries
+              .map((e) => LearningGoal(sortOrder: e.key + 1, learningGoalText: e.value))
+              .toList(),
           attributes: {
             ...fullAssignment.metadata.attributes,
             'language': _language,
           },
+          requirements: requirements,
+          examples: examples,
         ),
-        requirements: requirements,
-        examples: examples,
       );
 
       ref.read(tasksManagementBlocProvider.notifier).add(
