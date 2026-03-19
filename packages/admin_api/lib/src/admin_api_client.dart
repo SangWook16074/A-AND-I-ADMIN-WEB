@@ -38,6 +38,21 @@ class AdminApiClient {
   }
 
   /// 관리자 유저를 생성하고, 생성된 계정 메타데이터를 반환합니다.
+  Future<AdminUserSummary> getUser({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      pathSuffix: '/$userId',
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
     required AuthRole role,

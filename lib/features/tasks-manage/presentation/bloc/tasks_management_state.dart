@@ -1,4 +1,5 @@
 import 'package:aandi_course_api/aandi_course_api.dart';
+import '../../../users-manage/domain/entities/admin_user.dart';
 
 enum TasksManagementStatus { initial, loading, success, failure }
 
@@ -14,6 +15,9 @@ class TasksManagementState {
     this.selectedCourseAssignments,
     this.selectedAssignment,
     this.isLoadingDetails = false,
+    this.searchedUser,
+    this.isSearchingUser = false,
+    this.userNotFound = false,
   });
 
   const TasksManagementState.initial()
@@ -26,7 +30,10 @@ class TasksManagementState {
         selectedCourseEnrollments = null,
         selectedCourseAssignments = null,
         selectedAssignment = null,
-        isLoadingDetails = false;
+        isLoadingDetails = false,
+        searchedUser = null,
+        isSearchingUser = false,
+        userNotFound = false;
 
   final TasksManagementStatus status;
   final List<CourseSummary> courses;
@@ -39,6 +46,9 @@ class TasksManagementState {
   final List<Assignment>? selectedCourseAssignments;
   final Assignment? selectedAssignment;
   final bool isLoadingDetails;
+  final AdminUser? searchedUser;
+  final bool isSearchingUser;
+  final bool userNotFound;
 
   TasksManagementState copyWith({
     TasksManagementStatus? status,
@@ -51,7 +61,11 @@ class TasksManagementState {
     List<Assignment>? selectedCourseAssignments,
     Assignment? selectedAssignment,
     bool? isLoadingDetails,
+    AdminUser? searchedUser,
+    bool? isSearchingUser,
+    bool? userNotFound,
     bool clearError = false,
+    bool clearSearchedUser = false,
   }) {
     return TasksManagementState(
       status: status ?? this.status,
@@ -66,6 +80,9 @@ class TasksManagementState {
           selectedCourseAssignments ?? this.selectedCourseAssignments,
       selectedAssignment: selectedAssignment ?? this.selectedAssignment,
       isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
+      searchedUser: clearSearchedUser ? null : (searchedUser ?? this.searchedUser),
+      isSearchingUser: isSearchingUser ?? this.isSearchingUser,
+      userNotFound: userNotFound ?? this.userNotFound,
     );
   }
 }

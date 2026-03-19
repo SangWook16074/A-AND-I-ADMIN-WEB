@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
@@ -431,6 +432,13 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
   String _userId = '';
   bool _isUpdatingEnrollmentStatus = false;
+  Timer? _searchTimer;
+
+  @override
+  void dispose() {
+    _searchTimer?.cancel();
+    super.dispose();
+  }
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
@@ -444,6 +452,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               request: request,
             ),
           );
+      ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
       _formKey.currentState!.reset();
       FocusScope.of(context).unfocus();
     }
@@ -615,15 +624,63 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'User ID',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          onSaved: (v) => _userId = v?.trim() ?? '',
-                          validator: (v) =>
-                              v == null || v.trim().isEmpty ? '필수' : null,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'User ID',
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              onChanged: (v) {
+                                _searchTimer?.cancel();
+                                if (v.isEmpty) {
+                                  ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
+                                  return;
+                                }
+                                _searchTimer = Timer(const Duration(milliseconds: 500), () {
+                                  ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementUserSearchRequested(query: v.trim()));
+                                });
+                              },
+                              onSaved: (v) => _userId = v?.trim() ?? '',
+                              validator: (v) =>
+                                  v == null || v.trim().isEmpty ? '필수' : null,
+                            ),
+                            if (ref.watch(tasksManagementBlocProvider).isSearchingUser)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8, left: 12),
+                                child: SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              )
+                            else if (ref.watch(tasksManagementBlocProvider).searchedUser != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8, left: 12),
+                                child: Text(
+                                  '존재하는 사용자: ${ref.watch(tasksManagementBlocProvider).searchedUser!.nickname ?? ref.watch(tasksManagementBlocProvider).searchedUser!.id} (${ref.watch(tasksManagementBlocProvider).searchedUser!.username})',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
+                            else if (ref.watch(tasksManagementBlocProvider).userNotFound)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8, left: 12),
+                                child: Text(
+                                  '사용자를 찾을 수 없습니다.',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 12),
