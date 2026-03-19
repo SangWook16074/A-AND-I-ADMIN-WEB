@@ -107,46 +107,16 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _updateCourse(courseSlug: event.courseSlug, request: event.request);
     });
 
-    on<TasksManagementAssignmentSubmissionConfigRequested>((event) async {
-      await _loadAssignmentSubmissionConfig(
+    on<TasksManagementDeleteEnrollmentRequested>((event) async {
+      await _deleteEnrollment(
         courseSlug: event.courseSlug,
-        assignmentId: event.assignmentId,
+        userId: event.userId,
       );
     });
 
+
     Future.microtask(() => add(const TasksManagementStarted()));
     return const TasksManagementState.initial();
-  }
-
-  Future<void> _loadAssignmentSubmissionConfig({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    state = state.copyWith(isLoadingDetails: true, clearError: true);
-    try {
-      final config =
-          await ref.read(getAssignmentSubmissionConfigUseCaseProvider).execute(
-                courseSlug: courseSlug,
-                assignmentId: assignmentId,
-              );
-
-      if (state.selectedAssignment?.id == assignmentId) {
-        state = state.copyWith(
-          assignmentSubmissionConfig: config,
-          isLoadingDetails: false,
-        );
-      }
-    } catch (e) {
-      String errorMessage = '과제 제출 설정을 불러오는데 실패했습니다: $e';
-      if (e is CourseApiException) {
-        errorMessage =
-            '제출 설정 로드 실패: ${e.message} (statusCode: ${e.statusCode}, code: ${e.code})';
-      }
-      state = state.copyWith(
-        isLoadingDetails: false,
-        errorMessage: errorMessage,
-      );
-    }
   }
 
   Future<void> _loadCourses() async {
@@ -331,10 +301,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
           selectedAssignment: assignment,
           isLoadingDetails: false,
         );
-        add(TasksManagementEvent.assignmentSubmissionConfigRequested(
-          courseSlug: courseSlug,
-          assignmentId: assignmentId,
-        ));
       }
     } catch (e) {
       String errorMessage = '과제 상세 정보를 불러오는데 실패했습니다: $e';
@@ -466,6 +432,25 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     } catch (e) {
       state = state.copyWith(isCreating: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> _deleteEnrollment({
+    required String courseSlug,
+    required String userId,
+  }) async {
+    state = state.copyWith(isLoadingDetails: true, clearError: true);
+    try {
+      await ref.read(deleteEnrollmentUseCaseProvider).execute(
+        courseSlug: courseSlug,
+        userId: userId,
+      );
+      add(TasksManagementEnrollmentsRequested(courseSlug));
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingDetails: false,
+        errorMessage: '수강생 삭제 실패: $e',
+      );
     }
   }
 }

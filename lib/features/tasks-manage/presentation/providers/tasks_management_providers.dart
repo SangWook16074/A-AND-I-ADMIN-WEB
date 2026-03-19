@@ -12,6 +12,7 @@ import '../../domain/usecases/get_courses_use_case.dart';
 import '../../domain/usecases/get_enrollments_use_case.dart';
 import '../../domain/usecases/add_enrollment_use_case.dart';
 import '../../domain/usecases/update_enrollment_status_use_case.dart';
+import '../../domain/usecases/delete_enrollment_use_case.dart';
 import '../../domain/usecases/get_assignments_use_case.dart';
 import '../../domain/usecases/create_assignment_use_case.dart';
 import '../../domain/usecases/delete_assignment_use_case.dart';
@@ -19,7 +20,6 @@ import '../../domain/usecases/get_assignment_details_use_case.dart';
 import '../../domain/usecases/delete_course_use_case.dart';
 import '../../domain/usecases/update_course_use_case.dart';
 import '../../domain/usecases/update_assignment_use_case.dart';
-import '../../domain/usecases/get_assignment_submission_config_use_case.dart';
 
 part 'tasks_management_providers.g.dart';
 
@@ -118,13 +118,9 @@ AddEnrollmentUseCase addEnrollmentUseCase(Ref ref) {
   return AddEnrollmentUseCaseImpl(
     tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
   );
-}
-
-@Riverpod(keepAlive: true)
-GetAssignmentSubmissionConfigUseCase getAssignmentSubmissionConfigUseCase(
-  Ref ref,
-) {
-  return GetAssignmentSubmissionConfigUseCaseImpl(
-    tasksManagementRepository: ref.watch(tasksManagementRepositoryProvider),
+}@Riverpod(keepAlive: true)
+DeleteEnrollmentUseCase deleteEnrollmentUseCase(Ref ref) {
+  return DeleteEnrollmentUseCaseImpl(
+    ref.watch(tasksManagementRepositoryProvider),
   );
 }

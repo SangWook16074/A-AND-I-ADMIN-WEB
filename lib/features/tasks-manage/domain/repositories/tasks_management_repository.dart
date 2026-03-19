@@ -58,10 +58,7 @@ abstract interface class TasksManagementRepository {
     required String assignmentId,
   });
 
-  Future<AssignmentSubmissionConfig> getAssignmentSubmissionConfig({
-    required String courseSlug,
-    required String assignmentId,
-  });
+
 
 
   Future<Assignment> updateAssignment({

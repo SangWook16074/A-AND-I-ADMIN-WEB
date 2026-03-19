@@ -73,8 +73,9 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required UpdateEnrollmentStatusRequest request,
   }) = TasksManagementUpdateEnrollmentStatusRequested;
 
-  const factory TasksManagementEvent.assignmentSubmissionConfigRequested({
+  const factory TasksManagementEvent.deleteEnrollmentRequested({
     required String courseSlug,
-    required String assignmentId,
-  }) = TasksManagementAssignmentSubmissionConfigRequested;
+    required String userId,
+  }) = TasksManagementDeleteEnrollmentRequested;
+
 }
