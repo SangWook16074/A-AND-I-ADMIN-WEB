@@ -6,7 +6,7 @@ import 'task_management.dart';
 import 'assignment_details_dialog.dart';
 import 'edit_assignment_dialog.dart';
 
-enum _EnrollmentActionStatus { enrolled, dropped, banned }
+enum _EnrollmentActionStatus { enrolled, dropped, banned, deleted }
 
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
@@ -543,10 +543,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         tooltip: '상태 변경',
                         enabled: !_isUpdatingEnrollmentStatus,
                         onSelected: (value) {
-                          _showEnrollmentStatusDialog(
-                            enrollment: enrollment,
-                            status: value,
-                          );
+                          if (value == _EnrollmentActionStatus.deleted) {
+                            _showDeleteEnrollmentDialog(enrollment);
+                          } else {
+                            _showEnrollmentStatusDialog(
+                              enrollment: enrollment,
+                              status: value,
+                            );
+                          }
                         },
                         itemBuilder: (context) => const [
                           PopupMenuItem(
@@ -560,6 +564,24 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.banned,
                             child: Text('BANNED'),
+                          ),
+                          const PopupMenuDivider(),
+                          PopupMenuItem(
+                            value: _EnrollmentActionStatus.deleted,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '수강생 삭제',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                         child: const Padding(
@@ -666,6 +688,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                       _EnrollmentActionStatus.enrolled => 'ENROLLED',
                       _EnrollmentActionStatus.dropped => 'DROPPED',
                       _EnrollmentActionStatus.banned => 'BANNED',
+                      _EnrollmentActionStatus.deleted => 'DELETED',
                     }}',
                   ),
                   if (shouldRequireBanReason) ...[
@@ -718,6 +741,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                   _EnrollmentActionStatus.enrolled => 'ENROLLED',
                   _EnrollmentActionStatus.dropped => 'DROPPED',
                   _EnrollmentActionStatus.banned => 'BANNED',
+                  _EnrollmentActionStatus.deleted => 'DELETED',
                 };
 
                 ref
@@ -754,6 +778,49 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
           ],
         );
       },
+    );
+  }
+
+  void _showDeleteEnrollmentDialog(Enrollment enrollment) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text(
+          '수강생 삭제',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        content: Text(
+          '정말로 ${enrollment.userId} 수강생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+          style: const TextStyle(height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text(
+              '취소',
+              style: TextStyle(color: Color(0xFF8A8A8A)),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              ref.read(tasksManagementBlocProvider.notifier).add(
+                    TasksManagementDeleteEnrollmentRequested(
+                      courseSlug: widget.courseSlug,
+                      userId: enrollment.userId,
+                    ),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${enrollment.userId} 수강생을 삭제 요청했습니다.')),
+              );
+            },
+            child: const Text(
+              '삭제',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

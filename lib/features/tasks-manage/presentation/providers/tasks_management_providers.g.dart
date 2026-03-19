@@ -265,25 +265,24 @@ final addEnrollmentUseCaseProvider = Provider<AddEnrollmentUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AddEnrollmentUseCaseRef = ProviderRef<AddEnrollmentUseCase>;
-String _$getAssignmentSubmissionConfigUseCaseHash() =>
-    r'483c789bc7fb73c2d1388a2945361f728f799433';
+String _$deleteEnrollmentUseCaseHash() =>
+    r'4c3eaceaaf5165c71d3b13aa1d47b2d5717e35c5';
 
-/// See also [getAssignmentSubmissionConfigUseCase].
-@ProviderFor(getAssignmentSubmissionConfigUseCase)
-final getAssignmentSubmissionConfigUseCaseProvider =
-    Provider<GetAssignmentSubmissionConfigUseCase>.internal(
-      getAssignmentSubmissionConfigUseCase,
-      name: r'getAssignmentSubmissionConfigUseCaseProvider',
+/// See also [deleteEnrollmentUseCase].
+@ProviderFor(deleteEnrollmentUseCase)
+final deleteEnrollmentUseCaseProvider =
+    Provider<DeleteEnrollmentUseCase>.internal(
+      deleteEnrollmentUseCase,
+      name: r'deleteEnrollmentUseCaseProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$getAssignmentSubmissionConfigUseCaseHash,
+          : _$deleteEnrollmentUseCaseHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GetAssignmentSubmissionConfigUseCaseRef =
-    ProviderRef<GetAssignmentSubmissionConfigUseCase>;
+typedef DeleteEnrollmentUseCaseRef = ProviderRef<DeleteEnrollmentUseCase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
