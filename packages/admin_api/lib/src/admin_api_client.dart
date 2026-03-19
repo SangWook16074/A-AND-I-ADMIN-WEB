@@ -28,6 +28,21 @@ class AdminApiClient {
     ).whereType<Map<String, dynamic>>().map(AdminUserSummary.fromJson).toList();
   }
 
+  Future<AdminUserSummary> getUser({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      pathSuffix: '/$userId',
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
     required AuthRole role,

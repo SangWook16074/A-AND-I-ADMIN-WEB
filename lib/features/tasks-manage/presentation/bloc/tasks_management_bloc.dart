@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../providers/tasks_management_providers.dart';
 import 'tasks_management_event.dart';
 import 'tasks_management_state.dart';
+import '../../../users-manage/presentation/bloc/users_management_bloc.dart';
 
 part 'tasks_management_bloc.g.dart';
 
@@ -114,6 +115,13 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     });
 
+    on<TasksManagementUserSearchRequested>((event) async {
+      await _searchUser(query: event.query);
+    });
+
+    on<TasksManagementClearUserSearch>((event) async {
+      state = state.copyWith(clearSearchedUser: true, userNotFound: false);
+    });
 
     Future.microtask(() => add(const TasksManagementStarted()));
     return const TasksManagementState.initial();
@@ -394,7 +402,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
-
   Future<void> _deleteCourse({required String courseSlug}) async {
     state = state.copyWith(isDeleting: true, clearError: true);
     try {
@@ -441,15 +448,43 @@ class TasksManagementBloc extends _$TasksManagementBloc {
   }) async {
     state = state.copyWith(isLoadingDetails: true, clearError: true);
     try {
-      await ref.read(deleteEnrollmentUseCaseProvider).execute(
-        courseSlug: courseSlug,
-        userId: userId,
-      );
+      await ref
+          .read(deleteEnrollmentUseCaseProvider)
+          .execute(courseSlug: courseSlug, userId: userId);
       add(TasksManagementEnrollmentsRequested(courseSlug));
     } catch (e) {
       state = state.copyWith(
         isLoadingDetails: false,
         errorMessage: '수강생 삭제 실패: $e',
+      );
+    }
+  }
+
+  Future<void> _searchUser({required String query}) async {
+    if (query.isEmpty) {
+      state = state.copyWith(clearSearchedUser: true, userNotFound: false);
+      return;
+    }
+
+    state = state.copyWith(
+      isSearchingUser: true,
+      clearSearchedUser: true,
+      userNotFound: false,
+    );
+
+    try {
+      final repository = ref.read(usersManagementRepositoryProvider);
+      final user = await repository.getUser(userId: query);
+      state = state.copyWith(
+        isSearchingUser: false,
+        searchedUser: user,
+        userNotFound: false,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isSearchingUser: false,
+        clearSearchedUser: true,
+        userNotFound: true,
       );
     }
   }

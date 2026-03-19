@@ -77,5 +77,9 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String courseSlug,
     required String userId,
   }) = TasksManagementDeleteEnrollmentRequested;
+  const factory TasksManagementEvent.userSearchRequested({
+    required String query,
+  }) = TasksManagementUserSearchRequested;
 
+  const factory TasksManagementEvent.clearUserSearch() = TasksManagementClearUserSearch;
 }
