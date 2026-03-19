@@ -457,7 +457,7 @@ class _EnrollmentsTab extends ConsumerStatefulWidget {
 class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
   final _publicCodeController = TextEditingController();
-  bool _isUpdatingEnrollmentStatus = false;
+  final bool _isUpdatingEnrollmentStatus = false;
   Timer? _searchTimer;
 
   @override
@@ -778,7 +778,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
           ),
         ],
       ),
-    );
+    )
   }
 
   Future<void> _showEnrollmentStatusDialog({
