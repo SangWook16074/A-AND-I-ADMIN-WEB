@@ -287,11 +287,11 @@ Map<String, dynamic> _$UpdateAssignmentRequestToJson(
 
 _AddEnrollmentRequest _$AddEnrollmentRequestFromJson(
   Map<String, dynamic> json,
-) => _AddEnrollmentRequest(userId: json['userId'] as String);
+) => _AddEnrollmentRequest(publicCode: json['publicCode'] as String);
 
 Map<String, dynamic> _$AddEnrollmentRequestToJson(
   _AddEnrollmentRequest instance,
-) => <String, dynamic>{'userId': instance.userId};
+) => <String, dynamic>{'publicCode': instance.publicCode};
 
 _UpdateEnrollmentStatusRequest _$UpdateEnrollmentStatusRequestFromJson(
   Map<String, dynamic> json,

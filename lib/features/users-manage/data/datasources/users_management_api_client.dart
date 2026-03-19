@@ -86,6 +86,38 @@ class UsersManagementApiClient {
     }
   }
 
+  Future<AdminUserDto> lookupUserByPublicCode({
+    required String accessToken,
+    required String publicCode,
+  }) async {
+    try {
+      final user = await apiClient.lookupUserByPublicCode(
+        accessToken: accessToken,
+        publicCode: publicCode,
+      );
+      return AdminUserDto(
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        nickname: user.nickname,
+        publicCode: user.publicCode,
+        userTrack: user.userTrack,
+        cohort: user.cohort,
+        cohortOrder: user.cohortOrder,
+        forcePasswordChange: user.forcePasswordChange,
+        inviteLink: user.inviteLink,
+        inviteExpiresAt: user.inviteExpiresAt,
+        active: user.active,
+      );
+    } on admin_api.AdminApiException catch (e) {
+      throw UsersManagementApiException(
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
+      );
+    }
+  }
+
   Future<AdminUserDto> createUser({
     required String accessToken,
     required admin_api.AdminUserProvisionType provisionType,

@@ -50,7 +50,6 @@ class _CourseDetailsBottomSheetState
   @override
   Widget build(BuildContext context) {
     ref.listen(tasksManagementBlocProvider, (previous, next) {
-
       if (previous?.isDeleting == true && next.isDeleting == false) {
         if (next.errorMessage == null) {
           Navigator.of(context).pop();
@@ -125,6 +124,32 @@ class _CourseDetailsBottomSheetState
                           ),
                         ),
                       ],
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _CourseInfoChip(
+                            label: '분야',
+                            value: widget.course.targetTrack,
+                          ),
+                          _CourseInfoChip(
+                            label: 'Phase',
+                            value: widget.course.metadata.phase,
+                          ),
+                          _CourseInfoChip(
+                            label: 'Slug',
+                            value: widget.course.slug,
+                          ),
+                          if ((widget.course.startDate?.isNotEmpty ?? false) ||
+                              (widget.course.endDate?.isNotEmpty ?? false))
+                            _CourseInfoChip(
+                              label: '일정',
+                              value:
+                                  '${widget.course.startDate ?? '-'} ~ ${widget.course.endDate ?? '-'}',
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -222,6 +247,7 @@ class _CourseDetailsBottomSheetState
                     enrollments: enrollments,
                   ),
                   _AssignmentsTab(
+                    course: widget.course,
                     courseSlug: widget.course.slug,
                     isLoading: state.isLoadingDetails,
                     assignments: state.selectedCourseAssignments,
@@ -430,32 +456,65 @@ class _EnrollmentsTab extends ConsumerStatefulWidget {
 
 class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
-  String _userId = '';
+  final _publicCodeController = TextEditingController();
   bool _isUpdatingEnrollmentStatus = false;
   Timer? _searchTimer;
 
   @override
   void dispose() {
     _searchTimer?.cancel();
+    _publicCodeController.dispose();
     super.dispose();
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final request = AddEnrollmentRequest(userId: _userId);
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+
+    final searchedUser = ref.read(tasksManagementBlocProvider).searchedUser;
+    if (searchedUser == null) {
+      return;
+    }
+
+    final request = AddEnrollmentRequest(
+      publicCode: searchedUser.publicCode ?? _publicCodeController.text.trim(),
+    );
+    ref
+        .read(tasksManagementBlocProvider.notifier)
+        .add(
+          TasksManagementAddEnrollmentRequested(
+            courseSlug: widget.courseSlug,
+            request: request,
+          ),
+        );
+    ref
+        .read(tasksManagementBlocProvider.notifier)
+        .add(const TasksManagementClearUserSearch());
+    _publicCodeController.clear();
+    _formKey.currentState?.reset();
+    FocusScope.of(context).unfocus();
+  }
+
+  void _onPublicCodeChanged(String value) {
+    _searchTimer?.cancel();
+    ref
+        .read(tasksManagementBlocProvider.notifier)
+        .add(const TasksManagementClearUserSearch());
+
+    final query = value.trim();
+    if (query.isEmpty) {
+      return;
+    }
+
+    _searchTimer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) {
+        return;
+      }
       ref
           .read(tasksManagementBlocProvider.notifier)
-          .add(
-            TasksManagementAddEnrollmentRequested(
-              courseSlug: widget.courseSlug,
-              request: request,
-            ),
-          );
-      ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
-      _formKey.currentState!.reset();
-      FocusScope.of(context).unfocus();
-    }
+          .add(TasksManagementUserSearchRequested(query: query));
+    });
   }
 
   @override
@@ -463,6 +522,8 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
     if (widget.isLoading && widget.enrollments == null) {
       return const Center(child: CircularProgressIndicator());
     }
+
+    final taskState = ref.watch(tasksManagementBlocProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
@@ -574,7 +635,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                             value: _EnrollmentActionStatus.banned,
                             child: Text('BANNED'),
                           ),
-                          const PopupMenuDivider(),
+                          PopupMenuDivider(),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.deleted,
                             child: Row(
@@ -628,39 +689,48 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextFormField(
+                              controller: _publicCodeController,
                               decoration: const InputDecoration(
-                                labelText: 'User ID',
+                                labelText: 'Public Code',
+                                hintText: '3초 멈추면 자동 검색됩니다.',
                                 filled: true,
                                 fillColor: Colors.white,
                               ),
-                              onChanged: (v) {
-                                _searchTimer?.cancel();
-                                if (v.isEmpty) {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
-                                  return;
+                              onChanged: _onPublicCodeChanged,
+                              validator: (v) {
+                                final query = v?.trim() ?? '';
+                                if (query.isEmpty) {
+                                  return '필수';
                                 }
-                                _searchTimer = Timer(const Duration(milliseconds: 500), () {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementUserSearchRequested(query: v.trim()));
-                                });
+                                if (taskState.isSearchingUser) {
+                                  return '사용자 조회 중입니다.';
+                                }
+                                if (taskState.searchedUser?.publicCode !=
+                                    query) {
+                                  return '존재하는 publicCode를 입력하세요.';
+                                }
+                                return null;
                               },
-                              onSaved: (v) => _userId = v?.trim() ?? '',
-                              validator: (v) =>
-                                  v == null || v.trim().isEmpty ? '필수' : null,
                             ),
-                            if (ref.watch(tasksManagementBlocProvider).isSearchingUser)
+                            if (taskState.isSearchingUser)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: SizedBox(
                                   width: 12,
                                   height: 12,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).searchedUser != null)
+                            else if (taskState.searchedUser != null)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8, left: 12),
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  left: 12,
+                                ),
                                 child: Text(
-                                  '존재하는 사용자: ${ref.watch(tasksManagementBlocProvider).searchedUser!.nickname ?? ref.watch(tasksManagementBlocProvider).searchedUser!.id} (${ref.watch(tasksManagementBlocProvider).searchedUser!.username})',
+                                  '존재하는 사용자: ${taskState.searchedUser!.nickname ?? taskState.searchedUser!.id} (${taskState.searchedUser!.username})',
                                   style: const TextStyle(
                                     color: Colors.blue,
                                     fontSize: 12,
@@ -668,7 +738,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                                   ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).userNotFound)
+                            else if (taskState.userNotFound)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: Text(
@@ -853,15 +923,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(
-              '취소',
-              style: TextStyle(color: Color(0xFF8A8A8A)),
-            ),
+            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              ref.read(tasksManagementBlocProvider.notifier).add(
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
                     TasksManagementDeleteEnrollmentRequested(
                       courseSlug: widget.courseSlug,
                       userId: enrollment.userId,
@@ -884,11 +953,13 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
 
 class _AssignmentsTab extends ConsumerStatefulWidget {
   const _AssignmentsTab({
+    required this.course,
     required this.courseSlug,
     required this.isLoading,
     this.assignments,
   });
 
+  final CourseSummary course;
   final String courseSlug;
   final bool isLoading;
   final List<Assignment>? assignments;
@@ -922,6 +993,45 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF7E8),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF1DFC0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.course.metadata.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF2B2113),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _CourseInfoChip(
+                      label: '분야',
+                      value: widget.course.targetTrack,
+                    ),
+                    _CourseInfoChip(
+                      label: 'Phase',
+                      value: widget.course.metadata.phase,
+                    ),
+                    _CourseInfoChip(label: 'Slug', value: widget.course.slug),
+                  ],
+                ),
+              ],
+            ),
+          ),
           // List existing assignments
           if (widget.isLoading && widget.assignments == null)
             const Center(
@@ -978,6 +1088,29 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _CourseInfoChip(
+                            label: '분야',
+                            value: widget.course.targetTrack,
+                          ),
+                          _CourseInfoChip(
+                            label: 'Phase',
+                            value: widget.course.metadata.phase,
+                          ),
+                          if ((assignment.metadata.attributes['language'] ?? '')
+                              .toString()
+                              .isNotEmpty)
+                            _CourseInfoChip(
+                              label: '언어',
+                              value: assignment.metadata.attributes['language']
+                                  .toString(),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -1473,10 +1606,12 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       learningGoals: _learningGoals
                                           .asMap()
                                           .entries
-                                          .map((e) => LearningGoal(
-                                                sortOrder: e.key + 1,
-                                                learningGoalText: e.value,
-                                              ))
+                                          .map(
+                                            (e) => LearningGoal(
+                                              sortOrder: e.key + 1,
+                                              learningGoalText: e.value,
+                                            ),
+                                          )
                                           .toList(),
                                       requirements: reqList,
                                       examples: exampleList,
@@ -1515,6 +1650,33 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CourseInfoChip extends StatelessWidget {
+  const _CourseInfoChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE4D1B1)),
+      ),
+      child: Text(
+        '$label $value',
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF5F4A2A),
+        ),
       ),
     );
   }

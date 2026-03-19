@@ -112,9 +112,34 @@ class TaskManagementView extends ConsumerWidget {
                             course.metadata.title,
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          subtitle: Text(
-                            course.metadata.description ?? '설명 없음',
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 6),
+                              Text(
+                                course.metadata.description ?? '설명 없음',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _MetaPill(
+                                    label: '분야',
+                                    value: course.targetTrack,
+                                  ),
+                                  _MetaPill(
+                                    label: 'Phase',
+                                    value: course.metadata.phase,
+                                  ),
+                                  _MetaPill(label: 'Slug', value: course.slug),
+                                ],
+                              ),
+                            ],
                           ),
+                          isThreeLine: true,
                           trailing: const Icon(Icons.chevron_right_rounded),
                           onTap: () {
                             ref
@@ -154,6 +179,33 @@ class TaskManagementView extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _MetaPill extends StatelessWidget {
+  const _MetaPill({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE3E3E3)),
+      ),
+      child: Text(
+        '$label $value',
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF555555),
+        ),
       ),
     );
   }

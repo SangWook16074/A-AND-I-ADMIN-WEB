@@ -26,6 +26,11 @@ class FakeUsersManagementRepository implements UsersManagementRepository {
   }
 
   @override
+  Future<AdminUser> lookupUserByPublicCode({required String publicCode}) async {
+    return users.firstWhere((u) => u.publicCode == publicCode);
+  }
+
+  @override
   Future<AdminUser> createUser({
     required AdminUserProvisionType provisionType,
     required int cohort,
@@ -102,7 +107,7 @@ class FakeUsersManagementRepository implements UsersManagementRepository {
           cohortOrder: cohortOrder,
           forcePasswordChange: false,
           active: true,
-        )
+        ),
       );
     }
   }

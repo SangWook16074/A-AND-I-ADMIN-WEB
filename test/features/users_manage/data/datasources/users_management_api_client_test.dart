@@ -8,6 +8,46 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('UsersManagementApiClient.lookupUserByPublicCode', () {
+    test('sends GET /v1/users/lookup with code query', () async {
+      late RequestOptions captured;
+      final apiClient = UsersManagementApiClient(
+        baseUrl: 'https://api.example.com',
+        dio: _createMockDio((options, body) async {
+          captured = options;
+          expect(body, isEmpty);
+          return _jsonResponse({
+            'success': true,
+            'data': {
+              'id': 'u-1',
+              'username': 'user1',
+              'role': 'USER',
+              'nickname': 'tester',
+              'publicCode': 'PUB-001',
+            },
+          }, 200);
+        }),
+      );
+
+      final user = await apiClient.lookupUserByPublicCode(
+        accessToken: 'access-token',
+        publicCode: 'PUB-001',
+      );
+
+      expect(captured.method, 'GET');
+      expect(
+        captured.uri.toString(),
+        'https://api.example.com/v1/users/lookup?code=PUB-001',
+      );
+      expect(
+        _headerValue(captured.headers, 'authorization'),
+        'Bearer access-token',
+      );
+      expect(user.id, 'u-1');
+      expect(user.publicCode, 'PUB-001');
+    });
+  });
+
   group('UsersManagementApiClient.createUser', () {
     test('sends POST /v1/admin/users with expected payload', () async {
       late RequestOptions captured;

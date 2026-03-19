@@ -35,7 +35,25 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
       throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    final dto = await _apiClient.getUser(accessToken: accessToken, userId: userId);
+    final dto = await _apiClient.getUser(
+      accessToken: accessToken,
+      userId: userId,
+    );
+    return dto.toDomain();
+  }
+
+  @override
+  Future<AdminUser> lookupUserByPublicCode({required String publicCode}) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    final dto = await _apiClient.lookupUserByPublicCode(
+      accessToken: accessToken,
+      publicCode: publicCode,
+    );
     return dto.toDomain();
   }
 
@@ -101,7 +119,10 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
       throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    return await _apiClient.resetPassword(accessToken: accessToken, userId: userId);
+    return await _apiClient.resetPassword(
+      accessToken: accessToken,
+      userId: userId,
+    );
   }
 
   @override

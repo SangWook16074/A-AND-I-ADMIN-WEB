@@ -17,6 +17,7 @@ class AdminApiClient {
 
   /// 유저 조회/생성/수정/삭제를 단일 엔드포인트로 처리하는 서버 규약 경로입니다.
   static const _usersPath = '/v1/admin/users';
+  static const _userLookupPath = '/v1/users/lookup';
 
   /// API 호스트(base url)입니다. 예: `https://api.example.com`
   final String baseUrl;
@@ -46,6 +47,22 @@ class AdminApiClient {
       method: 'GET',
       accessToken: accessToken,
       pathSuffix: '/$userId',
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
+  Future<AdminUserSummary> lookupUserByPublicCode({
+    required String accessToken,
+    required String publicCode,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: _userLookupPath,
+      queryParameters: {'code': publicCode},
     );
 
     return AdminUserSummary.fromJson(
@@ -179,9 +196,15 @@ class AdminApiClient {
     bool allowEmptySuccessBody = false,
     String? path,
     String pathSuffix = '',
+    Map<String, dynamic>? queryParameters,
   }) async {
+    final uri = Uri.parse('$baseUrl${path ?? _usersPath}$pathSuffix').replace(
+      queryParameters: queryParameters?.map(
+        (key, value) => MapEntry(key, value.toString()),
+      ),
+    );
     final response = await dio.requestUri<dynamic>(
-      Uri.parse('$baseUrl${path ?? _usersPath}$pathSuffix'),
+      uri,
       data: data,
       options: Options(
         method: method,

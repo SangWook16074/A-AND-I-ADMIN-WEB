@@ -40,6 +40,7 @@ class _AssignmentDetailsDialogState
     final state = ref.watch(tasksManagementBlocProvider);
     final isLoading = state.isLoadingDetails;
     final assignment = state.selectedAssignment;
+    final selectedCourse = state.selectedCourse;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -77,6 +78,53 @@ class _AssignmentDetailsDialogState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (selectedCourse != null &&
+                          selectedCourse.slug == widget.courseSlug) ...[
+                        _buildSectionCard(
+                          title: '코스 정보',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                selectedCourse.metadata.title,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _DetailChip(
+                                    label: '분야',
+                                    value: selectedCourse.targetTrack,
+                                  ),
+                                  _DetailChip(
+                                    label: 'Phase',
+                                    value: selectedCourse.metadata.phase,
+                                  ),
+                                  _DetailChip(
+                                    label: 'Slug',
+                                    value: selectedCourse.slug,
+                                  ),
+                                  if ((selectedCourse.startDate?.isNotEmpty ??
+                                          false) ||
+                                      (selectedCourse.endDate?.isNotEmpty ??
+                                          false))
+                                    _DetailChip(
+                                      label: '일정',
+                                      value:
+                                          '${selectedCourse.startDate ?? '-'} ~ ${selectedCourse.endDate ?? '-'}',
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       _buildDetailRow('과제 ID', assignment.id),
                       _buildDetailRow(
                         '주차 / 순서',
@@ -90,17 +138,8 @@ class _AssignmentDetailsDialogState
                       if (assignment.publishedAt != null)
                         _buildDetailRow('배포일', assignment.publishedAt!),
                       const SizedBox(height: 16),
-                      const Text(
-                        '설명',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9F9F9),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                      _buildSectionCard(
+                        title: '설명',
                         child: Text(assignment.metadata.description ?? '설명 없음'),
                       ),
                       const SizedBox(height: 16),
@@ -218,6 +257,53 @@ class _AssignmentDetailsDialogState
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+Widget _buildSectionCard({required String title, required Widget child}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+      const SizedBox(height: 6),
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9F9F9),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFEAEAEA)),
+        ),
+        child: child,
+      ),
+    ],
+  );
+}
+
+class _DetailChip extends StatelessWidget {
+  const _DetailChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE3E3E3)),
+      ),
+      child: Text(
+        '$label $value',
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF555555),
+        ),
       ),
     );
   }

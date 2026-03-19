@@ -113,6 +113,45 @@ void main() {
     });
   });
 
+  group('AdminApiClient.lookupUserByPublicCode', () {
+    test('sends GET request to lookup endpoint and parses user', () async {
+      final client = _createClient(
+        baseUrl: baseUrl,
+        handler: (options, _) async {
+          expect(options.method, 'GET');
+          expect(
+            options.uri,
+            Uri.parse('$baseUrl/v1/users/lookup?code=USER-001'),
+          );
+          expect(
+            _headerValue(options.headers, 'authorization'),
+            'Bearer $accessToken',
+          );
+
+          return _jsonResponse({
+            'success': true,
+            'data': {
+              'id': 'user-1',
+              'username': 'alice',
+              'role': 'USER',
+              'nickname': 'Alice',
+              'publicCode': 'USER-001',
+            },
+          }, 200);
+        },
+      );
+
+      final user = await client.lookupUserByPublicCode(
+        accessToken: accessToken,
+        publicCode: 'USER-001',
+      );
+
+      expect(user.id, 'user-1');
+      expect(user.username, 'alice');
+      expect(user.publicCode, 'USER-001');
+    });
+  });
+
   group('AdminApiClient.createUser', () {
     test('sends POST request and parses created user on success', () async {
       final client = _createClient(
