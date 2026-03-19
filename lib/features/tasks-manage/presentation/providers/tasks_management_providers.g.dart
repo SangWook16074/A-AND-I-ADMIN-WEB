@@ -189,256 +189,6 @@ final createAssignmentUseCaseProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CreateAssignmentUseCaseRef = ProviderRef<CreateAssignmentUseCase>;
-String _$publishAssignmentUseCaseHash() =>
-    r'6012e478e937bf8f27a100029ca71dab48fe8fcc';
-
-/// See also [publishAssignmentUseCase].
-@ProviderFor(publishAssignmentUseCase)
-final publishAssignmentUseCaseProvider =
-    Provider<PublishAssignmentUseCase>.internal(
-      publishAssignmentUseCase,
-      name: r'publishAssignmentUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$publishAssignmentUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PublishAssignmentUseCaseRef = ProviderRef<PublishAssignmentUseCase>;
-String _$deliverAssignmentUseCaseHash() =>
-    r'04046afc6b71f156374f7ae46049b6d60aa3fc20';
-
-/// See also [deliverAssignmentUseCase].
-@ProviderFor(deliverAssignmentUseCase)
-final deliverAssignmentUseCaseProvider =
-    Provider<DeliverAssignmentUseCase>.internal(
-      deliverAssignmentUseCase,
-      name: r'deliverAssignmentUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$deliverAssignmentUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DeliverAssignmentUseCaseRef = ProviderRef<DeliverAssignmentUseCase>;
-String _$getAssignmentDeliveriesUseCaseHash() =>
-    r'37243277f04f4c450c1216ba120790864c65d95b';
-
-/// See also [getAssignmentDeliveriesUseCase].
-@ProviderFor(getAssignmentDeliveriesUseCase)
-final getAssignmentDeliveriesUseCaseProvider =
-    Provider<GetAssignmentDeliveriesUseCase>.internal(
-      getAssignmentDeliveriesUseCase,
-      name: r'getAssignmentDeliveriesUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$getAssignmentDeliveriesUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GetAssignmentDeliveriesUseCaseRef =
-    ProviderRef<GetAssignmentDeliveriesUseCase>;
-String _$assignmentDeliveriesHash() =>
-    r'68361c03766d23f725024c13cd9ecc2da439b61d';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [assignmentDeliveries].
-@ProviderFor(assignmentDeliveries)
-const assignmentDeliveriesProvider = AssignmentDeliveriesFamily();
-
-/// See also [assignmentDeliveries].
-class AssignmentDeliveriesFamily
-    extends Family<AsyncValue<List<AssignmentDelivery>>> {
-  /// See also [assignmentDeliveries].
-  const AssignmentDeliveriesFamily();
-
-  /// See also [assignmentDeliveries].
-  AssignmentDeliveriesProvider call({
-    required String courseSlug,
-    required String assignmentId,
-    String? status,
-  }) {
-    return AssignmentDeliveriesProvider(
-      courseSlug: courseSlug,
-      assignmentId: assignmentId,
-      status: status,
-    );
-  }
-
-  @override
-  AssignmentDeliveriesProvider getProviderOverride(
-    covariant AssignmentDeliveriesProvider provider,
-  ) {
-    return call(
-      courseSlug: provider.courseSlug,
-      assignmentId: provider.assignmentId,
-      status: provider.status,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'assignmentDeliveriesProvider';
-}
-
-/// See also [assignmentDeliveries].
-class AssignmentDeliveriesProvider
-    extends AutoDisposeFutureProvider<List<AssignmentDelivery>> {
-  /// See also [assignmentDeliveries].
-  AssignmentDeliveriesProvider({
-    required String courseSlug,
-    required String assignmentId,
-    String? status,
-  }) : this._internal(
-         (ref) => assignmentDeliveries(
-           ref as AssignmentDeliveriesRef,
-           courseSlug: courseSlug,
-           assignmentId: assignmentId,
-           status: status,
-         ),
-         from: assignmentDeliveriesProvider,
-         name: r'assignmentDeliveriesProvider',
-         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-             ? null
-             : _$assignmentDeliveriesHash,
-         dependencies: AssignmentDeliveriesFamily._dependencies,
-         allTransitiveDependencies:
-             AssignmentDeliveriesFamily._allTransitiveDependencies,
-         courseSlug: courseSlug,
-         assignmentId: assignmentId,
-         status: status,
-       );
-
-  AssignmentDeliveriesProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.courseSlug,
-    required this.assignmentId,
-    required this.status,
-  }) : super.internal();
-
-  final String courseSlug;
-  final String assignmentId;
-  final String? status;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<AssignmentDelivery>> Function(
-      AssignmentDeliveriesRef provider,
-    )
-    create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: AssignmentDeliveriesProvider._internal(
-        (ref) => create(ref as AssignmentDeliveriesRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        courseSlug: courseSlug,
-        assignmentId: assignmentId,
-        status: status,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<AssignmentDelivery>> createElement() {
-    return _AssignmentDeliveriesProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is AssignmentDeliveriesProvider &&
-        other.courseSlug == courseSlug &&
-        other.assignmentId == assignmentId &&
-        other.status == status;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, courseSlug.hashCode);
-    hash = _SystemHash.combine(hash, assignmentId.hashCode);
-    hash = _SystemHash.combine(hash, status.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin AssignmentDeliveriesRef
-    on AutoDisposeFutureProviderRef<List<AssignmentDelivery>> {
-  /// The parameter `courseSlug` of this provider.
-  String get courseSlug;
-
-  /// The parameter `assignmentId` of this provider.
-  String get assignmentId;
-
-  /// The parameter `status` of this provider.
-  String? get status;
-}
-
-class _AssignmentDeliveriesProviderElement
-    extends AutoDisposeFutureProviderElement<List<AssignmentDelivery>>
-    with AssignmentDeliveriesRef {
-  _AssignmentDeliveriesProviderElement(super.provider);
-
-  @override
-  String get courseSlug => (origin as AssignmentDeliveriesProvider).courseSlug;
-  @override
-  String get assignmentId =>
-      (origin as AssignmentDeliveriesProvider).assignmentId;
-  @override
-  String? get status => (origin as AssignmentDeliveriesProvider).status;
-}
-
 String _$getAssignmentDetailsUseCaseHash() =>
     r'b45a6a93db0ceb7c8de8e43f7817b2acfdc857aa';
 
@@ -515,5 +265,24 @@ final addEnrollmentUseCaseProvider = Provider<AddEnrollmentUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AddEnrollmentUseCaseRef = ProviderRef<AddEnrollmentUseCase>;
+String _$deleteEnrollmentUseCaseHash() =>
+    r'4c3eaceaaf5165c71d3b13aa1d47b2d5717e35c5';
+
+/// See also [deleteEnrollmentUseCase].
+@ProviderFor(deleteEnrollmentUseCase)
+final deleteEnrollmentUseCaseProvider =
+    Provider<DeleteEnrollmentUseCase>.internal(
+      deleteEnrollmentUseCase,
+      name: r'deleteEnrollmentUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$deleteEnrollmentUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DeleteEnrollmentUseCaseRef = ProviderRef<DeleteEnrollmentUseCase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

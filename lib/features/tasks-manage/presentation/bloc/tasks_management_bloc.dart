@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../providers/tasks_management_providers.dart';
 import 'tasks_management_event.dart';
 import 'tasks_management_state.dart';
+import '../../../users-manage/presentation/bloc/users_management_bloc.dart';
 
 part 'tasks_management_bloc.g.dart';
 
@@ -92,22 +93,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     });
 
-    on<TasksManagementPublishAssignmentRequested>((event) async {
-      await _publishAssignment(
-        courseSlug: event.courseSlug,
-        assignmentId: event.assignmentId,
-      );
-    });
-
     on<TasksManagementAssignmentDeletedRequested>((event) async {
       await _deleteAssignment(
-        courseSlug: event.courseSlug,
-        assignmentId: event.assignmentId,
-      );
-    });
-
-    on<TasksManagementDeliverAssignmentRequested>((event) async {
-      await _deliverAssignment(
         courseSlug: event.courseSlug,
         assignmentId: event.assignmentId,
       );
@@ -119,6 +106,21 @@ class TasksManagementBloc extends _$TasksManagementBloc {
 
     on<TasksManagementUpdateCourseRequested>((event) async {
       await _updateCourse(courseSlug: event.courseSlug, request: event.request);
+    });
+
+    on<TasksManagementDeleteEnrollmentRequested>((event) async {
+      await _deleteEnrollment(
+        courseSlug: event.courseSlug,
+        userId: event.userId,
+      );
+    });
+
+    on<TasksManagementUserSearchRequested>((event) async {
+      await _searchUser(query: event.query);
+    });
+
+    on<TasksManagementClearUserSearch>((event) async {
+      state = state.copyWith(clearSearchedUser: true, userNotFound: false);
     });
 
     Future.microtask(() => add(const TasksManagementStarted()));
@@ -203,8 +205,8 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         );
       }
     } catch (e) {
+      // Only record the error — don't flip the whole page to failure state.
       state = state.copyWith(
-        status: TasksManagementStatus.failure,
         isLoadingDetails: false,
         errorMessage: e.toString(),
       );
@@ -285,7 +287,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       }
     } catch (e) {
       state = state.copyWith(
-        status: TasksManagementStatus.failure,
         isLoadingDetails: false,
         errorMessage: e.toString(),
       );
@@ -401,55 +402,6 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     }
   }
 
-  Future<void> _publishAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    // Reusing isCreating or isLoadingDetails? Let's use isCreating as it means "performing action" and blocks forms.
-    // However, publish is an action on a specific assignment. Let's just use isCreating.
-    state = state.copyWith(isCreating: true, clearError: true);
-    try {
-      await ref.read(publishAssignmentUseCaseProvider)(
-        courseSlug: courseSlug,
-        assignmentId: assignmentId,
-      );
-
-      state = state.copyWith(isCreating: false);
-      add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
-    } catch (e) {
-      state = state.copyWith(
-        status: TasksManagementStatus.failure,
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
-  Future<void> _deliverAssignment({
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    state = state.copyWith(
-      isCreating: true,
-      clearError: true,
-      clearDeliveryResult: true,
-    );
-    try {
-      final result = await ref.read(deliverAssignmentUseCaseProvider)(
-        courseSlug: courseSlug,
-        assignmentId: assignmentId,
-      );
-
-      state = state.copyWith(isCreating: false, lastDeliveryResult: result);
-    } catch (e) {
-      state = state.copyWith(
-        status: TasksManagementStatus.failure,
-        isCreating: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
   Future<void> _deleteCourse({required String courseSlug}) async {
     state = state.copyWith(isDeleting: true, clearError: true);
     try {
@@ -487,6 +439,53 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     } catch (e) {
       state = state.copyWith(isCreating: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> _deleteEnrollment({
+    required String courseSlug,
+    required String userId,
+  }) async {
+    state = state.copyWith(isLoadingDetails: true, clearError: true);
+    try {
+      await ref
+          .read(deleteEnrollmentUseCaseProvider)
+          .execute(courseSlug: courseSlug, userId: userId);
+      add(TasksManagementEnrollmentsRequested(courseSlug));
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingDetails: false,
+        errorMessage: '수강생 삭제 실패: $e',
+      );
+    }
+  }
+
+  Future<void> _searchUser({required String query}) async {
+    if (query.isEmpty) {
+      state = state.copyWith(clearSearchedUser: true, userNotFound: false);
+      return;
+    }
+
+    state = state.copyWith(
+      isSearchingUser: true,
+      clearSearchedUser: true,
+      userNotFound: false,
+    );
+
+    try {
+      final repository = ref.read(usersManagementRepositoryProvider);
+      final user = await repository.getUser(userId: query);
+      state = state.copyWith(
+        isSearchingUser: false,
+        searchedUser: user,
+        userNotFound: false,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isSearchingUser: false,
+        clearSearchedUser: true,
+        userNotFound: true,
+      );
     }
   }
 }

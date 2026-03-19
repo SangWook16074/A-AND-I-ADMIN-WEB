@@ -24,7 +24,6 @@ class CourseApiClient {
     );
     return listData
         .whereType<Map<String, dynamic>>()
-        .map(_mapCourseJson)
         .map(CourseSummary.fromJson)
         .toList();
   }
@@ -53,26 +52,7 @@ class CourseApiClient {
       response.body,
       statusCode: response.statusCode,
     );
-    return CourseSummary.fromJson(_mapCourseJson(mapData));
-  }
-
-  Future<CourseWeek> createOrUpdateWeek({
-    required String accessToken,
-    required String courseSlug,
-    required CreateWeekRequest request,
-  }) async {
-    final response = await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      path: '$_coursesPath/$courseSlug/weeks',
-      data: request.toJson(),
-    );
-
-    final mapData = _readMapData(
-      response.body,
-      statusCode: response.statusCode,
-    );
-    return CourseWeek.fromJson(mapData);
+    return CourseSummary.fromJson(mapData);
   }
 
   Future<List<Enrollment>> getEnrollments({
@@ -114,6 +94,19 @@ class CourseApiClient {
     return Enrollment.fromJson(mapData);
   }
 
+  Future<void> deleteEnrollment({
+    required String accessToken,
+    required String courseSlug,
+    required String userId,
+  }) async {
+    await _requestJson(
+      method: 'DELETE',
+      accessToken: accessToken,
+      path: '$_coursesPath/$courseSlug/enrollments/$userId',
+      allowEmptySuccessBody: true,
+    );
+  }
+
   Future<Enrollment> updateEnrollmentStatus({
     required String accessToken,
     required String courseSlug,
@@ -151,6 +144,8 @@ class CourseApiClient {
     );
     return Assignment.fromJson(mapData);
   }
+
+
 
   Future<List<Assignment>> getAssignments({
     required String accessToken,
@@ -201,80 +196,6 @@ class CourseApiClient {
     return Assignment.fromJson(mapData);
   }
 
-  Future<void> publishAssignment({
-    required String accessToken,
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/publish',
-      data:
-          const <
-            String,
-            dynamic
-          >{}, // required for Content-Type: application/json
-    );
-  }
-
-  Future<DeliverAssignmentResult> deliverAssignment({
-    required String accessToken,
-    required String courseSlug,
-    required String assignmentId,
-  }) async {
-    final response = await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      path: '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries',
-      data:
-          const <
-            String,
-            dynamic
-          >{}, // required for Content-Type: application/json
-    );
-
-    final mapData = _readMapData(
-      response.body,
-      statusCode: response.statusCode,
-    );
-    return DeliverAssignmentResult.fromJson(mapData);
-  }
-
-  Future<List<AssignmentDelivery>> getAssignmentDeliveries({
-    required String accessToken,
-    required String courseSlug,
-    required String assignmentId,
-    String? status,
-  }) async {
-    final queryParams = <String, String>{};
-    if (status != null) {
-      queryParams['status'] = status;
-    }
-
-    final queryString = queryParams.entries
-        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-    final queryPart = queryString.isNotEmpty ? '?$queryString' : '';
-
-    final response = await _requestJson(
-      method: 'GET',
-      accessToken: accessToken,
-      path:
-          '$_coursesPath/$courseSlug/assignments/$assignmentId/deliveries$queryPart',
-      allowEmptySuccessBody: true,
-    );
-
-    final listData = _readListData(
-      response.body,
-      statusCode: response.statusCode,
-    );
-    return listData
-        .whereType<Map<String, dynamic>>()
-        .map(AssignmentDelivery.fromJson)
-        .toList();
-  }
-
   Future<CourseSummary> updateCourse({
     required String accessToken,
     required String courseSlug,
@@ -302,7 +223,7 @@ class CourseApiClient {
       response.body,
       statusCode: response.statusCode,
     );
-    return CourseSummary.fromJson(_mapCourseJson(mapData));
+    return CourseSummary.fromJson(mapData);
   }
 
   Future<void> deleteCourse({
@@ -348,22 +269,6 @@ class CourseApiClient {
       statusCode: response.statusCode,
     );
     return Assignment.fromJson(mapData);
-  }
-
-  Map<String, dynamic> _mapCourseJson(Map<String, dynamic> json) {
-    return {
-      'id': json['id'],
-      'slug': json['slug'],
-      'targetTrack': json['fieldTag'],
-      'startDate': json['startDate'],
-      'endDate': json['endDate'],
-      'status': json['status'],
-      'createdAt': json['createdAt'],
-      'updatedAt': json['updatedAt'],
-      'title': json['metadata']?['title'],
-      'description': json['metadata']?['description'],
-      'phase': json['metadata']?['phase'],
-    };
   }
 
   Future<({int statusCode, Map<String, dynamic> body})> _requestJson({

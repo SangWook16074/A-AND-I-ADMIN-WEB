@@ -1,4 +1,5 @@
 import 'package:aandi_course_api/aandi_course_api.dart';
+import '../../../users-manage/domain/entities/admin_user.dart';
 
 enum TasksManagementStatus { initial, loading, success, failure }
 
@@ -14,7 +15,9 @@ class TasksManagementState {
     this.selectedCourseAssignments,
     this.selectedAssignment,
     this.isLoadingDetails = false,
-    this.lastDeliveryResult,
+    this.searchedUser,
+    this.isSearchingUser = false,
+    this.userNotFound = false,
   });
 
   const TasksManagementState.initial()
@@ -28,7 +31,9 @@ class TasksManagementState {
         selectedCourseAssignments = null,
         selectedAssignment = null,
         isLoadingDetails = false,
-        lastDeliveryResult = null;
+        searchedUser = null,
+        isSearchingUser = false,
+        userNotFound = false;
 
   final TasksManagementStatus status;
   final List<CourseSummary> courses;
@@ -41,7 +46,9 @@ class TasksManagementState {
   final List<Assignment>? selectedCourseAssignments;
   final Assignment? selectedAssignment;
   final bool isLoadingDetails;
-  final DeliverAssignmentResult? lastDeliveryResult;
+  final AdminUser? searchedUser;
+  final bool isSearchingUser;
+  final bool userNotFound;
 
   TasksManagementState copyWith({
     TasksManagementStatus? status,
@@ -54,9 +61,11 @@ class TasksManagementState {
     List<Assignment>? selectedCourseAssignments,
     Assignment? selectedAssignment,
     bool? isLoadingDetails,
-    DeliverAssignmentResult? lastDeliveryResult,
+    AdminUser? searchedUser,
+    bool? isSearchingUser,
+    bool? userNotFound,
     bool clearError = false,
-    bool clearDeliveryResult = false,
+    bool clearSearchedUser = false,
   }) {
     return TasksManagementState(
       status: status ?? this.status,
@@ -65,11 +74,15 @@ class TasksManagementState {
       isDeleting: isDeleting ?? this.isDeleting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       selectedCourse: selectedCourse ?? this.selectedCourse,
-      selectedCourseEnrollments: selectedCourseEnrollments ?? this.selectedCourseEnrollments,
-      selectedCourseAssignments: selectedCourseAssignments ?? this.selectedCourseAssignments,
+      selectedCourseEnrollments:
+          selectedCourseEnrollments ?? this.selectedCourseEnrollments,
+      selectedCourseAssignments:
+          selectedCourseAssignments ?? this.selectedCourseAssignments,
       selectedAssignment: selectedAssignment ?? this.selectedAssignment,
       isLoadingDetails: isLoadingDetails ?? this.isLoadingDetails,
-      lastDeliveryResult: clearDeliveryResult ? null : (lastDeliveryResult ?? this.lastDeliveryResult),
+      searchedUser: clearSearchedUser ? null : (searchedUser ?? this.searchedUser),
+      isSearchingUser: isSearchingUser ?? this.isSearchingUser,
+      userNotFound: userNotFound ?? this.userNotFound,
     );
   }
 }

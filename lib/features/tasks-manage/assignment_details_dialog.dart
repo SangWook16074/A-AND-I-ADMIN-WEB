@@ -14,15 +14,19 @@ class AssignmentDetailsDialog extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AssignmentDetailsDialog> createState() => _AssignmentDetailsDialogState();
+  ConsumerState<AssignmentDetailsDialog> createState() =>
+      _AssignmentDetailsDialogState();
 }
 
-class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialog> {
+class _AssignmentDetailsDialogState
+    extends ConsumerState<AssignmentDetailsDialog> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(tasksManagementBlocProvider.notifier).add(
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(
             TasksManagementAssignmentDetailsRequested(
               courseSlug: widget.courseSlug,
               assignmentId: widget.assignmentId,
@@ -51,10 +55,7 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
               children: [
                 const Text(
                   '과제 상세 정보',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -77,7 +78,10 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow('과제 ID', assignment.id),
-                      _buildDetailRow('주차 / 순서', '${assignment.weekNo}주차 / ${assignment.orderInWeek}번째'),
+                      _buildDetailRow(
+                        '주차 / 순서',
+                        '${assignment.weekNo}주차 / ${assignment.orderInWeek}번째',
+                      ),
                       _buildDetailRow('제목', assignment.metadata.title),
                       _buildDetailRow('상태', assignment.status),
                       _buildDetailRow('난이도', assignment.metadata.difficulty),
@@ -86,7 +90,10 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                       if (assignment.publishedAt != null)
                         _buildDetailRow('배포일', assignment.publishedAt!),
                       const SizedBox(height: 16),
-                      const Text('설명', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const Text(
+                        '설명',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -98,23 +105,35 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                       ),
                       const SizedBox(height: 16),
                       if (assignment.metadata.learningGoals.isNotEmpty) ...[
-                        const Text('학습 목표', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const Text(
+                          '학습 목표',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
-                        ...assignment.metadata.learningGoals.map((goal) => Text('• $goal')),
-                        const SizedBox(height: 16),
-                      ],
-                      if (assignment.requirements.isNotEmpty) ...[
-                        const Text('요구사항', style: TextStyle(fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 4),
-                        ...assignment.requirements.map(
-                          (req) => Text('${req.sortOrder}. ${req.requirementText}'),
+                        ...assignment.metadata.learningGoals.map(
+                          (goal) => Text('• ${goal.learningGoalText}'),
                         ),
                         const SizedBox(height: 16),
                       ],
-                      if (assignment.examples.isNotEmpty) ...[
-                        const Text('예시', style: TextStyle(fontWeight: FontWeight.w700)),
+                      if (assignment.metadata.requirements.isNotEmpty) ...[
+                        const Text(
+                          '요구사항',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
-                        ...assignment.examples.map(
+                        ...assignment.metadata.requirements.map(
+                          (req) =>
+                              Text('${req.sortOrder}. ${req.requirementText}'),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      if (assignment.metadata.examples.isNotEmpty) ...[
+                        const Text(
+                          '예시',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        ...assignment.metadata.examples.map(
                           (ex) => Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),
@@ -125,22 +144,39 @@ class _AssignmentDetailsDialogState extends ConsumerState<AssignmentDetailsDialo
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Seq: ${ex.seq}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                                if (ex.description != null) Text('설명: ${ex.description}'),
+                                Text(
+                                  'Seq: ${ex.seq}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                if (ex.description != null)
+                                  Text('설명: ${ex.description}'),
                                 if (ex.inputText != null) ...[
                                   const SizedBox(height: 4),
-                                  const Text('Input:', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  const Text(
+                                    'Input:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   Text(ex.inputText!),
                                 ],
                                 if (ex.outputText != null) ...[
                                   const SizedBox(height: 4),
-                                  const Text('Output:', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  const Text(
+                                    'Output:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   Text(ex.outputText!),
                                 ],
                               ],
                             ),
                           ),
                         ),
+                        const SizedBox(height: 16),
                       ],
                     ],
                   ),

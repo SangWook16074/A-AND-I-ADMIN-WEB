@@ -37,16 +37,6 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required CreateAssignmentRequest request,
   }) = TasksManagementCreateAssignmentRequested;
 
-  const factory TasksManagementEvent.publishAssignmentRequested({
-    required String courseSlug,
-    required String assignmentId,
-  }) = TasksManagementPublishAssignmentRequested;
-
-  const factory TasksManagementEvent.deliverAssignmentRequested({
-    required String courseSlug,
-    required String assignmentId,
-  }) = TasksManagementDeliverAssignmentRequested;
-
   const factory TasksManagementEvent.courseDeletedRequested({
     required String courseSlug,
   }) = TasksManagementCourseDeletedRequested;
@@ -82,4 +72,14 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String userId,
     required UpdateEnrollmentStatusRequest request,
   }) = TasksManagementUpdateEnrollmentStatusRequested;
+
+  const factory TasksManagementEvent.deleteEnrollmentRequested({
+    required String courseSlug,
+    required String userId,
+  }) = TasksManagementDeleteEnrollmentRequested;
+  const factory TasksManagementEvent.userSearchRequested({
+    required String query,
+  }) = TasksManagementUserSearchRequested;
+
+  const factory TasksManagementEvent.clearUserSearch() = TasksManagementClearUserSearch;
 }
