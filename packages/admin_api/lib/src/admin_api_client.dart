@@ -38,6 +38,37 @@ class AdminApiClient {
     ).whereType<Map<String, dynamic>>().map(AdminUserSummary.fromJson).toList();
   }
 
+  Future<AdminUserSummary> getUser({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      pathSuffix: '/$userId',
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
+  Future<AdminUserSummary> lookupUserByPublicCode({
+    required String accessToken,
+    required String publicCode,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: _userLookupPath,
+      queryParameters: {'code': publicCode},
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
   /// 관리자 유저를 생성하고, 생성된 계정 메타데이터를 반환합니다.
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
@@ -75,6 +106,26 @@ class AdminApiClient {
     );
   }
 
+  Future<String> resetPassword({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final response = await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      pathSuffix: '/$userId/reset-password',
+      data: const <String, dynamic>{},
+    );
+    final data = _readMapData(response.body, statusCode: response.statusCode);
+    if (data['temporaryPassword'] is! String) {
+      throw AdminApiException(
+        'Missing temporaryPassword in response',
+        statusCode: response.statusCode,
+      );
+    }
+    return data['temporaryPassword'] as String;
+  }
+
   /// 관리자 유저의 권한/프로필 정보를 수정합니다.
   ///
   /// 성공 시 응답 바디가 비어 있어도 정상 처리합니다.
@@ -97,6 +148,28 @@ class AdminApiClient {
         'nickname': nickname,
       },
       allowEmptySuccessBody: true,
+    );
+  }
+
+  Future<void> inviteMail({
+    required String accessToken,
+    required List<String> emails,
+    required AuthRole role,
+    required int cohort,
+    required int cohortOrder,
+    required String userTrack,
+  }) async {
+    await _requestJson(
+      method: 'POST',
+      accessToken: accessToken,
+      path: '/v1/admin/invite-mail',
+      data: {
+        'emails': emails,
+        'role': role.toApi(),
+        'cohort': cohort,
+        'cohortOrder': cohortOrder,
+        'userTrack': userTrack,
+      },
     );
   }
 
