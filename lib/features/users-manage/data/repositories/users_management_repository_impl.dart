@@ -40,6 +40,18 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
   }
 
   @override
+  Future<AdminUser> lookupUser({required String code}) async {
+    final token = await _tokenStore.read();
+    final accessToken = token?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw UsersManagementApiException('인증 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+
+    final dto = await _apiClient.lookupUser(accessToken: accessToken, code: code);
+    return dto.toDomain();
+  }
+
+  @override
   Future<AdminUser> createUser({
     required AdminUserProvisionType provisionType,
     required int cohort,

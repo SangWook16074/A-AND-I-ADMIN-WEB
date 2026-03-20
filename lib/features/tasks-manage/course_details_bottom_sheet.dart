@@ -7,7 +7,7 @@ import 'task_management.dart';
 import 'assignment_details_dialog.dart';
 import 'edit_assignment_dialog.dart';
 
-enum _EnrollmentActionStatus { enrolled, dropped, banned, deleted }
+enum _EnrollmentActionStatus { enabled, banned, deleted }
 
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
@@ -50,7 +50,6 @@ class _CourseDetailsBottomSheetState
   @override
   Widget build(BuildContext context) {
     ref.listen(tasksManagementBlocProvider, (previous, next) {
-
       if (previous?.isDeleting == true && next.isDeleting == false) {
         if (next.errorMessage == null) {
           Navigator.of(context).pop();
@@ -430,20 +429,36 @@ class _EnrollmentsTab extends ConsumerStatefulWidget {
 
 class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
-  String _userId = '';
+  String _publicCode = '';
   bool _isUpdatingEnrollmentStatus = false;
-  Timer? _searchTimer;
+  late final TextEditingController _userLookupController;
+
+  @override
+  void initState() {
+    super.initState();
+    _userLookupController = TextEditingController();
+    _userLookupController.addListener(() {
+      if (_userLookupController.text.isEmpty) {
+        ref
+            .read(tasksManagementBlocProvider.notifier)
+            .add(const TasksManagementClearUserSearch());
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _searchTimer?.cancel();
+    _userLookupController.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final request = AddEnrollmentRequest(userId: _userId);
+      final searchedUser = ref.read(tasksManagementBlocProvider).searchedUser;
+      final request = AddEnrollmentRequest(
+        publicCode: searchedUser?.publicCode ?? _publicCode,
+      );
       ref
           .read(tasksManagementBlocProvider.notifier)
           .add(
@@ -452,7 +467,10 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               request: request,
             ),
           );
-      ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
+      _userLookupController.clear();
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(const TasksManagementClearUserSearch());
       _formKey.currentState!.reset();
       FocusScope.of(context).unfocus();
     }
@@ -521,15 +539,15 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '상태: ${enrollment.status}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: enrollment.status == 'ENROLLED'
-                                    ? Colors.green[700]
-                                    : enrollment.status == 'BANNED'
-                                    ? Colors.red[700]
-                                    : const Color(0xFF8A8A8A),
+                              Text(
+                                '상태: ${enrollment.status}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: enrollment.status == 'ENABLED'
+                                      ? Colors.green[700]
+                                      : enrollment.status == 'BANNED'
+                                      ? Colors.red[700]
+                                      : const Color(0xFF8A8A8A),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -563,18 +581,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         },
                         itemBuilder: (context) => const [
                           PopupMenuItem(
-                            value: _EnrollmentActionStatus.enrolled,
-                            child: Text('ENROLLED'),
-                          ),
-                          PopupMenuItem(
-                            value: _EnrollmentActionStatus.dropped,
-                            child: Text('DROPPED'),
+                            value: _EnrollmentActionStatus.enabled,
+                            child: Text('ENABLED'),
                           ),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.banned,
                             child: Text('BANNED'),
                           ),
-                          const PopupMenuDivider(),
+                          PopupMenuDivider(),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.deleted,
                             child: Row(
@@ -628,37 +642,81 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextFormField(
-                              decoration: const InputDecoration(
-                                labelText: 'User ID',
+                              controller: _userLookupController,
+                              decoration: InputDecoration(
+                                labelText: 'Code',
+                                hintText: '유저 코드 입력',
                                 filled: true,
                                 fillColor: Colors.white,
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    final query = _userLookupController.text
+                                        .trim();
+                                    if (query.isNotEmpty) {
+                                      ref
+                                          .read(
+                                            tasksManagementBlocProvider
+                                                .notifier,
+                                          )
+                                          .add(
+                                            TasksManagementUserSearchRequested(
+                                              query: query,
+                                            ),
+                                          );
+                                    }
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Center(
+                                      widthFactor: 1,
+                                      child: Text(
+                                        '조회',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              onChanged: (v) {
-                                _searchTimer?.cancel();
-                                if (v.isEmpty) {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
-                                  return;
-                                }
-                                _searchTimer = Timer(const Duration(milliseconds: 500), () {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementUserSearchRequested(query: v.trim()));
-                                });
-                              },
-                              onSaved: (v) => _userId = v?.trim() ?? '',
+                              onSaved: (v) => _publicCode = v?.trim() ?? '',
                               validator: (v) =>
                                   v == null || v.trim().isEmpty ? '필수' : null,
                             ),
-                            if (ref.watch(tasksManagementBlocProvider).isSearchingUser)
+                            if (ref
+                                .watch(tasksManagementBlocProvider)
+                                .isSearchingUser)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: SizedBox(
                                   width: 12,
                                   height: 12,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).searchedUser != null)
+                            else if (ref
+                                    .watch(tasksManagementBlocProvider)
+                                    .searchedUser !=
+                                null)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8, left: 12),
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  left: 12,
+                                ),
                                 child: Text(
                                   '존재하는 사용자: ${ref.watch(tasksManagementBlocProvider).searchedUser!.nickname ?? ref.watch(tasksManagementBlocProvider).searchedUser!.id} (${ref.watch(tasksManagementBlocProvider).searchedUser!.username})',
                                   style: const TextStyle(
@@ -668,7 +726,9 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                                   ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).userNotFound)
+                            else if (ref
+                                .watch(tasksManagementBlocProvider)
+                                .userNotFound)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: Text(
@@ -742,8 +802,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                   const SizedBox(height: 8),
                   Text(
                     '변경 상태: ${switch (status) {
-                      _EnrollmentActionStatus.enrolled => 'ENROLLED',
-                      _EnrollmentActionStatus.dropped => 'DROPPED',
+                      _EnrollmentActionStatus.enabled => 'ENABLED',
                       _EnrollmentActionStatus.banned => 'BANNED',
                       _EnrollmentActionStatus.deleted => 'DELETED',
                     }}',
@@ -795,10 +854,15 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 });
 
                 final targetStatus = switch (status) {
-                  _EnrollmentActionStatus.enrolled => 'ENROLLED',
-                  _EnrollmentActionStatus.dropped => 'DROPPED',
-                  _EnrollmentActionStatus.banned => 'BANNED',
-                  _EnrollmentActionStatus.deleted => 'DELETED',
+                  _EnrollmentActionStatus.enabled => EnrollmentStatus.enabled,
+                  _EnrollmentActionStatus.banned => EnrollmentStatus.banned,
+                  _EnrollmentActionStatus.deleted =>
+                    throw UnimplementedError('Delete is separate'),
+                };
+
+                final statusString = switch (targetStatus) {
+                  EnrollmentStatus.enabled => 'ENABLED',
+                  EnrollmentStatus.banned => 'BANNED',
                 };
 
                 ref
@@ -809,7 +873,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         userId: enrollment.userId,
                         request: UpdateEnrollmentStatusRequest(
                           status: targetStatus,
-                          banReason: targetStatus == 'BANNED'
+                          banReason: targetStatus == EnrollmentStatus.banned
                               ? banReason
                               : null,
                         ),
@@ -819,7 +883,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${enrollment.userId} 상태를 $targetStatus(으)로 변경 요청했습니다.',
+                      '${enrollment.userId} 상태를 $statusString(으)로 변경 요청했습니다.',
                     ),
                   ),
                 );
@@ -853,15 +917,14 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(
-              '취소',
-              style: TextStyle(color: Color(0xFF8A8A8A)),
-            ),
+            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              ref.read(tasksManagementBlocProvider.notifier).add(
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
                     TasksManagementDeleteEnrollmentRequested(
                       courseSlug: widget.courseSlug,
                       userId: enrollment.userId,
@@ -1473,10 +1536,12 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       learningGoals: _learningGoals
                                           .asMap()
                                           .entries
-                                          .map((e) => LearningGoal(
-                                                sortOrder: e.key + 1,
-                                                learningGoalText: e.value,
-                                              ))
+                                          .map(
+                                            (e) => LearningGoal(
+                                              sortOrder: e.key + 1,
+                                              learningGoalText: e.value,
+                                            ),
+                                          )
                                           .toList(),
                                       requirements: reqList,
                                       examples: exampleList,

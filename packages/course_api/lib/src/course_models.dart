@@ -183,18 +183,25 @@ abstract class UpdateAssignmentRequest with _$UpdateAssignmentRequest {
 
 @freezed
 abstract class AddEnrollmentRequest with _$AddEnrollmentRequest {
-  const factory AddEnrollmentRequest({required String userId}) =
+  const factory AddEnrollmentRequest({required String publicCode}) =
       _AddEnrollmentRequest;
 
   factory AddEnrollmentRequest.fromJson(Map<String, dynamic> json) =>
       _$AddEnrollmentRequestFromJson(json);
 }
 
+enum EnrollmentStatus {
+  @JsonValue('ENABLED')
+  enabled,
+  @JsonValue('BANNED')
+  banned,
+}
+
 @freezed
 abstract class UpdateEnrollmentStatusRequest
     with _$UpdateEnrollmentStatusRequest {
   const factory UpdateEnrollmentStatusRequest({
-    required String status,
+    required EnrollmentStatus status,
     String? banReason,
   }) = _UpdateEnrollmentStatusRequest;
 

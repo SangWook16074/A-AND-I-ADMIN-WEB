@@ -474,7 +474,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
 
     try {
       final repository = ref.read(usersManagementRepositoryProvider);
-      final user = await repository.getUser(userId: query);
+      final user = await repository.lookupUser(code: query);
       state = state.copyWith(
         isSearchingUser: false,
         searchedUser: user,

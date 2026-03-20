@@ -3455,7 +3455,7 @@ $AssignmentMetadataCopyWith<$Res> get metadata {
 /// @nodoc
 mixin _$AddEnrollmentRequest {
 
- String get userId;
+ String get publicCode;
 /// Create a copy of AddEnrollmentRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3468,16 +3468,16 @@ $AddEnrollmentRequestCopyWith<AddEnrollmentRequest> get copyWith => _$AddEnrollm
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddEnrollmentRequest&&(identical(other.userId, userId) || other.userId == userId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddEnrollmentRequest&&(identical(other.publicCode, publicCode) || other.publicCode == publicCode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId);
+int get hashCode => Object.hash(runtimeType,publicCode);
 
 @override
 String toString() {
-  return 'AddEnrollmentRequest(userId: $userId)';
+  return 'AddEnrollmentRequest(publicCode: $publicCode)';
 }
 
 
@@ -3488,7 +3488,7 @@ abstract mixin class $AddEnrollmentRequestCopyWith<$Res>  {
   factory $AddEnrollmentRequestCopyWith(AddEnrollmentRequest value, $Res Function(AddEnrollmentRequest) _then) = _$AddEnrollmentRequestCopyWithImpl;
 @useResult
 $Res call({
- String userId
+ String publicCode
 });
 
 
@@ -3505,9 +3505,9 @@ class _$AddEnrollmentRequestCopyWithImpl<$Res>
 
 /// Create a copy of AddEnrollmentRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? publicCode = null,}) {
   return _then(_self.copyWith(
-userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+publicCode: null == publicCode ? _self.publicCode : publicCode // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -3593,10 +3593,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String publicCode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AddEnrollmentRequest() when $default != null:
-return $default(_that.userId);case _:
+return $default(_that.publicCode);case _:
   return orElse();
 
 }
@@ -3614,10 +3614,10 @@ return $default(_that.userId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String publicCode)  $default,) {final _that = this;
 switch (_that) {
 case _AddEnrollmentRequest():
-return $default(_that.userId);case _:
+return $default(_that.publicCode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3634,10 +3634,10 @@ return $default(_that.userId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String publicCode)?  $default,) {final _that = this;
 switch (_that) {
 case _AddEnrollmentRequest() when $default != null:
-return $default(_that.userId);case _:
+return $default(_that.publicCode);case _:
   return null;
 
 }
@@ -3649,10 +3649,10 @@ return $default(_that.userId);case _:
 @JsonSerializable()
 
 class _AddEnrollmentRequest implements AddEnrollmentRequest {
-  const _AddEnrollmentRequest({required this.userId});
+  const _AddEnrollmentRequest({required this.publicCode});
   factory _AddEnrollmentRequest.fromJson(Map<String, dynamic> json) => _$AddEnrollmentRequestFromJson(json);
 
-@override final  String userId;
+@override final  String publicCode;
 
 /// Create a copy of AddEnrollmentRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -3667,16 +3667,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddEnrollmentRequest&&(identical(other.userId, userId) || other.userId == userId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddEnrollmentRequest&&(identical(other.publicCode, publicCode) || other.publicCode == publicCode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId);
+int get hashCode => Object.hash(runtimeType,publicCode);
 
 @override
 String toString() {
-  return 'AddEnrollmentRequest(userId: $userId)';
+  return 'AddEnrollmentRequest(publicCode: $publicCode)';
 }
 
 
@@ -3687,7 +3687,7 @@ abstract mixin class _$AddEnrollmentRequestCopyWith<$Res> implements $AddEnrollm
   factory _$AddEnrollmentRequestCopyWith(_AddEnrollmentRequest value, $Res Function(_AddEnrollmentRequest) _then) = __$AddEnrollmentRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String userId
+ String publicCode
 });
 
 
@@ -3704,9 +3704,9 @@ class __$AddEnrollmentRequestCopyWithImpl<$Res>
 
 /// Create a copy of AddEnrollmentRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? publicCode = null,}) {
   return _then(_AddEnrollmentRequest(
-userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+publicCode: null == publicCode ? _self.publicCode : publicCode // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -3718,7 +3718,7 @@ as String,
 /// @nodoc
 mixin _$UpdateEnrollmentStatusRequest {
 
- String get status; String? get banReason;
+ EnrollmentStatus get status; String? get banReason;
 /// Create a copy of UpdateEnrollmentStatusRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3751,7 +3751,7 @@ abstract mixin class $UpdateEnrollmentStatusRequestCopyWith<$Res>  {
   factory $UpdateEnrollmentStatusRequestCopyWith(UpdateEnrollmentStatusRequest value, $Res Function(UpdateEnrollmentStatusRequest) _then) = _$UpdateEnrollmentStatusRequestCopyWithImpl;
 @useResult
 $Res call({
- String status, String? banReason
+ EnrollmentStatus status, String? banReason
 });
 
 
@@ -3771,7 +3771,7 @@ class _$UpdateEnrollmentStatusRequestCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? banReason = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
+as EnrollmentStatus,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -3857,7 +3857,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String status,  String? banReason)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( EnrollmentStatus status,  String? banReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateEnrollmentStatusRequest() when $default != null:
 return $default(_that.status,_that.banReason);case _:
@@ -3878,7 +3878,7 @@ return $default(_that.status,_that.banReason);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String status,  String? banReason)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( EnrollmentStatus status,  String? banReason)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateEnrollmentStatusRequest():
 return $default(_that.status,_that.banReason);case _:
@@ -3898,7 +3898,7 @@ return $default(_that.status,_that.banReason);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String status,  String? banReason)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( EnrollmentStatus status,  String? banReason)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateEnrollmentStatusRequest() when $default != null:
 return $default(_that.status,_that.banReason);case _:
@@ -3916,7 +3916,7 @@ class _UpdateEnrollmentStatusRequest implements UpdateEnrollmentStatusRequest {
   const _UpdateEnrollmentStatusRequest({required this.status, this.banReason});
   factory _UpdateEnrollmentStatusRequest.fromJson(Map<String, dynamic> json) => _$UpdateEnrollmentStatusRequestFromJson(json);
 
-@override final  String status;
+@override final  EnrollmentStatus status;
 @override final  String? banReason;
 
 /// Create a copy of UpdateEnrollmentStatusRequest
@@ -3952,7 +3952,7 @@ abstract mixin class _$UpdateEnrollmentStatusRequestCopyWith<$Res> implements $U
   factory _$UpdateEnrollmentStatusRequestCopyWith(_UpdateEnrollmentStatusRequest value, $Res Function(_UpdateEnrollmentStatusRequest) _then) = __$UpdateEnrollmentStatusRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String status, String? banReason
+ EnrollmentStatus status, String? banReason
 });
 
 
@@ -3972,7 +3972,7 @@ class __$UpdateEnrollmentStatusRequestCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? banReason = freezed,}) {
   return _then(_UpdateEnrollmentStatusRequest(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
+as EnrollmentStatus,banReason: freezed == banReason ? _self.banReason : banReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

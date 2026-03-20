@@ -287,22 +287,27 @@ Map<String, dynamic> _$UpdateAssignmentRequestToJson(
 
 _AddEnrollmentRequest _$AddEnrollmentRequestFromJson(
   Map<String, dynamic> json,
-) => _AddEnrollmentRequest(userId: json['userId'] as String);
+) => _AddEnrollmentRequest(publicCode: json['publicCode'] as String);
 
 Map<String, dynamic> _$AddEnrollmentRequestToJson(
   _AddEnrollmentRequest instance,
-) => <String, dynamic>{'userId': instance.userId};
+) => <String, dynamic>{'publicCode': instance.publicCode};
 
 _UpdateEnrollmentStatusRequest _$UpdateEnrollmentStatusRequestFromJson(
   Map<String, dynamic> json,
 ) => _UpdateEnrollmentStatusRequest(
-  status: json['status'] as String,
+  status: $enumDecode(_$EnrollmentStatusEnumMap, json['status']),
   banReason: json['banReason'] as String?,
 );
 
 Map<String, dynamic> _$UpdateEnrollmentStatusRequestToJson(
   _UpdateEnrollmentStatusRequest instance,
 ) => <String, dynamic>{
-  'status': instance.status,
+  'status': _$EnrollmentStatusEnumMap[instance.status]!,
   'banReason': instance.banReason,
+};
+
+const _$EnrollmentStatusEnumMap = {
+  EnrollmentStatus.enabled: 'ENABLED',
+  EnrollmentStatus.banned: 'BANNED',
 };

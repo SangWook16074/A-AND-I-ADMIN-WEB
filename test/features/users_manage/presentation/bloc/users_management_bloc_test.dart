@@ -26,6 +26,11 @@ class FakeUsersManagementRepository implements UsersManagementRepository {
   }
 
   @override
+  Future<AdminUser> lookupUser({required String code}) async {
+    return users.firstWhere((u) => u.publicCode == code);
+  }
+
+  @override
   Future<AdminUser> createUser({
     required AdminUserProvisionType provisionType,
     required int cohort,
