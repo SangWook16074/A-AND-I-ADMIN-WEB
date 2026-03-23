@@ -70,6 +70,16 @@ class DashboardSidebarView extends ConsumerWidget {
                   .selectTab(DashboardNavTab.tasksManage);
             },
           ),
+          DashboardSidebarItemView(
+            icon: Icons.code_rounded,
+            label: 'Online Judge 관리',
+            selected: selectedTab == DashboardNavTab.ojManage,
+            onTap: () {
+              ref
+                  .read(dashboardNavViewModelProvider.notifier)
+                  .selectTab(DashboardNavTab.ojManage);
+            },
+          ),
           const Spacer(),
           const Divider(height: 1, color: Color(0xFFF1F1F1)),
           const Padding(

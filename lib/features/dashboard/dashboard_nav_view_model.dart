@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_nav_view_model.g.dart';
 
-enum DashboardNavTab { usersManage, tasksManage }
+enum DashboardNavTab { usersManage, tasksManage, ojManage }
 
 @riverpod
 class DashboardNavViewModel extends _$DashboardNavViewModel {
