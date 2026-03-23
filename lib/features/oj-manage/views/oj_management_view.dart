@@ -308,7 +308,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -389,7 +389,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -407,7 +407,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
         children: [
           const Divider(height: 1),
           const SizedBox(height: 16),
-          _buildCodeSection(submission.code),
+          _buildCodeSection(submission.code, submission.language),
           const SizedBox(height: 20),
           const Text(
             'Test Cases:',
@@ -424,7 +424,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     );
   }
 
-  Widget _buildCodeSection(String code) {
+  Widget _buildCodeSection(String code, String language) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -452,15 +452,349 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        _buildCodeBlock(code),
+        const SizedBox(height: 12),
+        // Language Buttons (as decoration/context)
+        Row(
+          children: [
+            _buildLangBadge('Kotlin', language == 'KOTLIN'),
+            const SizedBox(width: 8),
+            _buildLangBadge('Dart', language == 'DART'),
+            const SizedBox(width: 8),
+            _buildLangBadge('Python', language == 'PYTHON'),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildPremiumCodeEditor(code, language),
       ],
     );
+  }
+
+  Widget _buildLangBadge(String label, bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFFE2E8F0) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isActive ? Colors.black : const Color(0xFFCBD5E1),
+          width: isActive ? 1.5 : 1,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+          color: isActive ? Colors.black : const Color(0xFF64748B),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumCodeEditor(String code, String language) {
+    final lines = code.split('\n');
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF334155), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: Color(0xFF1E293B),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Row(
+              children: [
+                _buildDot(const Color(0xFFFF5F56)),
+                const SizedBox(width: 8),
+                _buildDot(const Color(0xFFFFBD2E)),
+                const SizedBox(width: 8),
+                _buildDot(const Color(0xFF27C93F)),
+                const SizedBox(width: 16),
+                Text(
+                  '${language[0] + language.substring(1).toLowerCase()} Editor',
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const Spacer(),
+                const Text(
+                  '템플릿',
+                  style: TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Code Area
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Gutter
+                Container(
+                  width: 45,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0F172A),
+                    border: Border(
+                      right: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: List.generate(
+                      lines.length,
+                      (i) => Text(
+                        '${i + 1}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF475569),
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Editor
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SelectableText.rich(
+                        _highlightCode(code, language),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'monospace',
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+
+  TextSpan _highlightCode(String code, String language) {
+    final lang = language.toLowerCase();
+    const keywords = {
+      'python': [
+        'def',
+        'return',
+        'if',
+        'else',
+        'elif',
+        'for',
+        'while',
+        'import',
+        'from',
+        'as',
+        'class',
+        'try',
+        'except',
+        'pass',
+        'print',
+        'in',
+        'is',
+        'not',
+      ],
+      'kotlin': [
+        'fun',
+        'val',
+        'var',
+        'if',
+        'else',
+        'when',
+        'for',
+        'while',
+        'return',
+        'class',
+        'interface',
+        'object',
+        'override',
+        'import',
+        'package',
+        'void',
+      ],
+      'dart': [
+        'void',
+        'final',
+        'var',
+        'if',
+        'else',
+        'return',
+        'class',
+        'import',
+        'package',
+        'async',
+        'await',
+        'late',
+        'dynamic',
+        'static',
+        'override',
+      ],
+    };
+
+    final kwList = keywords[lang] ?? keywords['python']!;
+    final spans = <TextSpan>[];
+
+    final combinedRegex = RegExp(
+      r'(".*?")|'
+      r"('.*?')|"
+      r'(\/\/.*)|'
+      r'(#.*)|'
+      r'([a-zA-Z_][a-zA-Z0-9_]*)|'
+      r'(\d+(\.\d*)?)|'
+      r'([{}()\[\]])|'
+      r'([+\-*/%=<>!&|^~,.:;])|'
+      r'(\s+)',
+    );
+
+    final matches = combinedRegex.allMatches(code).toList();
+
+    for (var i = 0; i < matches.length; i++) {
+      final match = matches[i];
+      final text = match.group(0)!;
+
+      if (match.group(1) != null || match.group(2) != null) {
+        // Strings
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF86EFAC)),
+          ),
+        );
+      } else if (match.group(3) != null || match.group(4) != null) {
+        // Comments
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(
+              color: Color(0xFF64748B),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        );
+      } else if (match.group(5) != null) {
+        // Words
+        final word = match.group(5)!;
+        if (kwList.contains(word)) {
+          spans.add(
+            TextSpan(
+              text: text,
+              style: const TextStyle(
+                color: Color(0xFFC084FC),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
+        } else if (i + 1 < matches.length &&
+            matches[i + 1].group(0)!.trim().startsWith('(')) {
+          // Basic function attempt: next non-whitespace token starts with '('
+          spans.add(
+            TextSpan(
+              text: text,
+              style: const TextStyle(color: Color(0xFF60A5FA)),
+            ),
+          );
+        } else {
+          spans.add(
+            TextSpan(
+              text: text,
+              style: const TextStyle(color: Color(0xFFE2E8F0)),
+            ),
+          );
+        }
+      } else if (match.group(6) != null) {
+        // Numbers
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFFDBA74)),
+          ),
+        );
+      } else if (match.group(8) != null) {
+        // Brackets
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFCBD5E1)),
+          ),
+        );
+      } else if (match.group(9) != null) {
+        // Operators
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF94A3B8)),
+          ),
+        );
+      } else {
+        // Whitespace etc
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
+      }
+    }
+
+    if (spans.isEmpty && code.isNotEmpty) {
+      spans.add(
+        TextSpan(
+          text: code,
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    return TextSpan(children: spans);
   }
 
   Widget _buildSubmissionTestCasesTable(List<SubmissionTestCase> testCases) {
     return Container(
       width: double.infinity,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -474,29 +808,54 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
           3: FixedColumnWidth(100),
           4: FlexColumnWidth(4),
         },
-        border: TableBorder.all(
-          color: const Color(0xFFE5E7EB),
-          width: 0.5,
-          borderRadius: BorderRadius.circular(8),
+        border: TableBorder.symmetric(
+          inside: const BorderSide(color: Color(0xFFE5E7EB), width: 0.5),
         ),
         children: [
-          // Header
+          // HEADER
           TableRow(
             decoration: const BoxDecoration(
-              color: Color(0xFFF9FAFB),
+              color: Color(0xFFF9FAFB), // Match light row color
             ),
             children: [
-              _buildTableCell('Case ID', isHeader: true),
-              _buildTableCell('Status', isHeader: true),
-              _buildTableCell('Time', isHeader: true),
-              _buildTableCell('Memory', isHeader: true),
-              _buildTableCell('Output/Error', isHeader: true),
+              _buildTableCell(
+                'Case ID',
+                isHeader: true,
+                textColor: const Color(0xFF111827),
+              ),
+              _buildTableCell(
+                'Status',
+                isHeader: true,
+                textColor: const Color(0xFF111827),
+              ),
+              _buildTableCell(
+                'Time',
+                isHeader: true,
+                textColor: const Color(0xFF111827),
+              ),
+              _buildTableCell(
+                'Memory',
+                isHeader: true,
+                textColor: const Color(0xFF111827),
+              ),
+              _buildTableCell(
+                'Output / Error',
+                isHeader: true,
+                textColor: const Color(0xFF111827),
+              ),
             ],
           ),
-          // Rows
-          ...testCases.map((tc) {
+          // ROWS
+          ...testCases.asMap().entries.map((entry) {
+            final index = entry.key;
+            final tc = entry.value;
             final color = _getStatusColor(tc.status);
+            final isAlt = index % 2 == 1;
+
             return TableRow(
+              decoration: BoxDecoration(
+                color: isAlt ? const Color(0xFFF9FAFB) : Colors.white,
+              ),
               children: [
                 _buildTableCell(tc.caseId.toString()),
                 _buildTableCell(
@@ -504,8 +863,10 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
                   textColor: color,
                   fontWeight: FontWeight.w900,
                 ),
-                _buildTableCell(_formatDouble(tc.timeMs, 'ms')),
-                _buildTableCell(_formatDouble(tc.memoryMb, 'MB')),
+                _buildTableCell(_formatDouble(tc.timeMs, ' ms')),
+                _buildTableCell(
+                  _formatDouble(tc.memoryMb, ' MB', precision: 9),
+                ),
                 _buildTableCell(
                   (tc.error != null && tc.error!.isNotEmpty)
                       ? tc.error!
@@ -521,11 +882,17 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     );
   }
 
-  String _formatDouble(double value, String suffix) {
-    if (value == value.toInt()) {
-      return '${value.toInt()}$suffix';
+  String _formatDouble(double value, String suffix, {int? precision}) {
+    double processed = value;
+    if (precision != null) {
+      // Round to given precision
+      processed = double.parse(value.toStringAsFixed(precision));
     }
-    return '$value$suffix';
+
+    if (processed == processed.toInt()) {
+      return '${processed.toInt()}$suffix';
+    }
+    return '$processed$suffix';
   }
 
   Widget _buildTableCell(
