@@ -131,7 +131,7 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
 abstract class AssignmentTestCase with _$AssignmentTestCase {
   const factory AssignmentTestCase({
     required int seq,
-    String? inputText,
+    @Default([]) List<String> inputValues,
     String? outputText,
     @Default('PUBLIC') String visibility,
   }) = _AssignmentTestCase;

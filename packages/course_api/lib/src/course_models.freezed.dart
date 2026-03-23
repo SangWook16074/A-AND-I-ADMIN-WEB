@@ -2353,7 +2353,7 @@ as String,
 /// @nodoc
 mixin _$AssignmentTestCase {
 
- int get seq; String? get inputText; String? get outputText; String get visibility;
+ int get seq; List<String> get inputValues; String? get outputText; String get visibility;
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2366,16 +2366,16 @@ $AssignmentTestCaseCopyWith<AssignmentTestCase> get copyWith => _$AssignmentTest
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other.inputValues, inputValues)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,visibility);
+int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(inputValues),outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
+  return 'AssignmentTestCase(seq: $seq, inputValues: $inputValues, outputText: $outputText, visibility: $visibility)';
 }
 
 
@@ -2386,7 +2386,7 @@ abstract mixin class $AssignmentTestCaseCopyWith<$Res>  {
   factory $AssignmentTestCaseCopyWith(AssignmentTestCase value, $Res Function(AssignmentTestCase) _then) = _$AssignmentTestCaseCopyWithImpl;
 @useResult
 $Res call({
- int seq, String? inputText, String? outputText, String visibility
+ int seq, List<String> inputValues, String? outputText, String visibility
 });
 
 
@@ -2403,11 +2403,11 @@ class _$AssignmentTestCaseCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? visibility = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputValues = null,Object? outputText = freezed,Object? visibility = null,}) {
   return _then(_self.copyWith(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
-as int,inputText: freezed == inputText ? _self.inputText : inputText // ignore: cast_nullable_to_non_nullable
-as String?,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
+as int,inputValues: null == inputValues ? _self.inputValues : inputValues // ignore: cast_nullable_to_non_nullable
+as List<String>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -2494,10 +2494,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
-return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
   return orElse();
 
 }
@@ -2515,10 +2515,10 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String visibility)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase():
-return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2535,10 +2535,10 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq,  String? inputText,  String? outputText,  String visibility)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)?  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
-return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
   return null;
 
 }
@@ -2550,11 +2550,17 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);cas
 @JsonSerializable()
 
 class _AssignmentTestCase implements AssignmentTestCase {
-  const _AssignmentTestCase({required this.seq, this.inputText, this.outputText, this.visibility = 'PUBLIC'});
+  const _AssignmentTestCase({required this.seq, final  List<String> inputValues = const [], this.outputText, this.visibility = 'PUBLIC'}): _inputValues = inputValues;
   factory _AssignmentTestCase.fromJson(Map<String, dynamic> json) => _$AssignmentTestCaseFromJson(json);
 
 @override final  int seq;
-@override final  String? inputText;
+ final  List<String> _inputValues;
+@override@JsonKey() List<String> get inputValues {
+  if (_inputValues is EqualUnmodifiableListView) return _inputValues;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_inputValues);
+}
+
 @override final  String? outputText;
 @override@JsonKey() final  String visibility;
 
@@ -2571,16 +2577,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other._inputValues, _inputValues)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,visibility);
+int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(_inputValues),outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
+  return 'AssignmentTestCase(seq: $seq, inputValues: $inputValues, outputText: $outputText, visibility: $visibility)';
 }
 
 
@@ -2591,7 +2597,7 @@ abstract mixin class _$AssignmentTestCaseCopyWith<$Res> implements $AssignmentTe
   factory _$AssignmentTestCaseCopyWith(_AssignmentTestCase value, $Res Function(_AssignmentTestCase) _then) = __$AssignmentTestCaseCopyWithImpl;
 @override @useResult
 $Res call({
- int seq, String? inputText, String? outputText, String visibility
+ int seq, List<String> inputValues, String? outputText, String visibility
 });
 
 
@@ -2608,11 +2614,11 @@ class __$AssignmentTestCaseCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? visibility = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputValues = null,Object? outputText = freezed,Object? visibility = null,}) {
   return _then(_AssignmentTestCase(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
-as int,inputText: freezed == inputText ? _self.inputText : inputText // ignore: cast_nullable_to_non_nullable
-as String?,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
+as int,inputValues: null == inputValues ? _self._inputValues : inputValues // ignore: cast_nullable_to_non_nullable
+as List<String>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
 as String,
   ));

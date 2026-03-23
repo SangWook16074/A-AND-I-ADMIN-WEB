@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
+import 'dart:math';
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
@@ -199,7 +200,10 @@ class _CourseDetailsBottomSheetState
                         },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Color(0xFF555555)),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Color(0xFF555555),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -278,8 +282,9 @@ class _CourseDetailsBottomSheetState
                           border: OutlineInputBorder(),
                         ),
                         onSaved: (v) => title = v?.trim() ?? title,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? '제목을 입력해주세요.' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? '제목을 입력해주세요.'
+                            : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -306,7 +311,10 @@ class _CourseDetailsBottomSheetState
                                   value: 'BASIC',
                                   child: Text('BASIC'),
                                 ),
-                                DropdownMenuItem(value: 'CS', child: Text('CS')),
+                                DropdownMenuItem(
+                                  value: 'CS',
+                                  child: Text('CS'),
+                                ),
                                 DropdownMenuItem(
                                   value: 'FRAMEWORK',
                                   child: Text('FRAMEWORK'),
@@ -325,9 +333,18 @@ class _CourseDetailsBottomSheetState
                                 border: OutlineInputBorder(),
                               ),
                               items: const [
-                                DropdownMenuItem(value: 'FL', child: Text('FL')),
-                                DropdownMenuItem(value: 'SP', child: Text('SP')),
-                                DropdownMenuItem(value: 'NO', child: Text('NO')),
+                                DropdownMenuItem(
+                                  value: 'FL',
+                                  child: Text('FL'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'SP',
+                                  child: Text('SP'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'NO',
+                                  child: Text('NO'),
+                                ),
                               ],
                               onChanged: (v) => fieldTag = v ?? fieldTag,
                               onSaved: (v) => fieldTag = v ?? fieldTag,
@@ -343,7 +360,10 @@ class _CourseDetailsBottomSheetState
                           border: OutlineInputBorder(),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
+                          DropdownMenuItem(
+                            value: 'DRAFT',
+                            child: Text('DRAFT'),
+                          ),
                           DropdownMenuItem(
                             value: 'PUBLISHED',
                             child: Text('PUBLISHED'),
@@ -380,14 +400,19 @@ class _CourseDetailsBottomSheetState
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(color: Color(0xFF8A8A8A)),
+                ),
               ),
               FilledButton(
                 onPressed: () {
                   if (formKey.currentState?.validate() ?? false) {
                     formKey.currentState?.save();
 
-                    ref.read(tasksManagementBlocProvider.notifier).add(
+                    ref
+                        .read(tasksManagementBlocProvider.notifier)
+                        .add(
                           TasksManagementUpdateCourseRequested(
                             courseSlug: course.slug,
                             request: UpdateCourseRequest(
@@ -1132,7 +1157,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
 
   String _requirementsText = '';
   final List<_TestCaseData> _testCases = [_TestCaseData()];
-  
+
   // Problem Detail fields
   String _inputDescription = '';
   String _outputDescription = '';
@@ -1145,7 +1170,11 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _commentSectionsText = '';
 
   // Code Templates
-  final List<_CodeTemplateData> _codeTemplates = [_CodeTemplateData()];
+  final List<_CodeTemplateData> _codeTemplates = [
+    _CodeTemplateData(language: 'KOTLIN'),
+    _CodeTemplateData(language: 'DART'),
+    _CodeTemplateData(language: 'PYTHON'),
+  ];
 
   late TextEditingController _startAtController;
   late TextEditingController _endAtController;
@@ -1155,12 +1184,44 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
     super.initState();
     _startAtController = TextEditingController();
     _endAtController = TextEditingController();
+
+    // Initialize with default values for first template
+    final kTemplate = _codeTemplates[0];
+    kTemplate.commentTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
+    kTemplate.functionTemplate =
+        "fun solution(): String {\n    var answer = \"\"\n    return answer\n}";
+    kTemplate.runnableTemplate =
+        "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}";
+
+    final dTemplate = _codeTemplates[1];
+    dTemplate.commentTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
+    dTemplate.functionTemplate =
+        "String solution() {\n  var answer = '';\n  return answer;\n}";
+    dTemplate.runnableTemplate =
+        "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}";
+
+    final pTemplate = _codeTemplates[2];
+    pTemplate.commentTemplate =
+        "\"\"\"\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n\"\"\"";
+    pTemplate.functionTemplate =
+        "def solution():\n    answer = ''\n    return answer";
+    pTemplate.runnableTemplate =
+        "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())";
+
+    for (var t in _codeTemplates) {
+      t.updateControllers();
+    }
   }
 
   @override
   void dispose() {
     _startAtController.dispose();
     _endAtController.dispose();
+    for (var t in _codeTemplates) {
+      t.dispose();
+    }
     super.dispose();
   }
 
@@ -1529,7 +1590,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
                     onSaved: (v) => _startAt = _startAt.trim(),
-                    validator: (v) => v == null || v.isEmpty ? '시작일시를 선택해주세요.' : null,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? '시작일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -1543,7 +1605,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
                     onSaved: (v) => _endAt = _endAt.trim(),
-                    validator: (v) => v == null || v.isEmpty ? '종료일시를 선택해주세요.' : null,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? '종료일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   const Divider(),
@@ -1678,15 +1741,17 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            initialValue: testCase.input,
+                            initialValue: testCase.inputs.join('\n'),
                             decoration: const InputDecoration(
-                              labelText: '입력 (Input)',
+                              labelText: '입력 (Inputs, 한 줄에 하나씩)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
-                              hintText: 'ADD 1\\nCLOSE',
+                              hintText: 'param1\nparam2',
                             ),
-                            maxLines: 2,
-                            onSaved: (v) => testCase.input = v?.trim() ?? '',
+                            maxLines: 4,
+                            onSaved: (v) => testCase.inputs =
+                                v?.split('\n').map((e) => e.trim()).toList() ??
+                                [],
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -1702,15 +1767,21 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
-                            value: testCase.visibility,
+                            initialValue: testCase.visibility,
                             decoration: const InputDecoration(
                               labelText: '공개 여부 (Visibility)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'PUBLIC', child: Text('PUBLIC')),
-                              DropdownMenuItem(value: 'PRIVATE', child: Text('PRIVATE')),
+                              DropdownMenuItem(
+                                value: 'PUBLIC',
+                                child: Text('PUBLIC'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PRIVATE',
+                                child: Text('PRIVATE'),
+                              ),
                             ],
                             onChanged: (v) {
                               if (v != null) testCase.visibility = v;
@@ -1792,6 +1863,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       labelText: '가이드 제목 (Guide Title)',
                       filled: true,
                       fillColor: Color(0xFFFAFAFA),
+                      hintText: '문제 풀이 템플릿',
                     ),
                     onSaved: (v) => _submissionGuideTitle = v?.trim() ?? '',
                   ),
@@ -1802,9 +1874,11 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       labelText: '가이드 설명 (Description)',
                       filled: true,
                       fillColor: Color(0xFFFAFAFA),
+                      hintText: '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.',
                     ),
-                    maxLines: 3,
-                    onSaved: (v) => _submissionGuideDescription = v?.trim() ?? '',
+                    maxLines: 2,
+                    onSaved: (v) =>
+                        _submissionGuideDescription = v?.trim() ?? '',
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
@@ -1813,7 +1887,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       labelText: '코멘트 섹션 (Comment Sections - 줄바꿈으로 구분)',
                       filled: true,
                       fillColor: Color(0xFFFAFAFA),
-                      hintText: '총평\n배운 점',
+                      hintText: '문제\n해석\n풀이',
                     ),
                     maxLines: 3,
                     onSaved: (v) => _commentSectionsText = v?.trim() ?? '',
@@ -1826,12 +1900,27 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                     children: [
                       const Text(
                         '코드 템플릿 (Code Templates)',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            _codeTemplates.add(_CodeTemplateData());
+                            setState(() {
+                              _codeTemplates.add(
+                                _CodeTemplateData(
+                                  language: 'KOTLIN',
+                                  commentTemplate:
+                                      '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
+                                  functionTemplate:
+                                      'fun solution(): String {\n    var answer = ""\n    return answer\n}',
+                                  runnableTemplate:
+                                      'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
+                                ),
+                              );
+                            });
                           });
                         },
                         icon: const Icon(Icons.add, size: 18),
@@ -1873,7 +1962,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _codeTemplates.removeAt(index);
+                                      final removed = _codeTemplates.removeAt(
+                                        index,
+                                      );
+                                      removed.dispose();
                                     });
                                   },
                                   padding: EdgeInsets.zero,
@@ -1883,53 +1975,54 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
-                            value: template.language,
+                            initialValue: template.language,
                             decoration: const InputDecoration(
                               labelText: '언어 (Language)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'KOTLIN', child: Text('KOTLIN')),
-                              DropdownMenuItem(value: 'DART', child: Text('DART')),
-                              DropdownMenuItem(value: 'PYTHON', child: Text('PYTHON')),
+                              DropdownMenuItem(
+                                value: 'KOTLIN',
+                                child: Text('KOTLIN'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'DART',
+                                child: Text('DART'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PYTHON',
+                                child: Text('PYTHON'),
+                              ),
                             ],
                             onChanged: (v) {
-                              if (v != null) template.language = v;
+                              if (v != null) {
+                                setState(() {
+                                  template.updateLanguage(v);
+                                });
+                              }
                             },
                           ),
                           const SizedBox(height: 12),
-                          TextFormField(
-                            initialValue: template.commentTemplate,
-                            decoration: const InputDecoration(
-                              labelText: '코멘트 템플릿 (Comment)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                            ),
-                            maxLines: 2,
-                            onSaved: (v) => template.commentTemplate = v?.trim() ?? '',
+                          _buildCodeField(
+                            label: '코멘트 템플릿 (Comment)',
+                            controller: template.commentController,
+                            language: template.language,
+                            hintText: '/*\\n[문제]\\n...*/',
                           ),
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            initialValue: template.functionTemplate,
-                            decoration: const InputDecoration(
-                              labelText: '함수 템플릿 (Function)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                            ),
-                            maxLines: 3,
-                            onSaved: (v) => template.functionTemplate = v?.trim() ?? '',
+                          const SizedBox(height: 16),
+                          _buildCodeField(
+                            label: '함수 템플릿 (Function)',
+                            controller: template.functionController,
+                            language: template.language,
+                            hintText: 'fun solution() { ... }',
                           ),
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            initialValue: template.runnableTemplate,
-                            decoration: const InputDecoration(
-                              labelText: '실행 가능 템플릿 (Runnable)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                            ),
-                            maxLines: 5,
-                            onSaved: (v) => template.runnableTemplate = v?.trim() ?? '',
+                          const SizedBox(height: 16),
+                          _buildCodeField(
+                            label: '실행 가능 템플릿 (Runnable)',
+                            controller: template.runnableController,
+                            language: template.language,
+                            hintText: 'fun main() { ... }',
                           ),
                         ],
                       ),
@@ -1963,16 +2056,15 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .entries
                               .where(
                                 (e) =>
-                                    e.value.input.isNotEmpty ||
+                                    e.value.inputs.isNotEmpty ||
                                     e.value.output.isNotEmpty,
                               )
                               .map(
                                 (e) => AssignmentTestCase(
                                   seq: e.key + 1,
-                                  inputText: e.value.input.replaceAll(
-                                    '\\n',
-                                    '\n',
-                                  ),
+                                  inputValues: e.value.inputs
+                                      .map((e) => e.replaceAll('\\n', '\n'))
+                                      .toList(),
                                   outputText: e.value.output.replaceAll(
                                     '\\n',
                                     '\n',
@@ -1987,9 +2079,12 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .map(
                                 (e) => CodeTemplate(
                                   language: e.language,
-                                  commentTemplate: e.commentTemplate.replaceAll('\\n', '\n'),
-                                  functionTemplate: e.functionTemplate.replaceAll('\\n', '\n'),
-                                  runnableTemplate: e.runnableTemplate.replaceAll('\\n', '\n'),
+                                  commentTemplate: e.commentController.text
+                                      .trim(),
+                                  functionTemplate: e.functionController.text
+                                      .trim(),
+                                  runnableTemplate: e.runnableController.text
+                                      .trim(),
                                 ),
                               )
                               .toList();
@@ -2030,14 +2125,16 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       ),
                                       submissionGuide: SubmissionGuide(
                                         title: _submissionGuideTitle,
-                                        description: _submissionGuideDescription,
-                                        commentSections: _commentSectionsText.isEmpty
+                                        description:
+                                            _submissionGuideDescription,
+                                        commentSections:
+                                            _commentSectionsText.isEmpty
                                             ? []
                                             : _commentSectionsText
-                                                .split('\n')
-                                                .map((e) => e.trim())
-                                                .where((e) => e.isNotEmpty)
-                                                .toList(),
+                                                  .split('\n')
+                                                  .map((e) => e.trim())
+                                                  .where((e) => e.isNotEmpty)
+                                                  .toList(),
                                       ),
                                       codeTemplates: codeTemplateList,
                                       attributes: _language.isNotEmpty
@@ -2055,7 +2152,48 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             _testCases.clear();
                             _testCases.add(_TestCaseData());
                             _codeTemplates.clear();
-                            _codeTemplates.add(_CodeTemplateData());
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'KOTLIN'),
+                            );
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'DART'),
+                            );
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'PYTHON'),
+                            );
+
+                            // Re-apply defaults to the new templates
+                            final k = _codeTemplates[0];
+                            k.commentTemplate =
+                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
+                            k.functionTemplate =
+                                'fun solution(): String {\n    var answer = ""\n    return answer\n}';
+                            k.runnableTemplate =
+                                'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}';
+
+                            final d = _codeTemplates[1];
+                            d.commentTemplate =
+                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
+                            d.functionTemplate =
+                                'String solution() {\n  var answer = "";\n  return answer;\n}';
+                            d.runnableTemplate =
+                                'String solution() {\n  var answer = "Hello World!";\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}';
+
+                            final p = _codeTemplates[2];
+                            p.commentTemplate =
+                                '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""';
+                            p.functionTemplate =
+                                'def solution():\n    answer = ""\n    return answer';
+                            p.runnableTemplate =
+                                'def solution():\n    answer = "Hello World!"\n    return answer\n\nif __name__ == "__main__":\n    print(solution())';
+
+                            for (var t in _codeTemplates) {
+                              t.updateControllers();
+                            }
+
+                            _submissionGuideTitle = '';
+                            _submissionGuideDescription = '';
+                            _commentSectionsText = '';
                           });
                         }
                       },
@@ -2080,17 +2218,389 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       ),
     );
   }
+
+  Widget _buildCodeField({
+    required String label,
+    required TextEditingController controller,
+    required String language,
+    String? hintText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 350,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF334155)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E293B),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: Row(
+                  children: [
+                    _buildDot(const Color(0xFFEF4444)),
+                    const SizedBox(width: 6),
+                    _buildDot(const Color(0xFFF59E0B)),
+                    const SizedBox(width: 6),
+                    _buildDot(const Color(0xFF10B981)),
+                    const SizedBox(width: 12),
+                    Text(
+                      language.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Body
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Gutter
+                    Container(
+                      width: 45,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0F172A),
+                        border: Border(
+                          right: BorderSide(color: Color(0xFF334155)),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
+                          children: List.generate(
+                            max(1, controller.text.split('\n').length),
+                            (i) => Text(
+                              '${i + 1}',
+                              style: const TextStyle(
+                                color: Color(0xFF475569),
+                                fontSize: 13,
+                                fontFamily: 'monospace',
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Editor
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        child: TextFormField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            hintText: hintText,
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          maxLines: null,
+                          cursorColor: Colors.white,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'monospace',
+                            height: 1.5,
+                            color: Color(0xFFE2E8F0),
+                          ),
+                          onChanged: (v) {
+                            setState(() {
+                              // Trigger rebuild for gutter
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
 }
 
 class _TestCaseData {
-  String input = '';
-  String output = '';
-  String visibility = 'PUBLIC';
+  List<String> inputs;
+  String output;
+  String visibility;
+
+  _TestCaseData({
+    List<String>? inputs,
+    this.output = '',
+    this.visibility = 'PUBLIC',
+  }) : inputs = inputs ?? [];
 }
 
 class _CodeTemplateData {
-  String language = 'KOTLIN';
+  String language;
   String commentTemplate = '';
   String functionTemplate = '';
   String runnableTemplate = '';
+
+  late final TextEditingController commentController;
+  late final TextEditingController functionController;
+  late final TextEditingController runnableController;
+
+  _CodeTemplateData({
+    this.language = 'KOTLIN',
+    String commentTemplate = '',
+    String functionTemplate = '',
+    String runnableTemplate = '',
+  }) {
+    this.commentTemplate = commentTemplate;
+    this.functionTemplate = functionTemplate;
+    this.runnableTemplate = runnableTemplate;
+
+    commentController = _PremiumCodeController(
+      text: commentTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+    functionController = _PremiumCodeController(
+      text: functionTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+    runnableController = _PremiumCodeController(
+      text: runnableTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+  }
+
+  void dispose() {
+    commentController.dispose();
+    functionController.dispose();
+    runnableController.dispose();
+  }
+
+  void updateControllers() {
+    commentController.text = commentTemplate.replaceAll('\\n', '\n');
+    functionController.text = functionTemplate.replaceAll('\\n', '\n');
+    runnableController.text = runnableTemplate.replaceAll('\\n', '\n');
+    (commentController as _PremiumCodeController).language = language;
+    (functionController as _PremiumCodeController).language = language;
+    (runnableController as _PremiumCodeController).language = language;
+  }
+
+  void updateLanguage(String lang) {
+    language = lang;
+    (commentController as _PremiumCodeController).language = lang;
+    (functionController as _PremiumCodeController).language = lang;
+    (runnableController as _PremiumCodeController).language = lang;
+  }
+}
+
+class _PremiumCodeController extends TextEditingController {
+  String language;
+  _PremiumCodeController({required String text, required this.language})
+    : super(text: text);
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    return _highlightCode(text, language);
+  }
+}
+
+TextSpan _highlightCode(String code, String language) {
+  final lang = language.toLowerCase();
+  const keywords = {
+    'python': [
+      'def',
+      'return',
+      'if',
+      'else',
+      'elif',
+      'for',
+      'while',
+      'import',
+      'from',
+      'as',
+      'class',
+      'try',
+      'except',
+      'pass',
+      'print',
+      'in',
+      'is',
+      'not',
+    ],
+    'kotlin': [
+      'fun',
+      'val',
+      'var',
+      'if',
+      'else',
+      'when',
+      'for',
+      'while',
+      'return',
+      'class',
+      'interface',
+      'object',
+      'override',
+      'import',
+      'package',
+      'void',
+    ],
+    'dart': [
+      'void',
+      'final',
+      'var',
+      'if',
+      'else',
+      'return',
+      'class',
+      'import',
+      'package',
+      'async',
+      'await',
+      'late',
+      'dynamic',
+      'static',
+      'override',
+    ],
+  };
+
+  final kwList = keywords[lang] ?? keywords['kotlin']!;
+  final spans = <TextSpan>[];
+
+  final combinedRegex = RegExp(
+    r'(".*?")|'
+    r"('.*?')|"
+    r'(\/\/.*)|'
+    r'(\/\*[\s\S]*?\*\/)|'
+    r'(#.*)|'
+    r'([a-zA-Z_][a-zA-Z0-9_]*)|'
+    r'(\d+(\.\d*)?)|'
+    r'([{}()\[\]])|'
+    r'([+\-*/%=<>!&|^~,.:;])|'
+    r'(\s+)',
+  );
+
+  final matches = combinedRegex.allMatches(code).toList();
+
+  for (var i = 0; i < matches.length; i++) {
+    final match = matches[i];
+    final text = match.group(0)!;
+
+    if (match.group(1) != null || match.group(2) != null) {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFF86EFAC)),
+        ),
+      );
+    } else if (match.group(3) != null ||
+        match.group(4) != null ||
+        match.group(5) != null) {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(
+            color: Color(0xFF64748B),
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    } else if (match.group(6) != null) {
+      final word = match.group(6)!;
+      if (kwList.contains(word)) {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(
+              color: Color(0xFFC084FC),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      } else if (i + 1 < matches.length &&
+          matches[i + 1].group(0)!.trim().startsWith('(')) {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF60A5FA)),
+          ),
+        );
+      } else {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFE2E8F0)),
+          ),
+        );
+      }
+    } else if (match.group(7) != null) {
+      // Numbers
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFFFDE68A)),
+        ),
+      );
+    } else if (match.group(9) != null || match.group(10) != null) {
+      // Punctuation/Operators
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFF94A3B8)),
+        ),
+      );
+    } else {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFFE2E8F0)),
+        ),
+      );
+    }
+  }
+
+  return TextSpan(children: spans);
 }
