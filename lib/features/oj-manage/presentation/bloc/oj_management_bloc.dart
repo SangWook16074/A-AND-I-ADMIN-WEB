@@ -1,13 +1,12 @@
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import '../../data/datasources/oj_management_api_client.dart';
 import '../../data/repositories/oj_management_repository_impl.dart';
 import '../../domain/repositories/oj_management_repository.dart';
 import 'oj_management_event.dart';
 import 'oj_management_state.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'oj_management_bloc.g.dart';
 
@@ -35,20 +34,32 @@ class OjManagementBloc extends _$OjManagementBloc {
   Future<void> onEvent(OjManagementEvent event) async {
     switch (event) {
       case OjManagementStarted():
-        await loadTestCases();
+        await loadAllData();
       case OjManagementRefreshRequested():
-        await loadTestCases();
+        await loadAllData();
+      case OjManagementSubmissionsRefreshRequested():
+        await loadSubmissions();
     }
   }
 
-  Future<void> loadTestCases() async {
-    state = state.copyWith(status: OjManagementStatus.loading, clearError: true);
+  Future<void> loadAllData() async {
+    state = state.copyWith(
+      status: OjManagementStatus.loading,
+      clearError: true,
+    );
 
     try {
-      final data = await ref.read(ojManagementRepositoryProvider).getTestCases();
+      final testCases = await ref
+          .read(ojManagementRepositoryProvider)
+          .getTestCases();
+      final submissions = await ref
+          .read(ojManagementRepositoryProvider)
+          .getSubmissions();
+
       state = state.copyWith(
         status: OjManagementStatus.success,
-        problemTestCases: data,
+        problemTestCases: testCases,
+        submissions: submissions,
       );
     } on OjManagementApiException catch (e) {
       state = state.copyWith(
@@ -59,6 +70,32 @@ class OjManagementBloc extends _$OjManagementBloc {
       state = state.copyWith(
         status: OjManagementStatus.failure,
         errorMessage: '데이터를 불러오지 못했습니다. 다시 시도해주세요.',
+      );
+    }
+  }
+
+  Future<void> loadSubmissions() async {
+    if (state.status != OjManagementStatus.success) {
+      state = state.copyWith(status: OjManagementStatus.loading);
+    }
+
+    try {
+      final submissions = await ref
+          .read(ojManagementRepositoryProvider)
+          .getSubmissions();
+      state = state.copyWith(
+        status: OjManagementStatus.success,
+        submissions: submissions,
+      );
+    } on OjManagementApiException catch (e) {
+      state = state.copyWith(
+        status: OjManagementStatus.failure,
+        errorMessage: e.message,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: OjManagementStatus.failure,
+        errorMessage: '제출 내역을 불러오지 못했습니다.',
       );
     }
   }

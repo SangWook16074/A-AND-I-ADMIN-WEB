@@ -38,4 +38,25 @@ class OjManagementApiClient {
       throw OjManagementApiException(e.toString());
     }
   }
+
+  Future<List<oj_api.Submission>> getSubmissions({required String accessToken}) async {
+    try {
+      return await apiClient.getSubmissions(accessToken: accessToken);
+    } catch (e) {
+      if (e is oj_api.OjApiException) {
+        throw OjManagementApiException(
+          e.message,
+          statusCode: e.statusCode,
+          code: e.code,
+        );
+      }
+      if (e is DioException) {
+        throw OjManagementApiException(
+          e.message ?? '제출 내역을 불러오는 중 오류가 발생했습니다.',
+          statusCode: e.response?.statusCode,
+        );
+      }
+      throw OjManagementApiException(e.toString());
+    }
+  }
 }

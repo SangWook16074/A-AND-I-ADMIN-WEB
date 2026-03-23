@@ -9,3 +9,7 @@ class OjManagementStarted extends OjManagementEvent {
 class OjManagementRefreshRequested extends OjManagementEvent {
   const OjManagementRefreshRequested();
 }
+
+class OjManagementSubmissionsRefreshRequested extends OjManagementEvent {
+  const OjManagementSubmissionsRefreshRequested();
+}
