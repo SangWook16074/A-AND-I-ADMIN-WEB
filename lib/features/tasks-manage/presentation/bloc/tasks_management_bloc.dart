@@ -297,7 +297,11 @@ class TasksManagementBloc extends _$TasksManagementBloc {
     required String courseSlug,
     required String assignmentId,
   }) async {
-    state = state.copyWith(isLoadingDetails: true, clearError: true);
+    state = state.copyWith(
+      isLoadingDetails: true,
+      selectedAssignment: null,
+      clearError: true,
+    );
     try {
       final assignment = await ref.read(getAssignmentDetailsUseCaseProvider)(
         courseSlug: courseSlug,

@@ -161,25 +161,6 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        initialValue: selectedCohortOrder.toString(),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          labelText: '기수 순서 (Cohort Order)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          isDense: true,
-                        ),
-                        onChanged: (val) {
-                          final parsed = int.tryParse(val) ?? 0;
-                          selectedCohortOrder = parsed;
-                        },
-                      ),
                     ],
                   ),
                 ),

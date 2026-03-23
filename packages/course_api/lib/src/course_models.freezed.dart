@@ -1453,7 +1453,7 @@ as DateTime?,
 /// @nodoc
 mixin _$AssignmentMetadata {
 
- String get title; String get difficulty; String? get description; int? get timeLimitMinutes; List<LearningGoal> get learningGoals; List<AssignmentRequirement> get requirements; List<AssignmentExample> get examples; Map<String, dynamic> get attributes; Map<String, dynamic>? get problemDetail;
+ String get title; String get difficulty; String? get description; List<LearningGoal> get learningGoals; List<AssignmentRequirement> get requirements; List<AssignmentTestCase> get testCases; ProblemDetail? get problemDetail; SubmissionGuide? get submissionGuide; List<CodeTemplate> get codeTemplates; Map<String, dynamic> get attributes;
 /// Create a copy of AssignmentMetadata
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1466,16 +1466,16 @@ $AssignmentMetadataCopyWith<AssignmentMetadata> get copyWith => _$AssignmentMeta
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.description, description) || other.description == description)&&(identical(other.timeLimitMinutes, timeLimitMinutes) || other.timeLimitMinutes == timeLimitMinutes)&&const DeepCollectionEquality().equals(other.learningGoals, learningGoals)&&const DeepCollectionEquality().equals(other.requirements, requirements)&&const DeepCollectionEquality().equals(other.examples, examples)&&const DeepCollectionEquality().equals(other.attributes, attributes)&&const DeepCollectionEquality().equals(other.problemDetail, problemDetail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.learningGoals, learningGoals)&&const DeepCollectionEquality().equals(other.requirements, requirements)&&const DeepCollectionEquality().equals(other.testCases, testCases)&&(identical(other.problemDetail, problemDetail) || other.problemDetail == problemDetail)&&(identical(other.submissionGuide, submissionGuide) || other.submissionGuide == submissionGuide)&&const DeepCollectionEquality().equals(other.codeTemplates, codeTemplates)&&const DeepCollectionEquality().equals(other.attributes, attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,difficulty,description,timeLimitMinutes,const DeepCollectionEquality().hash(learningGoals),const DeepCollectionEquality().hash(requirements),const DeepCollectionEquality().hash(examples),const DeepCollectionEquality().hash(attributes),const DeepCollectionEquality().hash(problemDetail));
+int get hashCode => Object.hash(runtimeType,title,difficulty,description,const DeepCollectionEquality().hash(learningGoals),const DeepCollectionEquality().hash(requirements),const DeepCollectionEquality().hash(testCases),problemDetail,submissionGuide,const DeepCollectionEquality().hash(codeTemplates),const DeepCollectionEquality().hash(attributes));
 
 @override
 String toString() {
-  return 'AssignmentMetadata(title: $title, difficulty: $difficulty, description: $description, timeLimitMinutes: $timeLimitMinutes, learningGoals: $learningGoals, requirements: $requirements, examples: $examples, attributes: $attributes, problemDetail: $problemDetail)';
+  return 'AssignmentMetadata(title: $title, difficulty: $difficulty, description: $description, learningGoals: $learningGoals, requirements: $requirements, testCases: $testCases, problemDetail: $problemDetail, submissionGuide: $submissionGuide, codeTemplates: $codeTemplates, attributes: $attributes)';
 }
 
 
@@ -1486,11 +1486,11 @@ abstract mixin class $AssignmentMetadataCopyWith<$Res>  {
   factory $AssignmentMetadataCopyWith(AssignmentMetadata value, $Res Function(AssignmentMetadata) _then) = _$AssignmentMetadataCopyWithImpl;
 @useResult
 $Res call({
- String title, String difficulty, String? description, int? timeLimitMinutes, List<LearningGoal> learningGoals, List<AssignmentRequirement> requirements, List<AssignmentExample> examples, Map<String, dynamic> attributes, Map<String, dynamic>? problemDetail
+ String title, String difficulty, String? description, List<LearningGoal> learningGoals, List<AssignmentRequirement> requirements, List<AssignmentTestCase> testCases, ProblemDetail? problemDetail, SubmissionGuide? submissionGuide, List<CodeTemplate> codeTemplates, Map<String, dynamic> attributes
 });
 
 
-
+$ProblemDetailCopyWith<$Res>? get problemDetail;$SubmissionGuideCopyWith<$Res>? get submissionGuide;
 
 }
 /// @nodoc
@@ -1503,21 +1503,46 @@ class _$AssignmentMetadataCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentMetadata
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? difficulty = null,Object? description = freezed,Object? timeLimitMinutes = freezed,Object? learningGoals = null,Object? requirements = null,Object? examples = null,Object? attributes = null,Object? problemDetail = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? difficulty = null,Object? description = freezed,Object? learningGoals = null,Object? requirements = null,Object? testCases = null,Object? problemDetail = freezed,Object? submissionGuide = freezed,Object? codeTemplates = null,Object? attributes = null,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,difficulty: null == difficulty ? _self.difficulty : difficulty // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,timeLimitMinutes: freezed == timeLimitMinutes ? _self.timeLimitMinutes : timeLimitMinutes // ignore: cast_nullable_to_non_nullable
-as int?,learningGoals: null == learningGoals ? _self.learningGoals : learningGoals // ignore: cast_nullable_to_non_nullable
+as String?,learningGoals: null == learningGoals ? _self.learningGoals : learningGoals // ignore: cast_nullable_to_non_nullable
 as List<LearningGoal>,requirements: null == requirements ? _self.requirements : requirements // ignore: cast_nullable_to_non_nullable
-as List<AssignmentRequirement>,examples: null == examples ? _self.examples : examples // ignore: cast_nullable_to_non_nullable
-as List<AssignmentExample>,attributes: null == attributes ? _self.attributes : attributes // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,problemDetail: freezed == problemDetail ? _self.problemDetail : problemDetail // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>?,
+as List<AssignmentRequirement>,testCases: null == testCases ? _self.testCases : testCases // ignore: cast_nullable_to_non_nullable
+as List<AssignmentTestCase>,problemDetail: freezed == problemDetail ? _self.problemDetail : problemDetail // ignore: cast_nullable_to_non_nullable
+as ProblemDetail?,submissionGuide: freezed == submissionGuide ? _self.submissionGuide : submissionGuide // ignore: cast_nullable_to_non_nullable
+as SubmissionGuide?,codeTemplates: null == codeTemplates ? _self.codeTemplates : codeTemplates // ignore: cast_nullable_to_non_nullable
+as List<CodeTemplate>,attributes: null == attributes ? _self.attributes : attributes // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
   ));
 }
+/// Create a copy of AssignmentMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProblemDetailCopyWith<$Res>? get problemDetail {
+    if (_self.problemDetail == null) {
+    return null;
+  }
 
+  return $ProblemDetailCopyWith<$Res>(_self.problemDetail!, (value) {
+    return _then(_self.copyWith(problemDetail: value));
+  });
+}/// Create a copy of AssignmentMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SubmissionGuideCopyWith<$Res>? get submissionGuide {
+    if (_self.submissionGuide == null) {
+    return null;
+  }
+
+  return $SubmissionGuideCopyWith<$Res>(_self.submissionGuide!, (value) {
+    return _then(_self.copyWith(submissionGuide: value));
+  });
+}
 }
 
 
@@ -1599,10 +1624,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String difficulty,  String? description,  int? timeLimitMinutes,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples,  Map<String, dynamic> attributes,  Map<String, dynamic>? problemDetail)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String difficulty,  String? description,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentTestCase> testCases,  ProblemDetail? problemDetail,  SubmissionGuide? submissionGuide,  List<CodeTemplate> codeTemplates,  Map<String, dynamic> attributes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AssignmentMetadata() when $default != null:
-return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMinutes,_that.learningGoals,_that.requirements,_that.examples,_that.attributes,_that.problemDetail);case _:
+return $default(_that.title,_that.difficulty,_that.description,_that.learningGoals,_that.requirements,_that.testCases,_that.problemDetail,_that.submissionGuide,_that.codeTemplates,_that.attributes);case _:
   return orElse();
 
 }
@@ -1620,10 +1645,10 @@ return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String difficulty,  String? description,  int? timeLimitMinutes,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples,  Map<String, dynamic> attributes,  Map<String, dynamic>? problemDetail)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String difficulty,  String? description,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentTestCase> testCases,  ProblemDetail? problemDetail,  SubmissionGuide? submissionGuide,  List<CodeTemplate> codeTemplates,  Map<String, dynamic> attributes)  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentMetadata():
-return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMinutes,_that.learningGoals,_that.requirements,_that.examples,_that.attributes,_that.problemDetail);case _:
+return $default(_that.title,_that.difficulty,_that.description,_that.learningGoals,_that.requirements,_that.testCases,_that.problemDetail,_that.submissionGuide,_that.codeTemplates,_that.attributes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1640,10 +1665,10 @@ return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String difficulty,  String? description,  int? timeLimitMinutes,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentExample> examples,  Map<String, dynamic> attributes,  Map<String, dynamic>? problemDetail)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String difficulty,  String? description,  List<LearningGoal> learningGoals,  List<AssignmentRequirement> requirements,  List<AssignmentTestCase> testCases,  ProblemDetail? problemDetail,  SubmissionGuide? submissionGuide,  List<CodeTemplate> codeTemplates,  Map<String, dynamic> attributes)?  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentMetadata() when $default != null:
-return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMinutes,_that.learningGoals,_that.requirements,_that.examples,_that.attributes,_that.problemDetail);case _:
+return $default(_that.title,_that.difficulty,_that.description,_that.learningGoals,_that.requirements,_that.testCases,_that.problemDetail,_that.submissionGuide,_that.codeTemplates,_that.attributes);case _:
   return null;
 
 }
@@ -1655,13 +1680,12 @@ return $default(_that.title,_that.difficulty,_that.description,_that.timeLimitMi
 @JsonSerializable()
 
 class _AssignmentMetadata implements AssignmentMetadata {
-  const _AssignmentMetadata({this.title = '', this.difficulty = 'MID', this.description, this.timeLimitMinutes, final  List<LearningGoal> learningGoals = const [], final  List<AssignmentRequirement> requirements = const [], final  List<AssignmentExample> examples = const [], final  Map<String, dynamic> attributes = const {}, final  Map<String, dynamic>? problemDetail}): _learningGoals = learningGoals,_requirements = requirements,_examples = examples,_attributes = attributes,_problemDetail = problemDetail;
+  const _AssignmentMetadata({this.title = '', this.difficulty = 'MID', this.description, final  List<LearningGoal> learningGoals = const [], final  List<AssignmentRequirement> requirements = const [], final  List<AssignmentTestCase> testCases = const [], this.problemDetail, this.submissionGuide, final  List<CodeTemplate> codeTemplates = const [], final  Map<String, dynamic> attributes = const {}}): _learningGoals = learningGoals,_requirements = requirements,_testCases = testCases,_codeTemplates = codeTemplates,_attributes = attributes;
   factory _AssignmentMetadata.fromJson(Map<String, dynamic> json) => _$AssignmentMetadataFromJson(json);
 
 @override@JsonKey() final  String title;
 @override@JsonKey() final  String difficulty;
 @override final  String? description;
-@override final  int? timeLimitMinutes;
  final  List<LearningGoal> _learningGoals;
 @override@JsonKey() List<LearningGoal> get learningGoals {
   if (_learningGoals is EqualUnmodifiableListView) return _learningGoals;
@@ -1676,11 +1700,20 @@ class _AssignmentMetadata implements AssignmentMetadata {
   return EqualUnmodifiableListView(_requirements);
 }
 
- final  List<AssignmentExample> _examples;
-@override@JsonKey() List<AssignmentExample> get examples {
-  if (_examples is EqualUnmodifiableListView) return _examples;
+ final  List<AssignmentTestCase> _testCases;
+@override@JsonKey() List<AssignmentTestCase> get testCases {
+  if (_testCases is EqualUnmodifiableListView) return _testCases;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_examples);
+  return EqualUnmodifiableListView(_testCases);
+}
+
+@override final  ProblemDetail? problemDetail;
+@override final  SubmissionGuide? submissionGuide;
+ final  List<CodeTemplate> _codeTemplates;
+@override@JsonKey() List<CodeTemplate> get codeTemplates {
+  if (_codeTemplates is EqualUnmodifiableListView) return _codeTemplates;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_codeTemplates);
 }
 
  final  Map<String, dynamic> _attributes;
@@ -1688,15 +1721,6 @@ class _AssignmentMetadata implements AssignmentMetadata {
   if (_attributes is EqualUnmodifiableMapView) return _attributes;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_attributes);
-}
-
- final  Map<String, dynamic>? _problemDetail;
-@override Map<String, dynamic>? get problemDetail {
-  final value = _problemDetail;
-  if (value == null) return null;
-  if (_problemDetail is EqualUnmodifiableMapView) return _problemDetail;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(value);
 }
 
 
@@ -1713,16 +1737,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.description, description) || other.description == description)&&(identical(other.timeLimitMinutes, timeLimitMinutes) || other.timeLimitMinutes == timeLimitMinutes)&&const DeepCollectionEquality().equals(other._learningGoals, _learningGoals)&&const DeepCollectionEquality().equals(other._requirements, _requirements)&&const DeepCollectionEquality().equals(other._examples, _examples)&&const DeepCollectionEquality().equals(other._attributes, _attributes)&&const DeepCollectionEquality().equals(other._problemDetail, _problemDetail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentMetadata&&(identical(other.title, title) || other.title == title)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._learningGoals, _learningGoals)&&const DeepCollectionEquality().equals(other._requirements, _requirements)&&const DeepCollectionEquality().equals(other._testCases, _testCases)&&(identical(other.problemDetail, problemDetail) || other.problemDetail == problemDetail)&&(identical(other.submissionGuide, submissionGuide) || other.submissionGuide == submissionGuide)&&const DeepCollectionEquality().equals(other._codeTemplates, _codeTemplates)&&const DeepCollectionEquality().equals(other._attributes, _attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,difficulty,description,timeLimitMinutes,const DeepCollectionEquality().hash(_learningGoals),const DeepCollectionEquality().hash(_requirements),const DeepCollectionEquality().hash(_examples),const DeepCollectionEquality().hash(_attributes),const DeepCollectionEquality().hash(_problemDetail));
+int get hashCode => Object.hash(runtimeType,title,difficulty,description,const DeepCollectionEquality().hash(_learningGoals),const DeepCollectionEquality().hash(_requirements),const DeepCollectionEquality().hash(_testCases),problemDetail,submissionGuide,const DeepCollectionEquality().hash(_codeTemplates),const DeepCollectionEquality().hash(_attributes));
 
 @override
 String toString() {
-  return 'AssignmentMetadata(title: $title, difficulty: $difficulty, description: $description, timeLimitMinutes: $timeLimitMinutes, learningGoals: $learningGoals, requirements: $requirements, examples: $examples, attributes: $attributes, problemDetail: $problemDetail)';
+  return 'AssignmentMetadata(title: $title, difficulty: $difficulty, description: $description, learningGoals: $learningGoals, requirements: $requirements, testCases: $testCases, problemDetail: $problemDetail, submissionGuide: $submissionGuide, codeTemplates: $codeTemplates, attributes: $attributes)';
 }
 
 
@@ -1733,11 +1757,11 @@ abstract mixin class _$AssignmentMetadataCopyWith<$Res> implements $AssignmentMe
   factory _$AssignmentMetadataCopyWith(_AssignmentMetadata value, $Res Function(_AssignmentMetadata) _then) = __$AssignmentMetadataCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String difficulty, String? description, int? timeLimitMinutes, List<LearningGoal> learningGoals, List<AssignmentRequirement> requirements, List<AssignmentExample> examples, Map<String, dynamic> attributes, Map<String, dynamic>? problemDetail
+ String title, String difficulty, String? description, List<LearningGoal> learningGoals, List<AssignmentRequirement> requirements, List<AssignmentTestCase> testCases, ProblemDetail? problemDetail, SubmissionGuide? submissionGuide, List<CodeTemplate> codeTemplates, Map<String, dynamic> attributes
 });
 
 
-
+@override $ProblemDetailCopyWith<$Res>? get problemDetail;@override $SubmissionGuideCopyWith<$Res>? get submissionGuide;
 
 }
 /// @nodoc
@@ -1750,22 +1774,47 @@ class __$AssignmentMetadataCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentMetadata
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? difficulty = null,Object? description = freezed,Object? timeLimitMinutes = freezed,Object? learningGoals = null,Object? requirements = null,Object? examples = null,Object? attributes = null,Object? problemDetail = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? difficulty = null,Object? description = freezed,Object? learningGoals = null,Object? requirements = null,Object? testCases = null,Object? problemDetail = freezed,Object? submissionGuide = freezed,Object? codeTemplates = null,Object? attributes = null,}) {
   return _then(_AssignmentMetadata(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,difficulty: null == difficulty ? _self.difficulty : difficulty // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,timeLimitMinutes: freezed == timeLimitMinutes ? _self.timeLimitMinutes : timeLimitMinutes // ignore: cast_nullable_to_non_nullable
-as int?,learningGoals: null == learningGoals ? _self._learningGoals : learningGoals // ignore: cast_nullable_to_non_nullable
+as String?,learningGoals: null == learningGoals ? _self._learningGoals : learningGoals // ignore: cast_nullable_to_non_nullable
 as List<LearningGoal>,requirements: null == requirements ? _self._requirements : requirements // ignore: cast_nullable_to_non_nullable
-as List<AssignmentRequirement>,examples: null == examples ? _self._examples : examples // ignore: cast_nullable_to_non_nullable
-as List<AssignmentExample>,attributes: null == attributes ? _self._attributes : attributes // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,problemDetail: freezed == problemDetail ? _self._problemDetail : problemDetail // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>?,
+as List<AssignmentRequirement>,testCases: null == testCases ? _self._testCases : testCases // ignore: cast_nullable_to_non_nullable
+as List<AssignmentTestCase>,problemDetail: freezed == problemDetail ? _self.problemDetail : problemDetail // ignore: cast_nullable_to_non_nullable
+as ProblemDetail?,submissionGuide: freezed == submissionGuide ? _self.submissionGuide : submissionGuide // ignore: cast_nullable_to_non_nullable
+as SubmissionGuide?,codeTemplates: null == codeTemplates ? _self._codeTemplates : codeTemplates // ignore: cast_nullable_to_non_nullable
+as List<CodeTemplate>,attributes: null == attributes ? _self._attributes : attributes // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
   ));
 }
 
+/// Create a copy of AssignmentMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProblemDetailCopyWith<$Res>? get problemDetail {
+    if (_self.problemDetail == null) {
+    return null;
+  }
 
+  return $ProblemDetailCopyWith<$Res>(_self.problemDetail!, (value) {
+    return _then(_self.copyWith(problemDetail: value));
+  });
+}/// Create a copy of AssignmentMetadata
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SubmissionGuideCopyWith<$Res>? get submissionGuide {
+    if (_self.submissionGuide == null) {
+    return null;
+  }
+
+  return $SubmissionGuideCopyWith<$Res>(_self.submissionGuide!, (value) {
+    return _then(_self.copyWith(submissionGuide: value));
+  });
+}
 }
 
 
@@ -2302,42 +2351,42 @@ as String,
 
 
 /// @nodoc
-mixin _$AssignmentExample {
+mixin _$AssignmentTestCase {
 
- int get seq; String? get inputText; String? get outputText; String? get description;
-/// Create a copy of AssignmentExample
+ int get seq; String? get inputText; String? get outputText; String get visibility;
+/// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$AssignmentExampleCopyWith<AssignmentExample> get copyWith => _$AssignmentExampleCopyWithImpl<AssignmentExample>(this as AssignmentExample, _$identity);
+$AssignmentTestCaseCopyWith<AssignmentTestCase> get copyWith => _$AssignmentTestCaseCopyWithImpl<AssignmentTestCase>(this as AssignmentTestCase, _$identity);
 
-  /// Serializes this AssignmentExample to a JSON map.
+  /// Serializes this AssignmentTestCase to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentExample&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.description, description) || other.description == description));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,description);
+int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentExample(seq: $seq, inputText: $inputText, outputText: $outputText, description: $description)';
+  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $AssignmentExampleCopyWith<$Res>  {
-  factory $AssignmentExampleCopyWith(AssignmentExample value, $Res Function(AssignmentExample) _then) = _$AssignmentExampleCopyWithImpl;
+abstract mixin class $AssignmentTestCaseCopyWith<$Res>  {
+  factory $AssignmentTestCaseCopyWith(AssignmentTestCase value, $Res Function(AssignmentTestCase) _then) = _$AssignmentTestCaseCopyWithImpl;
 @useResult
 $Res call({
- int seq, String? inputText, String? outputText, String? description
+ int seq, String? inputText, String? outputText, String visibility
 });
 
 
@@ -2345,30 +2394,30 @@ $Res call({
 
 }
 /// @nodoc
-class _$AssignmentExampleCopyWithImpl<$Res>
-    implements $AssignmentExampleCopyWith<$Res> {
-  _$AssignmentExampleCopyWithImpl(this._self, this._then);
+class _$AssignmentTestCaseCopyWithImpl<$Res>
+    implements $AssignmentTestCaseCopyWith<$Res> {
+  _$AssignmentTestCaseCopyWithImpl(this._self, this._then);
 
-  final AssignmentExample _self;
-  final $Res Function(AssignmentExample) _then;
+  final AssignmentTestCase _self;
+  final $Res Function(AssignmentTestCase) _then;
 
-/// Create a copy of AssignmentExample
+/// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? description = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? visibility = null,}) {
   return _then(_self.copyWith(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
 as int,inputText: freezed == inputText ? _self.inputText : inputText // ignore: cast_nullable_to_non_nullable
 as String?,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
-as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [AssignmentExample].
-extension AssignmentExamplePatterns on AssignmentExample {
+/// Adds pattern-matching-related methods to [AssignmentTestCase].
+extension AssignmentTestCasePatterns on AssignmentTestCase {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -2381,10 +2430,10 @@ extension AssignmentExamplePatterns on AssignmentExample {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AssignmentExample value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AssignmentTestCase value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _AssignmentExample() when $default != null:
+case _AssignmentTestCase() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -2403,10 +2452,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AssignmentExample value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AssignmentTestCase value)  $default,){
 final _that = this;
 switch (_that) {
-case _AssignmentExample():
+case _AssignmentTestCase():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -2424,10 +2473,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AssignmentExample value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AssignmentTestCase value)?  $default,){
 final _that = this;
 switch (_that) {
-case _AssignmentExample() when $default != null:
+case _AssignmentTestCase() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -2445,10 +2494,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String? description)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _AssignmentExample() when $default != null:
-return $default(_that.seq,_that.inputText,_that.outputText,_that.description);case _:
+case _AssignmentTestCase() when $default != null:
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   return orElse();
 
 }
@@ -2466,10 +2515,10 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.description);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String? description)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq,  String? inputText,  String? outputText,  String visibility)  $default,) {final _that = this;
 switch (_that) {
-case _AssignmentExample():
-return $default(_that.seq,_that.inputText,_that.outputText,_that.description);case _:
+case _AssignmentTestCase():
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2486,10 +2535,10 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.description);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq,  String? inputText,  String? outputText,  String? description)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq,  String? inputText,  String? outputText,  String visibility)?  $default,) {final _that = this;
 switch (_that) {
-case _AssignmentExample() when $default != null:
-return $default(_that.seq,_that.inputText,_that.outputText,_that.description);case _:
+case _AssignmentTestCase() when $default != null:
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   return null;
 
 }
@@ -2500,49 +2549,49 @@ return $default(_that.seq,_that.inputText,_that.outputText,_that.description);ca
 /// @nodoc
 @JsonSerializable()
 
-class _AssignmentExample implements AssignmentExample {
-  const _AssignmentExample({required this.seq, this.inputText, this.outputText, this.description});
-  factory _AssignmentExample.fromJson(Map<String, dynamic> json) => _$AssignmentExampleFromJson(json);
+class _AssignmentTestCase implements AssignmentTestCase {
+  const _AssignmentTestCase({required this.seq, this.inputText, this.outputText, this.visibility = 'PUBLIC'});
+  factory _AssignmentTestCase.fromJson(Map<String, dynamic> json) => _$AssignmentTestCaseFromJson(json);
 
 @override final  int seq;
 @override final  String? inputText;
 @override final  String? outputText;
-@override final  String? description;
+@override@JsonKey() final  String visibility;
 
-/// Create a copy of AssignmentExample
+/// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$AssignmentExampleCopyWith<_AssignmentExample> get copyWith => __$AssignmentExampleCopyWithImpl<_AssignmentExample>(this, _$identity);
+_$AssignmentTestCaseCopyWith<_AssignmentTestCase> get copyWith => __$AssignmentTestCaseCopyWithImpl<_AssignmentTestCase>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$AssignmentExampleToJson(this, );
+  return _$AssignmentTestCaseToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentExample&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.description, description) || other.description == description));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&(identical(other.inputText, inputText) || other.inputText == inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,description);
+int get hashCode => Object.hash(runtimeType,seq,inputText,outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentExample(seq: $seq, inputText: $inputText, outputText: $outputText, description: $description)';
+  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$AssignmentExampleCopyWith<$Res> implements $AssignmentExampleCopyWith<$Res> {
-  factory _$AssignmentExampleCopyWith(_AssignmentExample value, $Res Function(_AssignmentExample) _then) = __$AssignmentExampleCopyWithImpl;
+abstract mixin class _$AssignmentTestCaseCopyWith<$Res> implements $AssignmentTestCaseCopyWith<$Res> {
+  factory _$AssignmentTestCaseCopyWith(_AssignmentTestCase value, $Res Function(_AssignmentTestCase) _then) = __$AssignmentTestCaseCopyWithImpl;
 @override @useResult
 $Res call({
- int seq, String? inputText, String? outputText, String? description
+ int seq, String? inputText, String? outputText, String visibility
 });
 
 
@@ -2550,21 +2599,1127 @@ $Res call({
 
 }
 /// @nodoc
-class __$AssignmentExampleCopyWithImpl<$Res>
-    implements _$AssignmentExampleCopyWith<$Res> {
-  __$AssignmentExampleCopyWithImpl(this._self, this._then);
+class __$AssignmentTestCaseCopyWithImpl<$Res>
+    implements _$AssignmentTestCaseCopyWith<$Res> {
+  __$AssignmentTestCaseCopyWithImpl(this._self, this._then);
 
-  final _AssignmentExample _self;
-  final $Res Function(_AssignmentExample) _then;
+  final _AssignmentTestCase _self;
+  final $Res Function(_AssignmentTestCase) _then;
 
-/// Create a copy of AssignmentExample
+/// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? description = freezed,}) {
-  return _then(_AssignmentExample(
+@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputText = freezed,Object? outputText = freezed,Object? visibility = null,}) {
+  return _then(_AssignmentTestCase(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
 as int,inputText: freezed == inputText ? _self.inputText : inputText // ignore: cast_nullable_to_non_nullable
 as String?,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
+as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ProblemDetail {
+
+ String? get inputDescription; String? get outputDescription; ProblemClassification? get classification;
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ProblemDetailCopyWith<ProblemDetail> get copyWith => _$ProblemDetailCopyWithImpl<ProblemDetail>(this as ProblemDetail, _$identity);
+
+  /// Serializes this ProblemDetail to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProblemDetail&&(identical(other.inputDescription, inputDescription) || other.inputDescription == inputDescription)&&(identical(other.outputDescription, outputDescription) || other.outputDescription == outputDescription)&&(identical(other.classification, classification) || other.classification == classification));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,inputDescription,outputDescription,classification);
+
+@override
+String toString() {
+  return 'ProblemDetail(inputDescription: $inputDescription, outputDescription: $outputDescription, classification: $classification)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ProblemDetailCopyWith<$Res>  {
+  factory $ProblemDetailCopyWith(ProblemDetail value, $Res Function(ProblemDetail) _then) = _$ProblemDetailCopyWithImpl;
+@useResult
+$Res call({
+ String? inputDescription, String? outputDescription, ProblemClassification? classification
+});
+
+
+$ProblemClassificationCopyWith<$Res>? get classification;
+
+}
+/// @nodoc
+class _$ProblemDetailCopyWithImpl<$Res>
+    implements $ProblemDetailCopyWith<$Res> {
+  _$ProblemDetailCopyWithImpl(this._self, this._then);
+
+  final ProblemDetail _self;
+  final $Res Function(ProblemDetail) _then;
+
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? inputDescription = freezed,Object? outputDescription = freezed,Object? classification = freezed,}) {
+  return _then(_self.copyWith(
+inputDescription: freezed == inputDescription ? _self.inputDescription : inputDescription // ignore: cast_nullable_to_non_nullable
+as String?,outputDescription: freezed == outputDescription ? _self.outputDescription : outputDescription // ignore: cast_nullable_to_non_nullable
+as String?,classification: freezed == classification ? _self.classification : classification // ignore: cast_nullable_to_non_nullable
+as ProblemClassification?,
+  ));
+}
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProblemClassificationCopyWith<$Res>? get classification {
+    if (_self.classification == null) {
+    return null;
+  }
+
+  return $ProblemClassificationCopyWith<$Res>(_self.classification!, (value) {
+    return _then(_self.copyWith(classification: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [ProblemDetail].
+extension ProblemDetailPatterns on ProblemDetail {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProblemDetail value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ProblemDetail() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProblemDetail value)  $default,){
+final _that = this;
+switch (_that) {
+case _ProblemDetail():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProblemDetail value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ProblemDetail() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? inputDescription,  String? outputDescription,  ProblemClassification? classification)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ProblemDetail() when $default != null:
+return $default(_that.inputDescription,_that.outputDescription,_that.classification);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? inputDescription,  String? outputDescription,  ProblemClassification? classification)  $default,) {final _that = this;
+switch (_that) {
+case _ProblemDetail():
+return $default(_that.inputDescription,_that.outputDescription,_that.classification);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? inputDescription,  String? outputDescription,  ProblemClassification? classification)?  $default,) {final _that = this;
+switch (_that) {
+case _ProblemDetail() when $default != null:
+return $default(_that.inputDescription,_that.outputDescription,_that.classification);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ProblemDetail implements ProblemDetail {
+  const _ProblemDetail({this.inputDescription, this.outputDescription, this.classification});
+  factory _ProblemDetail.fromJson(Map<String, dynamic> json) => _$ProblemDetailFromJson(json);
+
+@override final  String? inputDescription;
+@override final  String? outputDescription;
+@override final  ProblemClassification? classification;
+
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProblemDetailCopyWith<_ProblemDetail> get copyWith => __$ProblemDetailCopyWithImpl<_ProblemDetail>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ProblemDetailToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProblemDetail&&(identical(other.inputDescription, inputDescription) || other.inputDescription == inputDescription)&&(identical(other.outputDescription, outputDescription) || other.outputDescription == outputDescription)&&(identical(other.classification, classification) || other.classification == classification));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,inputDescription,outputDescription,classification);
+
+@override
+String toString() {
+  return 'ProblemDetail(inputDescription: $inputDescription, outputDescription: $outputDescription, classification: $classification)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProblemDetailCopyWith<$Res> implements $ProblemDetailCopyWith<$Res> {
+  factory _$ProblemDetailCopyWith(_ProblemDetail value, $Res Function(_ProblemDetail) _then) = __$ProblemDetailCopyWithImpl;
+@override @useResult
+$Res call({
+ String? inputDescription, String? outputDescription, ProblemClassification? classification
+});
+
+
+@override $ProblemClassificationCopyWith<$Res>? get classification;
+
+}
+/// @nodoc
+class __$ProblemDetailCopyWithImpl<$Res>
+    implements _$ProblemDetailCopyWith<$Res> {
+  __$ProblemDetailCopyWithImpl(this._self, this._then);
+
+  final _ProblemDetail _self;
+  final $Res Function(_ProblemDetail) _then;
+
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? inputDescription = freezed,Object? outputDescription = freezed,Object? classification = freezed,}) {
+  return _then(_ProblemDetail(
+inputDescription: freezed == inputDescription ? _self.inputDescription : inputDescription // ignore: cast_nullable_to_non_nullable
+as String?,outputDescription: freezed == outputDescription ? _self.outputDescription : outputDescription // ignore: cast_nullable_to_non_nullable
+as String?,classification: freezed == classification ? _self.classification : classification // ignore: cast_nullable_to_non_nullable
+as ProblemClassification?,
+  ));
+}
+
+/// Create a copy of ProblemDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProblemClassificationCopyWith<$Res>? get classification {
+    if (_self.classification == null) {
+    return null;
+  }
+
+  return $ProblemClassificationCopyWith<$Res>(_self.classification!, (value) {
+    return _then(_self.copyWith(classification: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ProblemClassification {
+
+ String? get algorithmStep; int? get difficultyStep;
+/// Create a copy of ProblemClassification
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ProblemClassificationCopyWith<ProblemClassification> get copyWith => _$ProblemClassificationCopyWithImpl<ProblemClassification>(this as ProblemClassification, _$identity);
+
+  /// Serializes this ProblemClassification to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProblemClassification&&(identical(other.algorithmStep, algorithmStep) || other.algorithmStep == algorithmStep)&&(identical(other.difficultyStep, difficultyStep) || other.difficultyStep == difficultyStep));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,algorithmStep,difficultyStep);
+
+@override
+String toString() {
+  return 'ProblemClassification(algorithmStep: $algorithmStep, difficultyStep: $difficultyStep)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ProblemClassificationCopyWith<$Res>  {
+  factory $ProblemClassificationCopyWith(ProblemClassification value, $Res Function(ProblemClassification) _then) = _$ProblemClassificationCopyWithImpl;
+@useResult
+$Res call({
+ String? algorithmStep, int? difficultyStep
+});
+
+
+
+
+}
+/// @nodoc
+class _$ProblemClassificationCopyWithImpl<$Res>
+    implements $ProblemClassificationCopyWith<$Res> {
+  _$ProblemClassificationCopyWithImpl(this._self, this._then);
+
+  final ProblemClassification _self;
+  final $Res Function(ProblemClassification) _then;
+
+/// Create a copy of ProblemClassification
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? algorithmStep = freezed,Object? difficultyStep = freezed,}) {
+  return _then(_self.copyWith(
+algorithmStep: freezed == algorithmStep ? _self.algorithmStep : algorithmStep // ignore: cast_nullable_to_non_nullable
+as String?,difficultyStep: freezed == difficultyStep ? _self.difficultyStep : difficultyStep // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ProblemClassification].
+extension ProblemClassificationPatterns on ProblemClassification {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProblemClassification value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ProblemClassification() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProblemClassification value)  $default,){
+final _that = this;
+switch (_that) {
+case _ProblemClassification():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProblemClassification value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ProblemClassification() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? algorithmStep,  int? difficultyStep)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ProblemClassification() when $default != null:
+return $default(_that.algorithmStep,_that.difficultyStep);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? algorithmStep,  int? difficultyStep)  $default,) {final _that = this;
+switch (_that) {
+case _ProblemClassification():
+return $default(_that.algorithmStep,_that.difficultyStep);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? algorithmStep,  int? difficultyStep)?  $default,) {final _that = this;
+switch (_that) {
+case _ProblemClassification() when $default != null:
+return $default(_that.algorithmStep,_that.difficultyStep);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ProblemClassification implements ProblemClassification {
+  const _ProblemClassification({this.algorithmStep, this.difficultyStep});
+  factory _ProblemClassification.fromJson(Map<String, dynamic> json) => _$ProblemClassificationFromJson(json);
+
+@override final  String? algorithmStep;
+@override final  int? difficultyStep;
+
+/// Create a copy of ProblemClassification
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProblemClassificationCopyWith<_ProblemClassification> get copyWith => __$ProblemClassificationCopyWithImpl<_ProblemClassification>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ProblemClassificationToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProblemClassification&&(identical(other.algorithmStep, algorithmStep) || other.algorithmStep == algorithmStep)&&(identical(other.difficultyStep, difficultyStep) || other.difficultyStep == difficultyStep));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,algorithmStep,difficultyStep);
+
+@override
+String toString() {
+  return 'ProblemClassification(algorithmStep: $algorithmStep, difficultyStep: $difficultyStep)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProblemClassificationCopyWith<$Res> implements $ProblemClassificationCopyWith<$Res> {
+  factory _$ProblemClassificationCopyWith(_ProblemClassification value, $Res Function(_ProblemClassification) _then) = __$ProblemClassificationCopyWithImpl;
+@override @useResult
+$Res call({
+ String? algorithmStep, int? difficultyStep
+});
+
+
+
+
+}
+/// @nodoc
+class __$ProblemClassificationCopyWithImpl<$Res>
+    implements _$ProblemClassificationCopyWith<$Res> {
+  __$ProblemClassificationCopyWithImpl(this._self, this._then);
+
+  final _ProblemClassification _self;
+  final $Res Function(_ProblemClassification) _then;
+
+/// Create a copy of ProblemClassification
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? algorithmStep = freezed,Object? difficultyStep = freezed,}) {
+  return _then(_ProblemClassification(
+algorithmStep: freezed == algorithmStep ? _self.algorithmStep : algorithmStep // ignore: cast_nullable_to_non_nullable
+as String?,difficultyStep: freezed == difficultyStep ? _self.difficultyStep : difficultyStep // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$SubmissionGuide {
+
+ String? get title; String? get description; List<String> get commentSections;
+/// Create a copy of SubmissionGuide
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SubmissionGuideCopyWith<SubmissionGuide> get copyWith => _$SubmissionGuideCopyWithImpl<SubmissionGuide>(this as SubmissionGuide, _$identity);
+
+  /// Serializes this SubmissionGuide to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmissionGuide&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.commentSections, commentSections));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,const DeepCollectionEquality().hash(commentSections));
+
+@override
+String toString() {
+  return 'SubmissionGuide(title: $title, description: $description, commentSections: $commentSections)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SubmissionGuideCopyWith<$Res>  {
+  factory $SubmissionGuideCopyWith(SubmissionGuide value, $Res Function(SubmissionGuide) _then) = _$SubmissionGuideCopyWithImpl;
+@useResult
+$Res call({
+ String? title, String? description, List<String> commentSections
+});
+
+
+
+
+}
+/// @nodoc
+class _$SubmissionGuideCopyWithImpl<$Res>
+    implements $SubmissionGuideCopyWith<$Res> {
+  _$SubmissionGuideCopyWithImpl(this._self, this._then);
+
+  final SubmissionGuide _self;
+  final $Res Function(SubmissionGuide) _then;
+
+/// Create a copy of SubmissionGuide
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? description = freezed,Object? commentSections = null,}) {
+  return _then(_self.copyWith(
+title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,commentSections: null == commentSections ? _self.commentSections : commentSections // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SubmissionGuide].
+extension SubmissionGuidePatterns on SubmissionGuide {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SubmissionGuide value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SubmissionGuide() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SubmissionGuide value)  $default,){
+final _that = this;
+switch (_that) {
+case _SubmissionGuide():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SubmissionGuide value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SubmissionGuide() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title,  String? description,  List<String> commentSections)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SubmissionGuide() when $default != null:
+return $default(_that.title,_that.description,_that.commentSections);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title,  String? description,  List<String> commentSections)  $default,) {final _that = this;
+switch (_that) {
+case _SubmissionGuide():
+return $default(_that.title,_that.description,_that.commentSections);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title,  String? description,  List<String> commentSections)?  $default,) {final _that = this;
+switch (_that) {
+case _SubmissionGuide() when $default != null:
+return $default(_that.title,_that.description,_that.commentSections);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SubmissionGuide implements SubmissionGuide {
+  const _SubmissionGuide({this.title, this.description, final  List<String> commentSections = const []}): _commentSections = commentSections;
+  factory _SubmissionGuide.fromJson(Map<String, dynamic> json) => _$SubmissionGuideFromJson(json);
+
+@override final  String? title;
+@override final  String? description;
+ final  List<String> _commentSections;
+@override@JsonKey() List<String> get commentSections {
+  if (_commentSections is EqualUnmodifiableListView) return _commentSections;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_commentSections);
+}
+
+
+/// Create a copy of SubmissionGuide
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SubmissionGuideCopyWith<_SubmissionGuide> get copyWith => __$SubmissionGuideCopyWithImpl<_SubmissionGuide>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SubmissionGuideToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubmissionGuide&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._commentSections, _commentSections));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,const DeepCollectionEquality().hash(_commentSections));
+
+@override
+String toString() {
+  return 'SubmissionGuide(title: $title, description: $description, commentSections: $commentSections)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SubmissionGuideCopyWith<$Res> implements $SubmissionGuideCopyWith<$Res> {
+  factory _$SubmissionGuideCopyWith(_SubmissionGuide value, $Res Function(_SubmissionGuide) _then) = __$SubmissionGuideCopyWithImpl;
+@override @useResult
+$Res call({
+ String? title, String? description, List<String> commentSections
+});
+
+
+
+
+}
+/// @nodoc
+class __$SubmissionGuideCopyWithImpl<$Res>
+    implements _$SubmissionGuideCopyWith<$Res> {
+  __$SubmissionGuideCopyWithImpl(this._self, this._then);
+
+  final _SubmissionGuide _self;
+  final $Res Function(_SubmissionGuide) _then;
+
+/// Create a copy of SubmissionGuide
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? description = freezed,Object? commentSections = null,}) {
+  return _then(_SubmissionGuide(
+title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,commentSections: null == commentSections ? _self._commentSections : commentSections // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CodeTemplate {
+
+ String get language; String? get commentTemplate; String? get functionTemplate; String? get runnableTemplate;
+/// Create a copy of CodeTemplate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CodeTemplateCopyWith<CodeTemplate> get copyWith => _$CodeTemplateCopyWithImpl<CodeTemplate>(this as CodeTemplate, _$identity);
+
+  /// Serializes this CodeTemplate to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,language,commentTemplate,functionTemplate,runnableTemplate);
+
+@override
+String toString() {
+  return 'CodeTemplate(language: $language, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate, runnableTemplate: $runnableTemplate)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CodeTemplateCopyWith<$Res>  {
+  factory $CodeTemplateCopyWith(CodeTemplate value, $Res Function(CodeTemplate) _then) = _$CodeTemplateCopyWithImpl;
+@useResult
+$Res call({
+ String language, String? commentTemplate, String? functionTemplate, String? runnableTemplate
+});
+
+
+
+
+}
+/// @nodoc
+class _$CodeTemplateCopyWithImpl<$Res>
+    implements $CodeTemplateCopyWith<$Res> {
+  _$CodeTemplateCopyWithImpl(this._self, this._then);
+
+  final CodeTemplate _self;
+  final $Res Function(CodeTemplate) _then;
+
+/// Create a copy of CodeTemplate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? language = null,Object? commentTemplate = freezed,Object? functionTemplate = freezed,Object? runnableTemplate = freezed,}) {
+  return _then(_self.copyWith(
+language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
+as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
+as String?,runnableTemplate: freezed == runnableTemplate ? _self.runnableTemplate : runnableTemplate // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CodeTemplate].
+extension CodeTemplatePatterns on CodeTemplate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CodeTemplate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CodeTemplate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CodeTemplate value)  $default,){
+final _that = this;
+switch (_that) {
+case _CodeTemplate():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CodeTemplate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CodeTemplate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CodeTemplate() when $default != null:
+return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)  $default,) {final _that = this;
+switch (_that) {
+case _CodeTemplate():
+return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)?  $default,) {final _that = this;
+switch (_that) {
+case _CodeTemplate() when $default != null:
+return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CodeTemplate implements CodeTemplate {
+  const _CodeTemplate({required this.language, this.commentTemplate, this.functionTemplate, this.runnableTemplate});
+  factory _CodeTemplate.fromJson(Map<String, dynamic> json) => _$CodeTemplateFromJson(json);
+
+@override final  String language;
+@override final  String? commentTemplate;
+@override final  String? functionTemplate;
+@override final  String? runnableTemplate;
+
+/// Create a copy of CodeTemplate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CodeTemplateCopyWith<_CodeTemplate> get copyWith => __$CodeTemplateCopyWithImpl<_CodeTemplate>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CodeTemplateToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,language,commentTemplate,functionTemplate,runnableTemplate);
+
+@override
+String toString() {
+  return 'CodeTemplate(language: $language, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate, runnableTemplate: $runnableTemplate)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CodeTemplateCopyWith<$Res> implements $CodeTemplateCopyWith<$Res> {
+  factory _$CodeTemplateCopyWith(_CodeTemplate value, $Res Function(_CodeTemplate) _then) = __$CodeTemplateCopyWithImpl;
+@override @useResult
+$Res call({
+ String language, String? commentTemplate, String? functionTemplate, String? runnableTemplate
+});
+
+
+
+
+}
+/// @nodoc
+class __$CodeTemplateCopyWithImpl<$Res>
+    implements _$CodeTemplateCopyWith<$Res> {
+  __$CodeTemplateCopyWithImpl(this._self, this._then);
+
+  final _CodeTemplate _self;
+  final $Res Function(_CodeTemplate) _then;
+
+/// Create a copy of CodeTemplate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? language = null,Object? commentTemplate = freezed,Object? functionTemplate = freezed,Object? runnableTemplate = freezed,}) {
+  return _then(_CodeTemplate(
+language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
+as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
+as String?,runnableTemplate: freezed == runnableTemplate ? _self.runnableTemplate : runnableTemplate // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -3174,7 +4329,7 @@ $AssignmentMetadataCopyWith<$Res> get metadata {
 /// @nodoc
 mixin _$UpdateAssignmentRequest {
 
- int get orderInWeek; String get startAt; String get endAt; AssignmentMetadata get metadata;
+ int get orderInWeek; String get startAt; String get endAt; AssignmentMetadata get metadata; String? get status;
 /// Create a copy of UpdateAssignmentRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3187,16 +4342,16 @@ $UpdateAssignmentRequestCopyWith<UpdateAssignmentRequest> get copyWith => _$Upda
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata);
+int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata,status);
 
 @override
 String toString() {
-  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata)';
+  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata, status: $status)';
 }
 
 
@@ -3207,7 +4362,7 @@ abstract mixin class $UpdateAssignmentRequestCopyWith<$Res>  {
   factory $UpdateAssignmentRequestCopyWith(UpdateAssignmentRequest value, $Res Function(UpdateAssignmentRequest) _then) = _$UpdateAssignmentRequestCopyWithImpl;
 @useResult
 $Res call({
- int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata
+ int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata, String? status
 });
 
 
@@ -3224,13 +4379,14 @@ class _$UpdateAssignmentRequestCopyWithImpl<$Res>
 
 /// Create a copy of UpdateAssignmentRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,Object? status = freezed,}) {
   return _then(_self.copyWith(
 orderInWeek: null == orderInWeek ? _self.orderInWeek : orderInWeek // ignore: cast_nullable_to_non_nullable
 as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
 as String,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
 as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as AssignmentMetadata,
+as AssignmentMetadata,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of UpdateAssignmentRequest
@@ -3324,10 +4480,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  String? status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateAssignmentRequest() when $default != null:
-return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case _:
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.status);case _:
   return orElse();
 
 }
@@ -3345,10 +4501,10 @@ return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  String? status)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateAssignmentRequest():
-return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case _:
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.status);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3365,10 +4521,10 @@ return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int orderInWeek,  String startAt,  String endAt,  AssignmentMetadata metadata,  String? status)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateAssignmentRequest() when $default != null:
-return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case _:
+return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata,_that.status);case _:
   return null;
 
 }
@@ -3380,13 +4536,14 @@ return $default(_that.orderInWeek,_that.startAt,_that.endAt,_that.metadata);case
 @JsonSerializable()
 
 class _UpdateAssignmentRequest implements UpdateAssignmentRequest {
-  const _UpdateAssignmentRequest({required this.orderInWeek, required this.startAt, required this.endAt, required this.metadata});
+  const _UpdateAssignmentRequest({required this.orderInWeek, required this.startAt, required this.endAt, required this.metadata, this.status});
   factory _UpdateAssignmentRequest.fromJson(Map<String, dynamic> json) => _$UpdateAssignmentRequestFromJson(json);
 
 @override final  int orderInWeek;
 @override final  String startAt;
 @override final  String endAt;
 @override final  AssignmentMetadata metadata;
+@override final  String? status;
 
 /// Create a copy of UpdateAssignmentRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -3401,16 +4558,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateAssignmentRequest&&(identical(other.orderInWeek, orderInWeek) || other.orderInWeek == orderInWeek)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt)&&(identical(other.metadata, metadata) || other.metadata == metadata)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata);
+int get hashCode => Object.hash(runtimeType,orderInWeek,startAt,endAt,metadata,status);
 
 @override
 String toString() {
-  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata)';
+  return 'UpdateAssignmentRequest(orderInWeek: $orderInWeek, startAt: $startAt, endAt: $endAt, metadata: $metadata, status: $status)';
 }
 
 
@@ -3421,7 +4578,7 @@ abstract mixin class _$UpdateAssignmentRequestCopyWith<$Res> implements $UpdateA
   factory _$UpdateAssignmentRequestCopyWith(_UpdateAssignmentRequest value, $Res Function(_UpdateAssignmentRequest) _then) = __$UpdateAssignmentRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata
+ int orderInWeek, String startAt, String endAt, AssignmentMetadata metadata, String? status
 });
 
 
@@ -3438,13 +4595,14 @@ class __$UpdateAssignmentRequestCopyWithImpl<$Res>
 
 /// Create a copy of UpdateAssignmentRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? orderInWeek = null,Object? startAt = null,Object? endAt = null,Object? metadata = null,Object? status = freezed,}) {
   return _then(_UpdateAssignmentRequest(
 orderInWeek: null == orderInWeek ? _self.orderInWeek : orderInWeek // ignore: cast_nullable_to_non_nullable
 as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
 as String,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
 as String,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
-as AssignmentMetadata,
+as AssignmentMetadata,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -137,47 +137,57 @@ Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
-_AssignmentMetadata _$AssignmentMetadataFromJson(Map<String, dynamic> json) =>
-    _AssignmentMetadata(
-      title: json['title'] as String? ?? '',
-      difficulty: json['difficulty'] as String? ?? 'MID',
-      description: json['description'] as String?,
-      timeLimitMinutes: (json['timeLimitMinutes'] as num?)?.toInt(),
-      learningGoals:
-          (json['learningGoals'] as List<dynamic>?)
-              ?.map((e) => LearningGoal.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      requirements:
-          (json['requirements'] as List<dynamic>?)
-              ?.map(
-                (e) =>
-                    AssignmentRequirement.fromJson(e as Map<String, dynamic>),
-              )
-              .toList() ??
-          const [],
-      examples:
-          (json['examples'] as List<dynamic>?)
-              ?.map(
-                (e) => AssignmentExample.fromJson(e as Map<String, dynamic>),
-              )
-              .toList() ??
-          const [],
-      attributes: json['attributes'] as Map<String, dynamic>? ?? const {},
-      problemDetail: json['problemDetail'] as Map<String, dynamic>?,
-    );
+_AssignmentMetadata _$AssignmentMetadataFromJson(
+  Map<String, dynamic> json,
+) => _AssignmentMetadata(
+  title: json['title'] as String? ?? '',
+  difficulty: json['difficulty'] as String? ?? 'MID',
+  description: json['description'] as String?,
+  learningGoals:
+      (json['learningGoals'] as List<dynamic>?)
+          ?.map((e) => LearningGoal.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  requirements:
+      (json['requirements'] as List<dynamic>?)
+          ?.map(
+            (e) => AssignmentRequirement.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  testCases:
+      (json['testCases'] as List<dynamic>?)
+          ?.map((e) => AssignmentTestCase.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  problemDetail: json['problemDetail'] == null
+      ? null
+      : ProblemDetail.fromJson(json['problemDetail'] as Map<String, dynamic>),
+  submissionGuide: json['submissionGuide'] == null
+      ? null
+      : SubmissionGuide.fromJson(
+          json['submissionGuide'] as Map<String, dynamic>,
+        ),
+  codeTemplates:
+      (json['codeTemplates'] as List<dynamic>?)
+          ?.map((e) => CodeTemplate.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  attributes: json['attributes'] as Map<String, dynamic>? ?? const {},
+);
 
 Map<String, dynamic> _$AssignmentMetadataToJson(_AssignmentMetadata instance) =>
     <String, dynamic>{
       'title': instance.title,
       'difficulty': instance.difficulty,
       'description': instance.description,
-      'timeLimitMinutes': instance.timeLimitMinutes,
       'learningGoals': instance.learningGoals,
       'requirements': instance.requirements,
-      'examples': instance.examples,
-      'attributes': instance.attributes,
+      'testCases': instance.testCases,
       'problemDetail': instance.problemDetail,
+      'submissionGuide': instance.submissionGuide,
+      'codeTemplates': instance.codeTemplates,
+      'attributes': instance.attributes,
     };
 
 _LearningGoal _$LearningGoalFromJson(Map<String, dynamic> json) =>
@@ -206,20 +216,86 @@ Map<String, dynamic> _$AssignmentRequirementToJson(
   'requirementText': instance.requirementText,
 };
 
-_AssignmentExample _$AssignmentExampleFromJson(Map<String, dynamic> json) =>
-    _AssignmentExample(
+_AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
+    _AssignmentTestCase(
       seq: (json['seq'] as num).toInt(),
       inputText: json['inputText'] as String?,
       outputText: json['outputText'] as String?,
-      description: json['description'] as String?,
+      visibility: json['visibility'] as String? ?? 'PUBLIC',
     );
 
-Map<String, dynamic> _$AssignmentExampleToJson(_AssignmentExample instance) =>
+Map<String, dynamic> _$AssignmentTestCaseToJson(_AssignmentTestCase instance) =>
     <String, dynamic>{
       'seq': instance.seq,
       'inputText': instance.inputText,
       'outputText': instance.outputText,
+      'visibility': instance.visibility,
+    };
+
+_ProblemDetail _$ProblemDetailFromJson(Map<String, dynamic> json) =>
+    _ProblemDetail(
+      inputDescription: json['inputDescription'] as String?,
+      outputDescription: json['outputDescription'] as String?,
+      classification: json['classification'] == null
+          ? null
+          : ProblemClassification.fromJson(
+              json['classification'] as Map<String, dynamic>,
+            ),
+    );
+
+Map<String, dynamic> _$ProblemDetailToJson(_ProblemDetail instance) =>
+    <String, dynamic>{
+      'inputDescription': instance.inputDescription,
+      'outputDescription': instance.outputDescription,
+      'classification': instance.classification,
+    };
+
+_ProblemClassification _$ProblemClassificationFromJson(
+  Map<String, dynamic> json,
+) => _ProblemClassification(
+  algorithmStep: json['algorithmStep'] as String?,
+  difficultyStep: (json['difficultyStep'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$ProblemClassificationToJson(
+  _ProblemClassification instance,
+) => <String, dynamic>{
+  'algorithmStep': instance.algorithmStep,
+  'difficultyStep': instance.difficultyStep,
+};
+
+_SubmissionGuide _$SubmissionGuideFromJson(Map<String, dynamic> json) =>
+    _SubmissionGuide(
+      title: json['title'] as String?,
+      description: json['description'] as String?,
+      commentSections:
+          (json['commentSections'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$SubmissionGuideToJson(_SubmissionGuide instance) =>
+    <String, dynamic>{
+      'title': instance.title,
       'description': instance.description,
+      'commentSections': instance.commentSections,
+    };
+
+_CodeTemplate _$CodeTemplateFromJson(Map<String, dynamic> json) =>
+    _CodeTemplate(
+      language: json['language'] as String,
+      commentTemplate: json['commentTemplate'] as String?,
+      functionTemplate: json['functionTemplate'] as String?,
+      runnableTemplate: json['runnableTemplate'] as String?,
+    );
+
+Map<String, dynamic> _$CodeTemplateToJson(_CodeTemplate instance) =>
+    <String, dynamic>{
+      'language': instance.language,
+      'commentTemplate': instance.commentTemplate,
+      'functionTemplate': instance.functionTemplate,
+      'runnableTemplate': instance.runnableTemplate,
     };
 
 _Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(
@@ -280,6 +356,7 @@ _UpdateAssignmentRequest _$UpdateAssignmentRequestFromJson(
   metadata: AssignmentMetadata.fromJson(
     json['metadata'] as Map<String, dynamic>,
   ),
+  status: json['status'] as String?,
 );
 
 Map<String, dynamic> _$UpdateAssignmentRequestToJson(
@@ -289,6 +366,7 @@ Map<String, dynamic> _$UpdateAssignmentRequestToJson(
   'startAt': instance.startAt,
   'endAt': instance.endAt,
   'metadata': instance.metadata,
+  'status': instance.status,
 };
 
 _AddEnrollmentRequest _$AddEnrollmentRequestFromJson(

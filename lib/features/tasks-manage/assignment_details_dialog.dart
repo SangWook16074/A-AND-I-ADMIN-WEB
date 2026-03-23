@@ -127,13 +127,13 @@ class _AssignmentDetailsDialogState
                         ),
                         const SizedBox(height: 16),
                       ],
-                      if (assignment.metadata.examples.isNotEmpty) ...[
+                      if (assignment.metadata.testCases.isNotEmpty) ...[
                         const Text(
-                          '예시',
+                          '테스트케이스',
                           style: TextStyle(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 4),
-                        ...assignment.metadata.examples.map(
+                        ...assignment.metadata.testCases.map(
                           (ex) => Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),
@@ -144,15 +144,30 @@ class _AssignmentDetailsDialogState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Seq: ${ex.seq}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Seq: ${ex.seq}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      ex.visibility,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: ex.visibility == 'PUBLIC'
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                if (ex.description != null)
-                                  Text('설명: ${ex.description}'),
-                                if (ex.inputText != null) ...[
+                                if (ex.inputText != null &&
+                                    ex.inputText!.isNotEmpty) ...[
                                   const SizedBox(height: 4),
                                   const Text(
                                     'Input:',
@@ -162,7 +177,8 @@ class _AssignmentDetailsDialogState
                                   ),
                                   Text(ex.inputText!),
                                 ],
-                                if (ex.outputText != null) ...[
+                                if (ex.outputText != null &&
+                                    ex.outputText!.isNotEmpty) ...[
                                   const SizedBox(height: 4),
                                   const Text(
                                     'Output:',
