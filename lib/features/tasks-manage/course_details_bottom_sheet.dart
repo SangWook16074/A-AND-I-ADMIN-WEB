@@ -479,7 +479,12 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading && widget.enrollments == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -505,24 +510,51 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final enrollment = widget.enrollments![index];
+                final statusColor = enrollment.status == 'ENABLED'
+                    ? const Color(0xFF10B981)
+                    : enrollment.status == 'BANNED'
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFF6B7280);
+
                 return Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEAEAEA)),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: const Color(0xFFF0F0F0),
-                        child: Text(
-                          enrollment.userId.isNotEmpty
-                              ? enrollment.userId.substring(0, 1).toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                            color: Color(0xFF1A1A1A),
-                            fontWeight: FontWeight.w700,
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            (enrollment.username?.isNotEmpty ?? false)
+                                ? enrollment.username!
+                                      .substring(0, 1)
+                                      .toUpperCase()
+                                : (enrollment.userId.isNotEmpty
+                                      ? enrollment.userId
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                      : '?'),
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ),
@@ -531,34 +563,79 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'User ID: ${enrollment.userId}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  enrollment.username ?? 'Unknown',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                if (enrollment.publicCode != null) ...[
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    enrollment.publicCode!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.blue[600],
+                                      fontWeight: FontWeight.w600,
+                                      backgroundColor: Colors.blue[50]
+                                          ?.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 4),
-                              Text(
-                                '상태: ${enrollment.status}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: enrollment.status == 'ENABLED'
-                                      ? Colors.green[700]
-                                      : enrollment.status == 'BANNED'
-                                      ? Colors.red[700]
-                                      : const Color(0xFF8A8A8A),
-                                fontWeight: FontWeight.w600,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    enrollment.status,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                if (enrollment.joinedAt != null) ...[
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '등록: ${_formatDateTime(enrollment.joinedAt!)}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF9CA3AF),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             if (enrollment.banReason != null &&
                                 enrollment.banReason!.trim().isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                '제한 사유: ${enrollment.banReason}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF8A8A8A),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '사유: ${enrollment.banReason}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.red[700],
+                                  ),
                                 ),
                               ),
                             ],
@@ -567,8 +644,12 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                       ),
                       const SizedBox(width: 12),
                       PopupMenuButton<_EnrollmentActionStatus>(
-                        tooltip: '상태 변경',
+                        tooltip: '관리',
                         enabled: !_isUpdatingEnrollmentStatus,
+                        icon: const Icon(
+                          Icons.more_horiz,
+                          color: Color(0xFF9CA3AF),
+                        ),
                         onSelected: (value) {
                           if (value == _EnrollmentActionStatus.deleted) {
                             _showDeleteEnrollmentDialog(enrollment);
@@ -582,11 +663,11 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         itemBuilder: (context) => const [
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.enabled,
-                            child: Text('ENABLED'),
+                            child: Text('상태: ENABLED'),
                           ),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.banned,
-                            child: Text('BANNED'),
+                            child: Text('상태: BANNED'),
                           ),
                           PopupMenuDivider(),
                           PopupMenuItem(
@@ -594,23 +675,19 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.delete_outline_rounded,
+                                  Icons.delete_outline,
                                   color: Colors.red,
                                   size: 20,
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  '수강생 삭제',
+                                  '목록에서 삭제',
                                   style: TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
                           ),
                         ],
-                        child: const Padding(
-                          padding: EdgeInsets.all(4),
-                          child: Icon(Icons.more_vert),
-                        ),
                       ),
                     ],
                   ),
@@ -796,7 +873,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '대상: ${enrollment.userId}',
+                    '대상: ${enrollment.username ?? enrollment.userId}',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
@@ -856,8 +933,9 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 final targetStatus = switch (status) {
                   _EnrollmentActionStatus.enabled => EnrollmentStatus.enabled,
                   _EnrollmentActionStatus.banned => EnrollmentStatus.banned,
-                  _EnrollmentActionStatus.deleted =>
-                    throw UnimplementedError('Delete is separate'),
+                  _EnrollmentActionStatus.deleted => throw UnimplementedError(
+                    'Delete is separate',
+                  ),
                 };
 
                 final statusString = switch (targetStatus) {
@@ -883,7 +961,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${enrollment.userId} 상태를 $statusString(으)로 변경 요청했습니다.',
+                      '${enrollment.username ?? enrollment.userId} 상태를 $statusString(으)로 변경 요청했습니다.',
                     ),
                   ),
                 );
@@ -911,7 +989,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
         content: Text(
-          '정말로 ${enrollment.userId} 수강생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+          '정말로 ${enrollment.username ?? enrollment.userId} 수강생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
           style: const TextStyle(height: 1.5),
         ),
         actions: [
@@ -931,7 +1009,11 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                     ),
                   );
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${enrollment.userId} 수강생을 삭제 요청했습니다.')),
+                SnackBar(
+                  content: Text(
+                    '${enrollment.username ?? enrollment.userId} 수강생을 삭제 요청했습니다.',
+                  ),
+                ),
               );
             },
             child: const Text(
@@ -942,6 +1024,19 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
         ],
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dt) {
+    final now = DateTime.now();
+    final difference = now.difference(dt);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}분 전';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}시간 전';
+    } else {
+      return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
+    }
   }
 }
 

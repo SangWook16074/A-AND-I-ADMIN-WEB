@@ -69,9 +69,12 @@ abstract class UpdateCourseRequest with _$UpdateCourseRequest {
 @freezed
 abstract class Enrollment with _$Enrollment {
   const factory Enrollment({
-    @Default('') String id,
+    String? courseId,
+    String? courseSlug,
     @Default('') String userId,
-    @Default('ACTIVE') String status,
+    String? username,
+    String? publicCode,
+    @Default('ENABLED') String status,
     DateTime? joinedAt,
     DateTime? droppedAt,
     DateTime? bannedAt,

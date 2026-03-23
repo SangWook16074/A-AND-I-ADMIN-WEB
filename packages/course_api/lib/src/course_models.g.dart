@@ -101,9 +101,12 @@ Map<String, dynamic> _$UpdateCourseRequestToJson(
 };
 
 _Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
-  id: json['id'] as String? ?? '',
+  courseId: json['courseId'] as String?,
+  courseSlug: json['courseSlug'] as String?,
   userId: json['userId'] as String? ?? '',
-  status: json['status'] as String? ?? 'ACTIVE',
+  username: json['username'] as String?,
+  publicCode: json['publicCode'] as String?,
+  status: json['status'] as String? ?? 'ENABLED',
   joinedAt: json['joinedAt'] == null
       ? null
       : DateTime.parse(json['joinedAt'] as String),
@@ -121,8 +124,11 @@ _Enrollment _$EnrollmentFromJson(Map<String, dynamic> json) => _Enrollment(
 
 Map<String, dynamic> _$EnrollmentToJson(_Enrollment instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'courseId': instance.courseId,
+      'courseSlug': instance.courseSlug,
       'userId': instance.userId,
+      'username': instance.username,
+      'publicCode': instance.publicCode,
       'status': instance.status,
       'joinedAt': instance.joinedAt?.toIso8601String(),
       'droppedAt': instance.droppedAt?.toIso8601String(),

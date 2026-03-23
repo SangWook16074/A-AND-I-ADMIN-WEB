@@ -1160,7 +1160,7 @@ as String?,
 /// @nodoc
 mixin _$Enrollment {
 
- String get id; String get userId; String get status; DateTime? get joinedAt; DateTime? get droppedAt; DateTime? get bannedAt; String? get banReason; DateTime? get updatedAt;
+ String? get courseId; String? get courseSlug; String get userId; String? get username; String? get publicCode; String get status; DateTime? get joinedAt; DateTime? get droppedAt; DateTime? get bannedAt; String? get banReason; DateTime? get updatedAt;
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1173,16 +1173,16 @@ $EnrollmentCopyWith<Enrollment> get copyWith => _$EnrollmentCopyWithImpl<Enrollm
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Enrollment&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.status, status) || other.status == status)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt)&&(identical(other.droppedAt, droppedAt) || other.droppedAt == droppedAt)&&(identical(other.bannedAt, bannedAt) || other.bannedAt == bannedAt)&&(identical(other.banReason, banReason) || other.banReason == banReason)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Enrollment&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.username, username) || other.username == username)&&(identical(other.publicCode, publicCode) || other.publicCode == publicCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt)&&(identical(other.droppedAt, droppedAt) || other.droppedAt == droppedAt)&&(identical(other.bannedAt, bannedAt) || other.bannedAt == bannedAt)&&(identical(other.banReason, banReason) || other.banReason == banReason)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,status,joinedAt,droppedAt,bannedAt,banReason,updatedAt);
+int get hashCode => Object.hash(runtimeType,courseId,courseSlug,userId,username,publicCode,status,joinedAt,droppedAt,bannedAt,banReason,updatedAt);
 
 @override
 String toString() {
-  return 'Enrollment(id: $id, userId: $userId, status: $status, joinedAt: $joinedAt, droppedAt: $droppedAt, bannedAt: $bannedAt, banReason: $banReason, updatedAt: $updatedAt)';
+  return 'Enrollment(courseId: $courseId, courseSlug: $courseSlug, userId: $userId, username: $username, publicCode: $publicCode, status: $status, joinedAt: $joinedAt, droppedAt: $droppedAt, bannedAt: $bannedAt, banReason: $banReason, updatedAt: $updatedAt)';
 }
 
 
@@ -1193,7 +1193,7 @@ abstract mixin class $EnrollmentCopyWith<$Res>  {
   factory $EnrollmentCopyWith(Enrollment value, $Res Function(Enrollment) _then) = _$EnrollmentCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
+ String? courseId, String? courseSlug, String userId, String? username, String? publicCode, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
 });
 
 
@@ -1210,11 +1210,14 @@ class _$EnrollmentCopyWithImpl<$Res>
 
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? courseId = freezed,Object? courseSlug = freezed,Object? userId = null,Object? username = freezed,Object? publicCode = freezed,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+courseId: freezed == courseId ? _self.courseId : courseId // ignore: cast_nullable_to_non_nullable
+as String?,courseSlug: freezed == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String?,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String?,publicCode: freezed == publicCode ? _self.publicCode : publicCode // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,bannedAt: freezed == bannedAt ? _self.bannedAt : bannedAt // ignore: cast_nullable_to_non_nullable
@@ -1305,10 +1308,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? courseId,  String? courseSlug,  String userId,  String? username,  String? publicCode,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Enrollment() when $default != null:
-return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
+return $default(_that.courseId,_that.courseSlug,_that.userId,_that.username,_that.publicCode,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -1326,10 +1329,10 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? courseId,  String? courseSlug,  String userId,  String? username,  String? publicCode,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Enrollment():
-return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
+return $default(_that.courseId,_that.courseSlug,_that.userId,_that.username,_that.publicCode,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1346,10 +1349,10 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? courseId,  String? courseSlug,  String userId,  String? username,  String? publicCode,  String status,  DateTime? joinedAt,  DateTime? droppedAt,  DateTime? bannedAt,  String? banReason,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Enrollment() when $default != null:
-return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
+return $default(_that.courseId,_that.courseSlug,_that.userId,_that.username,_that.publicCode,_that.status,_that.joinedAt,_that.droppedAt,_that.bannedAt,_that.banReason,_that.updatedAt);case _:
   return null;
 
 }
@@ -1361,11 +1364,14 @@ return $default(_that.id,_that.userId,_that.status,_that.joinedAt,_that.droppedA
 @JsonSerializable()
 
 class _Enrollment implements Enrollment {
-  const _Enrollment({this.id = '', this.userId = '', this.status = 'ACTIVE', this.joinedAt, this.droppedAt, this.bannedAt, this.banReason, this.updatedAt});
+  const _Enrollment({this.courseId, this.courseSlug, this.userId = '', this.username, this.publicCode, this.status = 'ENABLED', this.joinedAt, this.droppedAt, this.bannedAt, this.banReason, this.updatedAt});
   factory _Enrollment.fromJson(Map<String, dynamic> json) => _$EnrollmentFromJson(json);
 
-@override@JsonKey() final  String id;
+@override final  String? courseId;
+@override final  String? courseSlug;
 @override@JsonKey() final  String userId;
+@override final  String? username;
+@override final  String? publicCode;
 @override@JsonKey() final  String status;
 @override final  DateTime? joinedAt;
 @override final  DateTime? droppedAt;
@@ -1386,16 +1392,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Enrollment&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.status, status) || other.status == status)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt)&&(identical(other.droppedAt, droppedAt) || other.droppedAt == droppedAt)&&(identical(other.bannedAt, bannedAt) || other.bannedAt == bannedAt)&&(identical(other.banReason, banReason) || other.banReason == banReason)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Enrollment&&(identical(other.courseId, courseId) || other.courseId == courseId)&&(identical(other.courseSlug, courseSlug) || other.courseSlug == courseSlug)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.username, username) || other.username == username)&&(identical(other.publicCode, publicCode) || other.publicCode == publicCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt)&&(identical(other.droppedAt, droppedAt) || other.droppedAt == droppedAt)&&(identical(other.bannedAt, bannedAt) || other.bannedAt == bannedAt)&&(identical(other.banReason, banReason) || other.banReason == banReason)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,status,joinedAt,droppedAt,bannedAt,banReason,updatedAt);
+int get hashCode => Object.hash(runtimeType,courseId,courseSlug,userId,username,publicCode,status,joinedAt,droppedAt,bannedAt,banReason,updatedAt);
 
 @override
 String toString() {
-  return 'Enrollment(id: $id, userId: $userId, status: $status, joinedAt: $joinedAt, droppedAt: $droppedAt, bannedAt: $bannedAt, banReason: $banReason, updatedAt: $updatedAt)';
+  return 'Enrollment(courseId: $courseId, courseSlug: $courseSlug, userId: $userId, username: $username, publicCode: $publicCode, status: $status, joinedAt: $joinedAt, droppedAt: $droppedAt, bannedAt: $bannedAt, banReason: $banReason, updatedAt: $updatedAt)';
 }
 
 
@@ -1406,7 +1412,7 @@ abstract mixin class _$EnrollmentCopyWith<$Res> implements $EnrollmentCopyWith<$
   factory _$EnrollmentCopyWith(_Enrollment value, $Res Function(_Enrollment) _then) = __$EnrollmentCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
+ String? courseId, String? courseSlug, String userId, String? username, String? publicCode, String status, DateTime? joinedAt, DateTime? droppedAt, DateTime? bannedAt, String? banReason, DateTime? updatedAt
 });
 
 
@@ -1423,11 +1429,14 @@ class __$EnrollmentCopyWithImpl<$Res>
 
 /// Create a copy of Enrollment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? courseId = freezed,Object? courseSlug = freezed,Object? userId = null,Object? username = freezed,Object? publicCode = freezed,Object? status = null,Object? joinedAt = freezed,Object? droppedAt = freezed,Object? bannedAt = freezed,Object? banReason = freezed,Object? updatedAt = freezed,}) {
   return _then(_Enrollment(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+courseId: freezed == courseId ? _self.courseId : courseId // ignore: cast_nullable_to_non_nullable
+as String?,courseSlug: freezed == courseSlug ? _self.courseSlug : courseSlug // ignore: cast_nullable_to_non_nullable
+as String?,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String?,publicCode: freezed == publicCode ? _self.publicCode : publicCode // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,droppedAt: freezed == droppedAt ? _self.droppedAt : droppedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,bannedAt: freezed == bannedAt ? _self.bannedAt : bannedAt // ignore: cast_nullable_to_non_nullable
