@@ -32,13 +32,14 @@ class FakeUsersManagementRepository implements UsersManagementRepository {
 
   @override
   Future<AdminUser> createUser({
+    required AuthRole role,
     required AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
     final created = AdminUser(
       id: 'u-2',
       username: 'new-admin',
-      role: AuthRole.user,
+      role: role,
       cohort: cohort,
     );
     users.add(created);

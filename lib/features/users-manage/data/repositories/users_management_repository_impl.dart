@@ -53,6 +53,7 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
 
   @override
   Future<AdminUser> createUser({
+    required AuthRole role,
     required AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
@@ -64,6 +65,7 @@ class UsersManagementRepositoryImpl implements UsersManagementRepository {
 
     final dto = await _apiClient.createUser(
       accessToken: accessToken,
+      role: role,
       provisionType: provisionType,
       cohort: cohort,
     );

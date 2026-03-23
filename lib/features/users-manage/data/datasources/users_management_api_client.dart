@@ -120,13 +120,14 @@ class UsersManagementApiClient {
 
   Future<AdminUserDto> createUser({
     required String accessToken,
+    required AuthRole role,
     required admin_api.AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
     try {
       final created = await apiClient.createUser(
         accessToken: accessToken,
-        role: AuthRole.user,
+        role: role,
         provisionType: provisionType,
         cohort: cohort,
       );

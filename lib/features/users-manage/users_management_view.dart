@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:aandi_auth/aandi_auth.dart';
-
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 
 import 'domain/entities/admin_user.dart';
 import 'presentation/bloc/users_management_bloc.dart';
@@ -15,10 +15,14 @@ class _InviteUserData {
   const _InviteUserData({
     required this.emails,
     required this.userTrack,
+    required this.cohort,
+    required this.cohortOrder,
   });
 
   final List<String> emails;
   final String userTrack;
+  final int cohort;
+  final int cohortOrder;
 }
 
 class UsersManagementView extends ConsumerStatefulWidget {
@@ -57,8 +61,8 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
           UsersManagementInviteRequested(
             emails: inviteData.emails,
             role: AuthRole.user,
-            cohort: 4,
-            cohortOrder: 4,
+            cohort: inviteData.cohort,
+            cohortOrder: inviteData.cohortOrder,
             userTrack: inviteData.userTrack,
           ),
         );
@@ -78,48 +82,106 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
       ),
     );
   }
+
   Future<_InviteUserData?> showInviteUserDialog() async {
     return showDialog<_InviteUserData>(
       context: context,
       builder: (dialogContext) {
         final emailsController = TextEditingController();
         var selectedTrack = 'NO';
-        
+        var selectedCohort = 4;
+        var selectedCohortOrder = 0;
+
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('사용자 초대'),
+              title: const Text('사용자 초대 (이메일)'),
               content: SizedBox(
                 width: 400,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: emailsController,
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        labelText: '이메일 (콤마 또는 줄바꿈으로 구분)',
-                        border: OutlineInputBorder(),
-                        alignLabelWithHint: true,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: emailsController,
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          labelText: '이메일 (콤마 또는 줄바꿈으로 구분)',
+                          border: OutlineInputBorder(),
+                          alignLabelWithHint: true,
+                        ),
                       ),
-                    ),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: '트랙',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        isDense: true,
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: '트랙',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          isDense: true,
+                        ),
+                        initialValue: selectedTrack,
+                        items: const [
+                          DropdownMenuItem(value: 'NO', child: Text('공통 (NO)')),
+                          DropdownMenuItem(
+                            value: 'SP',
+                            child: Text('스프링 (SP)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'FL',
+                            child: Text('플러터 (FL)'),
+                          ),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setDialogState(() => selectedTrack = val);
+                          }
+                        },
                       ),
-                      value: selectedTrack,
-                      items: const [
-                        DropdownMenuItem(value: 'NO', child: Text('공통 (NO)')),
-                        DropdownMenuItem(value: 'SP', child: Text('스프링 (SP)')),
-                        DropdownMenuItem(value: 'FL', child: Text('플러터 (FL)')),
-                      ],
-                      onChanged: (val) {
-                        if (val != null) setDialogState(() => selectedTrack = val);
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          labelText: '기수 (Cohort)',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          isDense: true,
+                        ),
+                        initialValue: selectedCohort,
+                        items: List.generate(
+                          12,
+                          (i) => DropdownMenuItem(
+                            value: i + 1,
+                            child: Text('${i + 1}기'),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setDialogState(() => selectedCohort = val);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        initialValue: selectedCohortOrder.toString(),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          labelText: '기수 순서 (Cohort Order)',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          isDense: true,
+                        ),
+                        onChanged: (val) {
+                          final parsed = int.tryParse(val) ?? 0;
+                          selectedCohortOrder = parsed;
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -137,10 +199,135 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                         .toList();
                     if (emails.isEmpty) return;
                     Navigator.of(dialogContext).pop(
-                      _InviteUserData(emails: emails, userTrack: selectedTrack),
+                      _InviteUserData(
+                        emails: emails,
+                        userTrack: selectedTrack,
+                        cohort: selectedCohort,
+                        cohortOrder: selectedCohortOrder,
+                      ),
                     );
                   },
                   child: const Text('초대 발송'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> onAddUserPressed() async {
+    final result = await showAddUserManualDialog();
+    if (result == null) return;
+
+    await ref
+        .read(usersManagementBlocProvider.notifier)
+        .onEvent(
+          UsersManagementCreateRequested(
+            role: result.role,
+            cohort: result.cohort,
+            provisionType: AdminUserProvisionType.invite,
+          ),
+        );
+
+    if (!mounted) return;
+
+    final nextState = ref.read(usersManagementBlocProvider);
+    final isSuccess =
+        nextState.status == UsersManagementStatus.success &&
+        nextState.errorMessage == null;
+
+    if (isSuccess) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('사용자를 성공적으로 추가했습니다.')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(nextState.errorMessage ?? '사용자 추가에 실패했습니다.')),
+      );
+    }
+  }
+
+  Future<({AuthRole role, int cohort})?> showAddUserManualDialog() async {
+    return showDialog<({AuthRole role, int cohort})>(
+      context: context,
+      builder: (dialogContext) {
+        var selectedRole = AuthRole.user;
+        var selectedCohort = 4;
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('사용자 추가 (직접)'),
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<AuthRole>(
+                      decoration: InputDecoration(
+                        labelText: '권한 (Role)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        isDense: true,
+                      ),
+                      initialValue: selectedRole,
+                      items: const [
+                        DropdownMenuItem(
+                          value: AuthRole.user,
+                          child: Text('사용자 (USER)'),
+                        ),
+                        DropdownMenuItem(
+                          value: AuthRole.organizer,
+                          child: Text('관리자 (ORGANIZER)'),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedRole = val);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<int>(
+                      decoration: InputDecoration(
+                        labelText: '기수 (Cohort)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        isDense: true,
+                      ),
+                      initialValue: selectedCohort,
+                      items: List.generate(
+                        12,
+                        (i) => DropdownMenuItem(
+                          value: i + 1,
+                          child: Text('${i + 1}기'),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedCohort = val);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('취소'),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.of(
+                      dialogContext,
+                    ).pop((role: selectedRole, cohort: selectedCohort));
+                  },
+                  child: const Text('사용자 추가'),
                 ),
               ],
             );
@@ -207,7 +394,7 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                         label: '트랙',
                         value: selectedTrack,
                         options: const [
-                          DropdownMenuItem(value: 'NO', child: Text('없음')),
+                          DropdownMenuItem(value: 'NO', child: Text('분야 없음')),
                           DropdownMenuItem(value: 'FL', child: Text('Flutter')),
                           DropdownMenuItem(
                             value: 'SP',
@@ -278,7 +465,11 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                   child: const Text('닫기'),
                 ),
                 FilledButton.icon(
-                  onPressed: isDeleting || isUpdating || isResettingPassword || user.inviteLink == null
+                  onPressed:
+                      isDeleting ||
+                          isUpdating ||
+                          isResettingPassword ||
+                          user.inviteLink == null
                       ? null
                       : () async {
                           await Clipboard.setData(
@@ -308,19 +499,26 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                                 );
                             if (!mounted) return;
 
-                            final nextState = ref.read(usersManagementBlocProvider);
-                            final isSuccess = nextState.status == UsersManagementStatus.success &&
+                            final nextState = ref.read(
+                              usersManagementBlocProvider,
+                            );
+                            final isSuccess =
+                                nextState.status ==
+                                    UsersManagementStatus.success &&
                                 nextState.errorMessage == null;
 
-                            if (isSuccess && nextState.temporaryPassword != null) {
-                              final temporaryPassword = nextState.temporaryPassword!;
+                            if (isSuccess &&
+                                nextState.temporaryPassword != null) {
+                              final temporaryPassword =
+                                  nextState.temporaryPassword!;
                               await showDialog(
                                 context: context,
                                 builder: (popupContext) => AlertDialog(
                                   title: const Text('임시 비밀번호 발급'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         '아래 임시 비밀번호를 복사하여 사용자에게 전달해주세요.\n창을 닫으면 다시 확인할 수 없습니다.',
@@ -330,7 +528,9 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFF5F5F5),
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: SelectableText(
                                           temporaryPassword,
@@ -345,21 +545,31 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                                   ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(popupContext).pop(),
+                                      onPressed: () =>
+                                          Navigator.of(popupContext).pop(),
                                       child: const Text('닫기'),
                                     ),
                                     FilledButton.icon(
                                       onPressed: () async {
                                         await Clipboard.setData(
-                                          ClipboardData(text: temporaryPassword),
+                                          ClipboardData(
+                                            text: temporaryPassword,
+                                          ),
                                         );
                                         if (popupContext.mounted) {
-                                          ScaffoldMessenger.of(popupContext).showSnackBar(
-                                            const SnackBar(content: Text('비밀번호가 복사되었습니다.')),
+                                          ScaffoldMessenger.of(
+                                            popupContext,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('비밀번호가 복사되었습니다.'),
+                                            ),
                                           );
                                         }
                                       },
-                                      icon: const Icon(Icons.copy_rounded, size: 16),
+                                      icon: const Icon(
+                                        Icons.copy_rounded,
+                                        size: 16,
+                                      ),
                                       label: const Text('복사하기'),
                                     ),
                                   ],
@@ -368,7 +578,10 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(nextState.errorMessage ?? '비밀번호 발급에 실패했습니다.'),
+                                  content: Text(
+                                    nextState.errorMessage ??
+                                        '비밀번호 발급에 실패했습니다.',
+                                  ),
                                 ),
                               );
                             }
@@ -379,7 +592,9 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                           }
                         },
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E88E5), // Blue color for emphasis
+                    backgroundColor: const Color(
+                      0xFF1E88E5,
+                    ), // Blue color for emphasis
                     foregroundColor: Colors.white,
                   ),
                   icon: isResettingPassword
@@ -617,6 +832,35 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                     ),
                   ),
                   FilledButton.icon(
+                    onPressed: state.isCreating ? null : onAddUserPressed,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: state.isCreating
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.person_add_rounded),
+                    label: Text(
+                      state.isCreating ? '생성 중...' : '사용자 추가',
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
                     onPressed: state.isCreating ? null : onCreateUserPressed,
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFF1A1A1A),
@@ -638,9 +882,9 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
                               color: Colors.white,
                             ),
                           )
-                        : const Icon(Icons.add_rounded),
+                        : const Icon(Icons.mail_outline_rounded),
                     label: Text(
-                      state.isCreating ? '생성 중...' : '사용자 생성',
+                      state.isCreating ? '발송 중...' : '초대 메일 발송',
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -716,7 +960,7 @@ class UsersManagementViewState extends ConsumerState<UsersManagementView> {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem({required this.label, required this.value});
+  const DetailItem({super.key, required this.label, required this.value});
 
   final String label;
   final String value;
@@ -771,7 +1015,7 @@ class _EditableSelectField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: options,
       onChanged: enabled ? onChanged : null,
       decoration: InputDecoration(

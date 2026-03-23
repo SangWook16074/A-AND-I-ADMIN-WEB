@@ -68,6 +68,7 @@ class AdminApiClient {
     final response = await _requestJson(
       method: 'POST',
       accessToken: accessToken,
+      path: '/v1/admin/users',
       data: {
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
@@ -165,8 +166,9 @@ class AdminApiClient {
     String pathSuffix = '',
     Map<String, dynamic>? queryParameters,
   }) async {
-    final uri = Uri.parse('$baseUrl${path ?? _usersPath}$pathSuffix')
-        .replace(queryParameters: queryParameters);
+    final uri = Uri.parse(
+      '$baseUrl${path ?? _usersPath}$pathSuffix',
+    ).replace(queryParameters: queryParameters);
     final response = await dio.requestUri<dynamic>(
       uri,
       data: data,

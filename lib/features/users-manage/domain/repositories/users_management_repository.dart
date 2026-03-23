@@ -8,6 +8,7 @@ abstract interface class UsersManagementRepository {
   Future<AdminUser> getUser({required String userId});
   Future<AdminUser> lookupUser({required String code});
   Future<AdminUser> createUser({
+    required AuthRole role,
     required AdminUserProvisionType provisionType,
     required int cohort,
   });
