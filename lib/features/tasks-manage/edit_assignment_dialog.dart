@@ -31,11 +31,16 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   late String _language;
   late List<_ExampleData> _examples;
 
+  late final TextEditingController _startAtController;
+  late final TextEditingController _endAtController;
+
   bool _isInit = false;
 
   @override
   void initState() {
     super.initState();
+    _startAtController = TextEditingController();
+    _endAtController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(tasksManagementBlocProvider.notifier).add(
             TasksManagementAssignmentDetailsRequested(
@@ -55,16 +60,93 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     _description = fullAssignment.metadata.description ?? '';
     _startAt = fullAssignment.startAt;
     _endAt = fullAssignment.endAt;
-    _learningGoals = fullAssignment.metadata.learningGoals.map((e) => e.learningGoalText).join(', ');
+
+    try {
+      final start = DateTime.parse(_startAt);
+      _startAtController.text = _formatFullDateTime(start);
+    } catch (_) {
+      _startAtController.text = _startAt;
+    }
+
+    try {
+      final end = DateTime.parse(_endAt);
+      _endAtController.text = _formatFullDateTime(end);
+    } catch (_) {
+      _endAtController.text = _endAt;
+    }
+
+    _learningGoals =
+        fullAssignment.metadata.learningGoals.map((e) => e.learningGoalText).join(', ');
     _language = fullAssignment.metadata.attributes['language'] ?? 'kotlin';
-    _examples = fullAssignment.metadata.examples.map((e) => _ExampleData(
-      input: e.inputText ?? '',
-      output: e.outputText ?? '',
-      description: e.description ?? '',
-    )).toList();
+    _examples = fullAssignment.metadata.examples
+        .map((e) => _ExampleData(
+              input: e.inputText ?? '',
+              output: e.outputText ?? '',
+              description: e.description ?? '',
+            ))
+        .toList();
     if (_examples.isEmpty) {
       _examples.add(_ExampleData());
     }
+  }
+
+  @override
+  void dispose() {
+    _startAtController.dispose();
+    _endAtController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDateTime(bool isStart) async {
+    final DateTime current = isStart
+        ? (DateTime.tryParse(_startAt) ?? DateTime.now())
+        : (DateTime.tryParse(_endAt) ?? DateTime.now());
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate == null) return;
+
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(current),
+    );
+
+    if (pickedTime == null) return;
+
+    final DateTime fullDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      final offset = fullDateTime.timeZoneOffset;
+      final hours = offset.inHours.abs().toString().padLeft(2, '0');
+      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      final sign = offset.isNegative ? '-' : '+';
+      final formattedIso =
+          '${fullDateTime.toIso8601String().split('.').first}$sign$hours:$minutes';
+
+      if (isStart) {
+        _startAt = formattedIso;
+        _startAtController.text = _formatFullDateTime(fullDateTime);
+      } else {
+        _endAt = formattedIso;
+        _endAtController.text = _formatFullDateTime(fullDateTime);
+      }
+    });
+  }
+
+  String _formatFullDateTime(DateTime dt) {
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   void _submit(Assignment fullAssignment) {
@@ -207,28 +289,32 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                              initialValue: _startAt,
+                              controller: _startAtController,
+                              readOnly: true,
+                              onTap: () => _selectDateTime(true),
                               decoration: const InputDecoration(
                                 labelText: '시작 일시 *',
-                                hintText: '2026-03-04T09:00:00+09:00',
                                 filled: true,
                                 fillColor: Colors.white,
+                                suffixIcon: Icon(Icons.calendar_today, size: 20),
                               ),
-                              onSaved: (v) => _startAt = v?.trim() ?? '',
+                              onSaved: (v) => _startAt = _startAt.trim(),
                               validator: (v) => v == null || v.trim().isEmpty ? '필수' : null,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: TextFormField(
-                              initialValue: _endAt,
+                              controller: _endAtController,
+                              readOnly: true,
+                              onTap: () => _selectDateTime(false),
                               decoration: const InputDecoration(
                                 labelText: '종료 일시 *',
-                                hintText: '2026-03-12T08:59:59+09:00',
                                 filled: true,
                                 fillColor: Colors.white,
+                                suffixIcon: Icon(Icons.calendar_today, size: 20),
                               ),
-                              onSaved: (v) => _endAt = v?.trim() ?? '',
+                              onSaved: (v) => _endAt = _endAt.trim(),
                               validator: (v) => v == null || v.trim().isEmpty ? '필수' : null,
                             ),
                           ),

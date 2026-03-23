@@ -54,7 +54,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Online Judge 관리',
+          '채점 서비스 관리',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 20,

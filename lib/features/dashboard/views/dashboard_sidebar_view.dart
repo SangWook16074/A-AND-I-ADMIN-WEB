@@ -72,7 +72,7 @@ class DashboardSidebarView extends ConsumerWidget {
           ),
           DashboardSidebarItemView(
             icon: Icons.code_rounded,
-            label: 'Online Judge 관리',
+            label: '채점 서비스 관리',
             selected: selectedTab == DashboardNavTab.ojManage,
             onTap: () {
               ref

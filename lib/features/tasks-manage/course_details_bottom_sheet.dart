@@ -250,164 +250,219 @@ class _CourseDetailsBottomSheetState
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(
-          '코스 수정',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        content: SizedBox(
-          width: 440,
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    initialValue: title,
-                    decoration: const InputDecoration(
-                      labelText: '제목',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSaved: (v) => title = v?.trim() ?? title,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? '제목을 입력해주세요.' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    initialValue: description,
-                    decoration: const InputDecoration(
-                      labelText: '설명',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 2,
-                    onSaved: (v) => description = v?.trim() ?? '',
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text(
+              '코스 수정',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            content: SizedBox(
+              width: 440,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: phase,
-                          decoration: const InputDecoration(
-                            labelText: '단계 (Phase)',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'BASIC',
-                              child: Text('BASIC'),
+                      TextFormField(
+                        initialValue: title,
+                        decoration: const InputDecoration(
+                          labelText: '제목',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSaved: (v) => title = v?.trim() ?? title,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty) ? '제목을 입력해주세요.' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        initialValue: description,
+                        decoration: const InputDecoration(
+                          labelText: '설명',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 2,
+                        onSaved: (v) => description = v?.trim() ?? '',
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              initialValue: phase,
+                              decoration: const InputDecoration(
+                                labelText: '단계 (Phase)',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'BASIC',
+                                  child: Text('BASIC'),
+                                ),
+                                DropdownMenuItem(value: 'CS', child: Text('CS')),
+                                DropdownMenuItem(
+                                  value: 'FRAMEWORK',
+                                  child: Text('FRAMEWORK'),
+                                ),
+                              ],
+                              onChanged: (v) => phase = v ?? phase,
+                              onSaved: (v) => phase = v ?? phase,
                             ),
-                            DropdownMenuItem(value: 'CS', child: Text('CS')),
-                            DropdownMenuItem(
-                              value: 'FRAMEWORK',
-                              child: Text('FRAMEWORK'),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              initialValue: fieldTag,
+                              decoration: const InputDecoration(
+                                labelText: '트랙 (Field Tag)',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: 'FL', child: Text('FL')),
+                                DropdownMenuItem(value: 'SP', child: Text('SP')),
+                                DropdownMenuItem(value: 'NO', child: Text('NO')),
+                              ],
+                              onChanged: (v) => fieldTag = v ?? fieldTag,
+                              onSaved: (v) => fieldTag = v ?? fieldTag,
                             ),
-                          ],
-                          onChanged: (v) => phase = v ?? phase,
-                          onSaved: (v) => phase = v ?? phase,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: fieldTag,
-                          decoration: const InputDecoration(
-                            labelText: '트랙 (Field Tag)',
-                            border: OutlineInputBorder(),
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'FL', child: Text('FL')),
-                            DropdownMenuItem(value: 'SP', child: Text('SP')),
-                            DropdownMenuItem(value: 'NO', child: Text('NO')),
-                          ],
-                          onChanged: (v) => fieldTag = v ?? fieldTag,
-                          onSaved: (v) => fieldTag = v ?? fieldTag,
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: status,
+                        decoration: const InputDecoration(
+                          labelText: '상태 (Status)',
+                          border: OutlineInputBorder(),
                         ),
+                        items: const [
+                          DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
+                          DropdownMenuItem(
+                            value: 'PUBLISHED',
+                            child: Text('PUBLISHED'),
+                          ),
+                        ],
+                        onChanged: (v) => status = v ?? status,
+                        onSaved: (v) => status = v ?? status,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DatePickerFieldInline(
+                              label: '시작일',
+                              initialValue: startDate,
+                              onChanged: (v) => startDate = v,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _DatePickerFieldInline(
+                              label: '종료일',
+                              initialValue: endDate,
+                              onChanged: (v) => endDate = v,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: status,
-                    decoration: const InputDecoration(
-                      labelText: '상태 (Status)',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
-                      DropdownMenuItem(
-                        value: 'PUBLISHED',
-                        child: Text('PUBLISHED'),
-                      ),
-                    ],
-                    onChanged: (v) => status = v ?? status,
-                    onSaved: (v) => status = v ?? status,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: startDate,
-                          decoration: const InputDecoration(
-                            labelText: '시작일 (YYYY-MM-DD)',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSaved: (v) => startDate = v?.trim() ?? '',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: endDate,
-                          decoration: const InputDecoration(
-                            labelText: '종료일 (YYYY-MM-DD)',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSaved: (v) => endDate = v?.trim() ?? '',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() ?? false) {
-                formKey.currentState?.save();
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() ?? false) {
+                    formKey.currentState?.save();
 
-                ref
-                    .read(tasksManagementBlocProvider.notifier)
-                    .add(
-                      TasksManagementUpdateCourseRequested(
-                        courseSlug: course.slug,
-                        request: UpdateCourseRequest(
-                          fieldTag: fieldTag,
-                          startDate: startDate,
-                          endDate: endDate,
-                          title: title,
-                          description: description,
-                          phase: phase,
-                          status: status,
-                        ),
-                      ),
-                    );
-                Navigator.pop(dialogContext);
-              }
-            },
-            child: const Text('수정'),
-          ),
-        ],
+                    ref.read(tasksManagementBlocProvider.notifier).add(
+                          TasksManagementUpdateCourseRequested(
+                            courseSlug: course.slug,
+                            request: UpdateCourseRequest(
+                              fieldTag: fieldTag,
+                              startDate: startDate,
+                              endDate: endDate,
+                              title: title,
+                              description: description,
+                              phase: phase,
+                              status: status,
+                            ),
+                          ),
+                        );
+                    Navigator.pop(dialogContext);
+                  }
+                },
+                child: const Text('수정'),
+              ),
+            ],
+          );
+        },
       ),
+    );
+  }
+}
+
+class _DatePickerFieldInline extends StatefulWidget {
+  const _DatePickerFieldInline({
+    required this.label,
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String initialValue;
+  final Function(String) onChanged;
+
+  @override
+  State<_DatePickerFieldInline> createState() => _DatePickerFieldInlineState();
+}
+
+class _DatePickerFieldInlineState extends State<_DatePickerFieldInline> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        border: const OutlineInputBorder(),
+        suffixIcon: const Icon(Icons.calendar_today, size: 18),
+      ),
+      onTap: () async {
+        final current = DateTime.tryParse(_controller.text) ?? DateTime.now();
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: current,
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2101),
+        );
+        if (picked != null) {
+          final formatted =
+              '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+          _controller.text = formatted;
+          widget.onChanged(formatted);
+        }
+      },
     );
   }
 }
@@ -1073,6 +1128,72 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _requirementsText = '';
   final List<_ExampleData> _examples = [_ExampleData()];
 
+  late TextEditingController _startAtController;
+  late TextEditingController _endAtController;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAtController = TextEditingController();
+    _endAtController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _startAtController.dispose();
+    _endAtController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDateTime(bool isStart) async {
+    final DateTime now = DateTime.now();
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate == null) return;
+
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(now),
+    );
+
+    if (pickedTime == null) return;
+
+    final DateTime fullDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      final offset = fullDateTime.timeZoneOffset;
+      final hours = offset.inHours.abs().toString().padLeft(2, '0');
+      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      final sign = offset.isNegative ? '-' : '+';
+      final formattedIso =
+          '${fullDateTime.toIso8601String().split('.').first}$sign$hours:$minutes';
+
+      if (isStart) {
+        _startAt = formattedIso;
+        _startAtController.text = _formatFullDateTime(fullDateTime);
+      } else {
+        _endAt = formattedIso;
+        _endAtController.text = _formatFullDateTime(fullDateTime);
+      }
+    });
+  }
+
+  String _formatFullDateTime(DateTime dt) {
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -1378,23 +1499,31 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    controller: _startAtController,
+                    readOnly: true,
+                    onTap: () => _selectDateTime(true),
                     decoration: const InputDecoration(
-                      labelText: '시작일시 (예: 2026-03-03T09:00:00+09:00)',
+                      labelText: '시작일시 (달력에서 선택)',
                       filled: true,
                       fillColor: Colors.white,
+                      suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
-                    onSaved: (v) => _startAt = v?.trim() ?? '',
-                    validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                    onSaved: (v) => _startAt = _startAt.trim(),
+                    validator: (v) => v == null || v.isEmpty ? '시작일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    controller: _endAtController,
+                    readOnly: true,
+                    onTap: () => _selectDateTime(false),
                     decoration: const InputDecoration(
-                      labelText: '종료일시 (예: 2026-03-11T08:59:59+09:00)',
+                      labelText: '종료일시 (달력에서 선택)',
                       filled: true,
                       fillColor: Colors.white,
+                      suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
-                    onSaved: (v) => _endAt = v?.trim() ?? '',
-                    validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                    onSaved: (v) => _endAt = _endAt.trim(),
+                    validator: (v) => v == null || v.isEmpty ? '종료일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   const Divider(),
