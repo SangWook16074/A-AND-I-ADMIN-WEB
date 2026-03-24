@@ -1,9 +1,13 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aandi_course_api/aandi_course_api.dart';
 import 'presentation/bloc/tasks_management_bloc.dart';
 import 'presentation/bloc/tasks_management_event.dart';
+import 'package:code_text_field/code_text_field.dart';
+import 'package:highlight/languages/kotlin.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:flutter_highlight/themes/atom-one-dark.dart';
 
 class EditAssignmentDialog extends ConsumerStatefulWidget {
   final String courseSlug;
@@ -43,7 +47,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   // Submission Guide fields
   late String _submissionGuideTitle;
   late String _submissionGuideDescription;
-  late String _commentSectionsText;
+  late final CodeController _commentSectionsController;
 
   // Code Templates
   late List<_CodeTemplateData> _codeTemplates;
@@ -59,6 +63,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     super.initState();
     _startAtController = TextEditingController();
     _endAtController = TextEditingController();
+    _commentSectionsController = CodeController(
+      language: dart, // just for basic highlighting or structure
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(tasksManagementBlocProvider.notifier)
@@ -101,11 +108,13 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     _language = fullAssignment.metadata.attributes['language'] ?? 'kotlin';
     _status = fullAssignment.status;
     _testCases = fullAssignment.metadata.testCases
-        .map((tc) => _TestCaseData(
-              inputs: tc.inputText.map((e) => e.toString()).toList(),
-              output: tc.outputText ?? '',
-              visibility: tc.visibility,
-            ))
+        .map(
+          (tc) => _TestCaseData(
+            inputs: tc.inputValues.map((e) => e.toString()).toList(),
+            output: tc.outputText ?? '',
+            visibility: tc.visibility,
+          ),
+        )
         .toList();
     if (_testCases.isEmpty) {
       _testCases.add(_TestCaseData());
@@ -123,11 +132,15 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         1;
 
     final guide = fullAssignment.metadata.submissionGuide;
-    _submissionGuideTitle = (guide?.title == '문제 풀이 템플릿') ? '' : (guide?.title ?? '');
-    _submissionGuideDescription = (guide?.description == '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.')
+    _submissionGuideTitle = (guide?.title == '문제 풀이 템플릿')
+        ? ''
+        : (guide?.title ?? '');
+    _submissionGuideDescription =
+        (guide?.description == '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.')
         ? ''
         : (guide?.description ?? '');
-    _commentSectionsText = (guide?.commentSections.join('\n') == '문제\n해석\n풀이')
+    _commentSectionsController.text =
+        (guide?.commentSections.join('\n') == '문제\n해석\n풀이')
         ? ''
         : (guide?.commentSections ?? []).join('\n');
 
@@ -139,7 +152,8 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         .map(
           (e) => _CodeTemplateData(
             language: e.language,
-            codeTemplate: e.codeTemplate ??
+            codeTemplate:
+                e.codeTemplate ??
                 '${e.commentTemplate ?? ''}\n\n${e.functionTemplate ?? ''}'
                     .trim(),
             runnableTemplate: e.runnableTemplate ?? '',
@@ -149,28 +163,16 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
     if (_codeTemplates.isEmpty) {
       _codeTemplates = [
-        _CodeTemplateData(
-          language: 'KOTLIN',
-          codeTemplate:
-              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
-          runnableTemplate:
-              'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
-        ),
-        _CodeTemplateData(
-          language: 'DART',
-          codeTemplate:
-              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n    var answer = "";\n    return answer;\n}',
-          runnableTemplate:
-              'String solution() {\n    var answer = "Hello World!";\n    return answer;\n}\n\nvoid main() {\n    print(solution());\n}',
-        ),
-        _CodeTemplateData(
-          language: 'PYTHON',
-          codeTemplate:
-              '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""\n\ndef solution():\n    answer = ""\n    return answer',
-          runnableTemplate:
-              'def solution():\n    answer = "Hello World!"\n    return answer\n\nif __name__ == "__main__":\n    print(solution())',
-        ),
+        _CodeTemplateData(language: 'KOTLIN'),
+        _CodeTemplateData(language: 'DART'),
+        _CodeTemplateData(language: 'PYTHON'),
       ];
+
+      for (var t in _codeTemplates) {
+        final defaults = _CodeTemplateData.getDefaultTemplates(t.language);
+        t.codeController.text = defaults['code']!;
+        t.runnableController.text = defaults['runnable']!;
+      }
     }
   }
 
@@ -181,6 +183,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     for (var t in _codeTemplates) {
       t.dispose();
     }
+    _commentSectionsController.dispose();
     super.dispose();
   }
 
@@ -261,7 +264,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           .map(
             (e) => AssignmentTestCase(
               seq: e.key + 1,
-              inputText: e.value.inputs.map((input) {
+              inputValues: e.value.inputs.map((input) {
                 final trimmed = input.trim();
                 if (trimmed.toLowerCase() == 'true') return true;
                 if (trimmed.toLowerCase() == 'false') return false;
@@ -278,11 +281,31 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       final codeTemplateList = _codeTemplates
           .where((e) => e.language.isNotEmpty)
           .map(
-            (e) => CodeTemplate(
-              language: e.language,
-              codeTemplate: e.codeController.text,
-              runnableTemplate: e.runnableController.text,
-            ),
+            (e) {
+              final code = e.codeController.text.trim();
+              String? comment;
+              String? function;
+              
+              if (code.contains('*/')) {
+                final parts = code.split('*/');
+                comment = '${parts[0]}*/'.trim();
+                function = parts.sublist(1).join('*/').trim();
+              } else if (code.contains("'''")) {
+                final parts = code.split("'''");
+                if (parts.length >= 3) {
+                  comment = "'''${parts[1]}'''".trim();
+                  function = parts.sublist(2).join("'''").trim();
+                }
+              }
+
+              return CodeTemplate(
+                language: e.language,
+                codeTemplate: code,
+                runnableTemplate: e.runnableController.text,
+                commentTemplate: comment,
+                functionTemplate: function,
+              );
+            },
           )
           .toList();
 
@@ -326,9 +349,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           submissionGuide: SubmissionGuide(
             title: _submissionGuideTitle,
             description: _submissionGuideDescription,
-            commentSections: _commentSectionsText.isEmpty
+            commentSections: _commentSectionsController.text.isEmpty
                 ? []
-                : _commentSectionsText
+                : _commentSectionsController.text
                       .split('\n')
                       .map((e) => e.trim())
                       .where((e) => e.isNotEmpty)
@@ -356,6 +379,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     final state = ref.watch(tasksManagementBlocProvider);
     final isLoading = state.isLoadingDetails;
     final fullAssignment = state.selectedAssignment;
+    String commentSectionsText = '';
 
     if (isLoading ||
         fullAssignment == null ||
@@ -608,7 +632,8 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                   hintText: 'param1\nparam2',
                                 ),
                                 maxLines: 4,
-                                onSaved: (v) => testCase.inputs = v
+                                onSaved: (v) => testCase.inputs =
+                                    v
                                         ?.split('\n')
                                         .map((e) => e.trim())
                                         .toList() ??
@@ -754,15 +779,15 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
-                        initialValue: _commentSectionsText,
+                        initialValue: commentSectionsText,
                         decoration: const InputDecoration(
-                          labelText: '주석 항목 (줄바꿈으로 구분)',
-                          hintText: '문제\n해석\n풀이',
+                          labelText: '코멘트 섹션 (Comment Sections - 줄바꿈으로 구분)',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Color(0xFFFAFAFA),
+                          hintText: '문제\n해석\n풀이',
                         ),
                         maxLines: 3,
-                        onSaved: (v) => _commentSectionsText = v?.trim() ?? '',
+                        onSaved: (v) => commentSectionsText = v?.trim() ?? '',
                       ),
                       const SizedBox(height: 24),
                       const Divider(),
@@ -779,15 +804,15 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                           ),
                           TextButton.icon(
                             onPressed: () {
-                            setState(() {
-                              _codeTemplates.add(_CodeTemplateData(
-                                language: 'KOTLIN',
-                                codeTemplate:
-                                    '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
-                                runnableTemplate:
-                                    'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
-                              ));
-                            });
+                              setState(() {
+                                _codeTemplates.add(
+                                  _CodeTemplateData(
+                                    language: 'KOTLIN',
+                                    codeTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['code'] ?? '',
+                                    runnableTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['runnable'] ?? '',
+                                  ),
+                                );
+                              });
                             },
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('템플릿 추가'),
@@ -828,10 +853,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                         DropdownMenuItem(
                                           value: 'PYTHON',
                                           child: Text('PYTHON'),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: 'JAVASCRIPT',
-                                          child: Text('JAVASCRIPT'),
                                         ),
                                       ],
                                       onChanged: (v) {
@@ -906,11 +927,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
   Widget _buildPremiumCodeEditor({
     required String label,
-    required TextEditingController controller,
+    required CodeController controller,
     required String language,
-    String? hintText,
   }) {
-    final lines = controller.text.split('\n');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -945,8 +964,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
             children: [
               // Header
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 decoration: const BoxDecoration(
                   color: Color(0xFF1E293B),
                   borderRadius: BorderRadius.only(
@@ -975,66 +996,27 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                 ),
               ),
               // Code Area
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Gutter
-                    Container(
-                      width: 45,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF0F172A),
-                        border: Border(
-                          right:
-                              BorderSide(color: Color(0xFF1E293B), width: 1.5),
-                        ),
-                      ),
-                      child: Column(
-                        children: List.generate(
-                          max(1, lines.length),
-                          (i) => Text(
-                            '${i + 1}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Color(0xFF475569),
-                              fontSize: 12,
-                              fontFamily: 'monospace',
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
+              CodeTheme(
+                data: CodeThemeData(styles: atomOneDarkTheme),
+                child: CodeField(
+                  controller: controller,
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'monospace',
+                    height: 1.5,
+                  ),
+                  lineNumberStyle: const LineNumberStyle(
+                    width: 45,
+                    margin: 16,
+                    textStyle: TextStyle(
+                      color: Color(0xFF475569),
+                      fontSize: 12,
+                      fontFamily: 'monospace',
                     ),
-                    // Editor
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: TextFormField(
-                          controller: controller,
-                          decoration: InputDecoration(
-                            hintText: hintText,
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          maxLines: null,
-                          cursorColor: Colors.white,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                            color: Color(0xFFE2E8F0),
-                          ),
-                          onChanged: (v) {
-                            setState(() {
-                              // Trigger rebuild for gutter
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                  decoration: const BoxDecoration(color: Color(0xFF0F172A)),
+                  maxLines: null,
+                  minLines: 5,
                 ),
               ),
             ],
@@ -1055,19 +1037,22 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
 class _CodeTemplateData {
   String language;
-  final TextEditingController codeController;
-  final TextEditingController runnableController;
+  late final CodeController codeController;
+  late final CodeController runnableController;
 
   _CodeTemplateData({
     this.language = 'KOTLIN',
     String codeTemplate = '',
     String runnableTemplate = '',
-  })  : codeController = _PremiumCodeController(
-            text: codeTemplate.replaceAll('\\n', '\n'), language: language),
-        runnableController = _PremiumCodeController(
-            text: runnableTemplate.replaceAll('\\n', '\n'),
-            language: language) {
-    // Update language when it changes
+  }) {
+    codeController = CodeController(
+      text: codeTemplate.replaceAll('\\n', '\n'),
+      language: _getLanguage(language),
+    );
+    runnableController = CodeController(
+      text: runnableTemplate.replaceAll('\\n', '\n'),
+      language: _getLanguage(language),
+    );
   }
 
   void dispose() {
@@ -1077,186 +1062,49 @@ class _CodeTemplateData {
 
   void updateLanguage(String lang) {
     language = lang;
-    (codeController as _PremiumCodeController).language = lang;
-    (runnableController as _PremiumCodeController).language = lang;
+    codeController.language = _getLanguage(lang);
+    runnableController.language = _getLanguage(lang);
+
+    // Automatically update to default template for the new language
+    final defaults = getDefaultTemplates(lang);
+    codeController.text = defaults['code']!;
+    runnableController.text = defaults['runnable']!;
   }
-}
 
-class _PremiumCodeController extends TextEditingController {
-  String language;
-  _PremiumCodeController({required String text, required this.language})
-      : super(text: text);
-
-  @override
-  TextSpan buildTextSpan(
-      {required BuildContext context,
-      TextStyle? style,
-      required bool withComposing}) {
-    return _highlightCode(text, language);
-  }
-}
-
-TextSpan _highlightCode(String code, String language) {
-  final lang = language.toLowerCase();
-  const keywords = {
-    'python': [
-      'def',
-      'return',
-      'if',
-      'else',
-      'elif',
-      'for',
-      'while',
-      'import',
-      'from',
-      'as',
-      'class',
-      'try',
-      'except',
-      'pass',
-      'print',
-      'in',
-      'is',
-      'not',
-    ],
-    'kotlin': [
-      'fun',
-      'val',
-      'var',
-      'if',
-      'else',
-      'when',
-      'for',
-      'while',
-      'return',
-      'class',
-      'interface',
-      'object',
-      'override',
-      'import',
-      'package',
-      'void',
-    ],
-    'dart': [
-      'void',
-      'final',
-      'var',
-      'if',
-      'else',
-      'return',
-      'class',
-      'import',
-      'package',
-      'async',
-      'await',
-      'late',
-      'dynamic',
-      'static',
-      'override',
-    ],
-  };
-
-  final kwList = keywords[lang] ?? keywords['kotlin']!;
-  final spans = <TextSpan>[];
-
-  final combinedRegex = RegExp(
-    r'(".*?")|'
-    r"('.*?')|"
-    r'(\/\/.*)|'
-    r'(\/\*[\s\S]*?\*\/)|'
-    r'(#.*)|'
-    r'([a-zA-Z_][a-zA-Z0-9_]*)|'
-    r'(\d+(\.\d*)?)|'
-    r'([{}()\[\]])|'
-    r'([+\-*/%=<>!&|^~,.:;])|'
-    r'(\s+)',
-  );
-
-  final matches = combinedRegex.allMatches(code).toList();
-
-  for (var i = 0; i < matches.length; i++) {
-    final match = matches[i];
-    final text = match.group(0)!;
-
-    if (match.group(1) != null || match.group(2) != null) {
-      // Strings
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFF86EFAC)),
-        ),
-      );
-    } else if (match.group(3) != null ||
-        match.group(4) != null ||
-        match.group(5) != null) {
-      // Comments (// or /* */ or #)
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(
-            color: Color(0xFF64748B),
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    } else if (match.group(6) != null) {
-      // Words
-      final word = match.group(6)!;
-      if (kwList.contains(word)) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(
-              color: Color(0xFFC084FC),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        );
-      } else if (i + 1 < matches.length &&
-          matches[i + 1].group(0)!.trim().startsWith('(')) {
-        // Basic function attempt
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFF60A5FA)),
-          ),
-        );
-      } else {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFFE2E8F0)),
-          ),
-        );
-      }
-    } else if (match.group(7) != null) {
-      // Numbers
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFFFDE68A)),
-        ),
-      );
-    } else if (match.group(9) != null || match.group(10) != null) {
-      // Punctuation/Brackets/Operators
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFF94A3B8)),
-        ),
-      );
-    } else {
-      // Whitespace and others
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFFE2E8F0)),
-        ),
-      );
+  static Map<String, String> getDefaultTemplates(String lang) {
+    switch (lang.toUpperCase()) {
+      case 'KOTLIN':
+        return {
+          'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
+          'runnable': "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}",
+        };
+      case 'DART':
+        return {
+          'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
+          'runnable': "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}",
+        };
+      case 'PYTHON':
+        return {
+          'code': "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
+          'runnable': "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())",
+        };
+      default:
+        return {'code': '', 'runnable': ''};
     }
   }
 
-  return TextSpan(children: spans);
+  dynamic _getLanguage(String lang) {
+    switch (lang.toUpperCase()) {
+      case 'KOTLIN':
+        return kotlin;
+      case 'DART':
+        return dart;
+      case 'PYTHON':
+        return python;
+      default:
+        return kotlin;
+    }
+  }
 }
 
 class _TestCaseData {

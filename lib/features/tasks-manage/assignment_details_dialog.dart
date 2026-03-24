@@ -156,7 +156,9 @@ class _AssignmentDetailsDialogState
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: ex.visibility == 'PUBLIC'
                                             ? Colors.blue.withOpacity(0.1)
@@ -176,7 +178,7 @@ class _AssignmentDetailsDialogState
                                     ),
                                   ],
                                 ),
-                                if (ex.inputText.isNotEmpty) ...[
+                                if (ex.inputValues.isNotEmpty) ...[
                                   const SizedBox(height: 8),
                                   const Text(
                                     'Inputs (Parameters):',
@@ -193,13 +195,15 @@ class _AssignmentDetailsDialogState
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
-                                          color: const Color(0xFFE2E8F0)),
+                                        color: const Color(0xFFE2E8F0),
+                                      ),
                                     ),
                                     child: Text(
-                                      ex.inputText.join('\n'),
+                                      ex.inputValues.join('\n'),
                                       style: const TextStyle(
-                                          fontFamily: 'monospace',
-                                          fontSize: 12),
+                                        fontFamily: 'monospace',
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -221,13 +225,15 @@ class _AssignmentDetailsDialogState
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
-                                          color: const Color(0xFFE2E8F0)),
+                                        color: const Color(0xFFE2E8F0),
+                                      ),
                                     ),
                                     child: Text(
                                       ex.outputText!,
                                       style: const TextStyle(
-                                          fontFamily: 'monospace',
-                                          fontSize: 12),
+                                        fontFamily: 'monospace',
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -255,7 +261,8 @@ class _AssignmentDetailsDialogState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                assignment.metadata.submissionGuide!.title ?? '',
+                                assignment.metadata.submissionGuide!.title ??
+                                    '',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 15,
@@ -263,14 +270,21 @@ class _AssignmentDetailsDialogState
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                assignment.metadata.submissionGuide!.description ?? '',
+                                assignment
+                                        .metadata
+                                        .submissionGuide!
+                                        .description ??
+                                    '',
                                 style: const TextStyle(
                                   fontSize: 13,
                                   color: Color(0xFF475569),
                                 ),
                               ),
-                              if (assignment.metadata.submissionGuide!
-                                  .commentSections.isNotEmpty) ...[
+                              if (assignment
+                                  .metadata
+                                  .submissionGuide!
+                                  .commentSections
+                                  .isNotEmpty) ...[
                                 const SizedBox(height: 12),
                                 const Text(
                                   '주석 섹션:',
@@ -285,28 +299,33 @@ class _AssignmentDetailsDialogState
                                   spacing: 6,
                                   runSpacing: 6,
                                   children: assignment
-                                      .metadata.submissionGuide!.commentSections
-                                      .map((s) => Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
+                                      .metadata
+                                      .submissionGuide!
+                                      .commentSections
+                                      .map(
+                                        (s) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              6,
                                             ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                              border: Border.all(
-                                                  color:
-                                                      const Color(0xFFCBD5E1)),
+                                            border: Border.all(
+                                              color: const Color(0xFFCBD5E1),
                                             ),
-                                            child: Text(
-                                              s,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                          ),
+                                          child: Text(
+                                            s,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                          ))
+                                          ),
+                                        ),
+                                      )
                                       .toList(),
                                 ),
                               ],
@@ -331,7 +350,9 @@ class _AssignmentDetailsDialogState
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF1E293B),
                                         borderRadius: BorderRadius.circular(6),
@@ -349,15 +370,18 @@ class _AssignmentDetailsDialogState
                                 ),
                                 const SizedBox(height: 12),
                                 if ((template.codeTemplate ?? '').isNotEmpty ||
-                                    (template.commentTemplate ?? '').isNotEmpty ||
-                                    (template.functionTemplate ?? '').isNotEmpty) ...[
+                                    (template.commentTemplate ?? '')
+                                        .isNotEmpty ||
+                                    (template.functionTemplate ?? '')
+                                        .isNotEmpty) ...[
                                   _buildReadOnlyCodeField(
                                     label: 'Code Template',
-                                    code: (template.codeTemplate?.isNotEmpty ??
+                                    code:
+                                        (template.codeTemplate?.isNotEmpty ??
                                             false)
                                         ? template.codeTemplate!
                                         : '${template.commentTemplate ?? ''}\n\n${template.functionTemplate ?? ''}'
-                                            .trim(),
+                                              .trim(),
                                     language: template.language,
                                   ),
                                   const SizedBox(height: 16),
@@ -450,7 +474,10 @@ class _AssignmentDetailsDialogState
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: const BoxDecoration(
                   color: Color(0xFF1E293B),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
@@ -540,7 +567,7 @@ class _AssignmentDetailsDialogState
         'print',
         'in',
         'is',
-        'not'
+        'not',
       ],
       'kotlin': [
         'fun',
@@ -558,7 +585,7 @@ class _AssignmentDetailsDialogState
         'override',
         'import',
         'package',
-        'void'
+        'void',
       ],
       'dart': [
         'void',
@@ -575,7 +602,7 @@ class _AssignmentDetailsDialogState
         'late',
         'dynamic',
         'static',
-        'override'
+        'override',
       ],
     };
 
@@ -602,42 +629,83 @@ class _AssignmentDetailsDialogState
       final text = match.group(0)!;
 
       if (match.group(1) != null || match.group(2) != null) {
-        spans.add(TextSpan(
-            text: text, style: const TextStyle(color: Color(0xFF86EFAC))));
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF86EFAC)),
+          ),
+        );
       } else if (match.group(3) != null ||
           match.group(4) != null ||
           match.group(5) != null) {
-        spans.add(TextSpan(
+        spans.add(
+          TextSpan(
             text: text,
             style: const TextStyle(
-                color: Color(0xFF64748B), fontStyle: FontStyle.italic)));
+              color: Color(0xFF64748B),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        );
       } else if (match.group(6) != null) {
         final word = match.group(6)!;
         if (kwList.contains(word)) {
-          spans.add(TextSpan(
+          spans.add(
+            TextSpan(
               text: text,
               style: const TextStyle(
-                  color: Color(0xFFC084FC), fontWeight: FontWeight.w700)));
+                color: Color(0xFFC084FC),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
         } else if (i + 1 < matches.length &&
             matches[i + 1].group(0)!.trim().startsWith('(')) {
-          spans.add(TextSpan(
-              text: text, style: const TextStyle(color: Color(0xFF60A5FA))));
+          spans.add(
+            TextSpan(
+              text: text,
+              style: const TextStyle(color: Color(0xFF60A5FA)),
+            ),
+          );
         } else {
-          spans.add(TextSpan(
-              text: text, style: const TextStyle(color: Color(0xFFE2E8F0))));
+          spans.add(
+            TextSpan(
+              text: text,
+              style: const TextStyle(color: Color(0xFFE2E8F0)),
+            ),
+          );
         }
       } else if (match.group(7) != null) {
-        spans.add(TextSpan(
-            text: text, style: const TextStyle(color: Color(0xFFFDE68A))));
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFFDE68A)),
+          ),
+        );
       } else if (match.group(9) != null || match.group(10) != null) {
-        spans.add(TextSpan(
-            text: text, style: const TextStyle(color: Color(0xFF94A3B8))));
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF94A3B8)),
+          ),
+        );
       } else {
-        spans.add(TextSpan(
-            text: text, style: const TextStyle(color: Color(0xFFE2E8F0))));
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFE2E8F0)),
+          ),
+        );
       }
     }
 
-    return TextSpan(children: spans, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', height: 1.5));
+    return TextSpan(
+      children: spans,
+      style: const TextStyle(
+        fontSize: 12,
+        fontFamily: 'monospace',
+        height: 1.5,
+      ),
+    );
   }
 }

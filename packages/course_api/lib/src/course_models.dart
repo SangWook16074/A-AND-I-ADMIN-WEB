@@ -131,7 +131,9 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
 abstract class AssignmentTestCase with _$AssignmentTestCase {
   const factory AssignmentTestCase({
     required int seq,
-    @JsonKey(fromJson: _inputTextFromJson) @Default([]) List<dynamic> inputText,
+    @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)
+    @Default([])
+    List<dynamic> inputValues,
     String? outputText,
     @Default('PUBLIC') String visibility,
   }) = _AssignmentTestCase;
@@ -140,7 +142,7 @@ abstract class AssignmentTestCase with _$AssignmentTestCase {
       _$AssignmentTestCaseFromJson(json);
 }
 
-List<dynamic> _inputTextFromJson(dynamic json) {
+List<dynamic> _inputValuesFromJson(dynamic json) {
   if (json == null) return const <dynamic>[];
   if (json is List) {
     try {

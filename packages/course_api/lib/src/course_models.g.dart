@@ -219,9 +219,9 @@ Map<String, dynamic> _$AssignmentRequirementToJson(
 _AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
     _AssignmentTestCase(
       seq: (json['seq'] as num).toInt(),
-      inputText: json['inputText'] == null
+      inputValues: json['inputValues'] == null
           ? const []
-          : _inputTextFromJson(json['inputText']),
+          : _inputValuesFromJson(json['inputValues']),
       outputText: json['outputText'] as String?,
       visibility: json['visibility'] as String? ?? 'PUBLIC',
     );
@@ -229,7 +229,7 @@ _AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$AssignmentTestCaseToJson(_AssignmentTestCase instance) =>
     <String, dynamic>{
       'seq': instance.seq,
-      'inputText': instance.inputText,
+      'inputValues': instance.inputValues,
       'outputText': instance.outputText,
       'visibility': instance.visibility,
     };

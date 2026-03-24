@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
-import 'dart:math';
 import 'package:aandi_course_api/aandi_course_api.dart';
+import 'package:code_text_field/code_text_field.dart';
+import 'package:highlight/languages/kotlin.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:flutter_highlight/themes/atom-one-dark.dart';
 
 import 'task_management.dart';
 import 'assignment_details_dialog.dart';
@@ -1167,7 +1171,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   // Submission Guide fields
   String _submissionGuideTitle = '';
   String _submissionGuideDescription = '';
-  String _commentSectionsText = '';
+  late final CodeController _commentSectionsController;
 
   // Code Templates
   final List<_CodeTemplateData> _codeTemplates = [
@@ -1184,27 +1188,14 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
     super.initState();
     _startAtController = TextEditingController();
     _endAtController = TextEditingController();
+    _commentSectionsController = CodeController(
+      language: dart, // just for basic highlighting or structure
+    );
 
-    // Initialize with default values for first template
-    final kTemplate = _codeTemplates[0];
-    kTemplate.codeTemplate =
-        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}";
-    kTemplate.runnableTemplate =
-        "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}";
-
-    final dTemplate = _codeTemplates[1];
-    dTemplate.codeTemplate =
-        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}";
-    dTemplate.runnableTemplate =
-        "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}";
-
-    final pTemplate = _codeTemplates[2];
-    pTemplate.codeTemplate =
-        "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer";
-    pTemplate.runnableTemplate =
-        "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())";
-
+    // Initialize with default values for templates
     for (var t in _codeTemplates) {
+      final defaults = _CodeTemplateData.getDefaultTemplates(t.language);
+      t.updateContent(defaults['code']!, defaults['runnable']!);
       t.updateControllers();
     }
   }
@@ -1213,6 +1204,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   void dispose() {
     _startAtController.dispose();
     _endAtController.dispose();
+    _commentSectionsController.dispose();
     for (var t in _codeTemplates) {
       t.dispose();
     }
@@ -1270,6 +1262,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
 
   @override
   Widget build(BuildContext context) {
+    String commentSectionsText = '';
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
       child: Column(
@@ -1612,18 +1605,6 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      /* Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: '제한 시간 (분)',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          keyboardType: TextInputType.number,
-                          onSaved: (v) =>
-                              _timeLimitMinutes = int.tryParse(v ?? ''),
-                        ),
-                      ), */
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextFormField(
@@ -1876,7 +1857,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    initialValue: _commentSectionsText,
+                    initialValue: commentSectionsText,
                     decoration: const InputDecoration(
                       labelText: '코멘트 섹션 (Comment Sections - 줄바꿈으로 구분)',
                       filled: true,
@@ -1884,7 +1865,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       hintText: '문제\n해석\n풀이',
                     ),
                     maxLines: 3,
-                    onSaved: (v) => _commentSectionsText = v?.trim() ?? '',
+                    onSaved: (v) => commentSectionsText = v?.trim() ?? '',
                   ),
                   const SizedBox(height: 12),
                   const Divider(),
@@ -1902,17 +1883,15 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            setState(() {
-                              _codeTemplates.add(
-                                _CodeTemplateData(
-                                  language: 'KOTLIN',
-                                  codeTemplate:
-                                      '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
-                                  runnableTemplate:
-                                      'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
-                                ),
-                              );
-                            });
+                            _codeTemplates.add(
+                              _CodeTemplateData(
+                                language: 'KOTLIN',
+                                codeTemplate:
+                                    '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
+                                runnableTemplate:
+                                    'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
+                              ),
+                            );
                           });
                         },
                         icon: const Icon(Icons.add, size: 18),
@@ -1996,18 +1975,16 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             },
                           ),
                           const SizedBox(height: 12),
-                          _buildCodeField(
+                          _buildPremiumCodeEditor(
                             label: '코드 템플릿',
                             controller: template.codeController,
                             language: template.language,
-                            hintText: '/* ... */\n\nfun solution() { ... }',
                           ),
                           const SizedBox(height: 16),
-                          _buildCodeField(
+                          _buildPremiumCodeEditor(
                             label: '실행 가능 템플릿 (Runnable)',
                             controller: template.runnableController,
                             language: template.language,
-                            hintText: 'fun main() { ... }',
                           ),
                         ],
                       ),
@@ -2047,7 +2024,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .map(
                                 (e) => AssignmentTestCase(
                                   seq: e.key + 1,
-                                  inputText: e.value.inputs.map((input) {
+                                  inputValues: e.value.inputs.map((input) {
                                     final trimmed = input.trim();
                                     if (trimmed.toLowerCase() == 'true') {
                                       return true;
@@ -2071,12 +2048,32 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           final codeTemplateList = _codeTemplates
                               .where((e) => e.language.isNotEmpty)
                               .map(
-                                (e) => CodeTemplate(
-                                  language: e.language,
-                                  codeTemplate: e.codeController.text.trim(),
-                                  runnableTemplate: e.runnableController.text
-                                      .trim(),
-                                ),
+                                (e) {
+                                  final code = e.codeController.text.trim();
+                                  String? comment;
+                                  String? function;
+                                  
+                                  if (code.contains('*/')) {
+                                    final parts = code.split('*/');
+                                    comment = '${parts[0]}*/'.trim();
+                                    function = parts.sublist(1).join('*/').trim();
+                                  } else if (code.contains("'''")) {
+                                    final parts = code.split("'''");
+                                    // Python templates often have two sets of triple quotes
+                                    if (parts.length >= 3) {
+                                      comment = "'''${parts[1]}'''".trim();
+                                      function = parts.sublist(2).join("'''").trim();
+                                    }
+                                  }
+
+                                  return CodeTemplate(
+                                    language: e.language,
+                                    codeTemplate: code,
+                                    runnableTemplate: e.runnableController.text.trim(),
+                                    commentTemplate: comment,
+                                    functionTemplate: function,
+                                  );
+                                },
                               )
                               .toList();
 
@@ -2119,9 +2116,11 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                         description:
                                             _submissionGuideDescription,
                                         commentSections:
-                                            _commentSectionsText.isEmpty
+                                            _commentSectionsController
+                                                .text
+                                                .isEmpty
                                             ? []
-                                            : _commentSectionsText
+                                            : _commentSectionsController.text
                                                   .split('\n')
                                                   .map((e) => e.trim())
                                                   .where((e) => e.isNotEmpty)
@@ -2138,47 +2137,14 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')),
                           );
-                          _formKey.currentState?.reset();
                           setState(() {
-                            _testCases.clear();
-                            _testCases.add(_TestCaseData());
-                            _codeTemplates.clear();
-                            _codeTemplates.add(
-                              _CodeTemplateData(language: 'KOTLIN', codeTemplate: ''),
-                            );
-                            _codeTemplates.add(
-                              _CodeTemplateData(language: 'DART', codeTemplate: ''),
-                            );
-                            _codeTemplates.add(
-                              _CodeTemplateData(language: 'PYTHON', codeTemplate: ''),
-                            );
-
-                            // Re-apply defaults to the new templates
-                            final k = _codeTemplates[0];
-                            k.codeTemplate =
-                                "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}";
-                            k.runnableTemplate =
-                                'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}';
-
-                            final d = _codeTemplates[1];
-                            d.codeTemplate =
-                                "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}";
-                            d.runnableTemplate =
-                                "String solution() {\n  return 'Hello World!';\n}\n\nvoid main() {\n  print(solution());\n}";
-
-                            final p = _codeTemplates[2];
-                            p.codeTemplate =
-                                "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer";
-                            p.runnableTemplate =
-                                "def solution():\n    return 'Hello World!'\n\nif __name__ == '__main__':\n    print(solution())";
-
                             for (var t in _codeTemplates) {
                               t.updateControllers();
                             }
 
                             _submissionGuideTitle = '';
                             _submissionGuideDescription = '';
-                            _commentSectionsText = '';
+                            _commentSectionsController.text = '';
                           });
                         }
                       },
@@ -2204,39 +2170,42 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
     );
   }
 
-  Widget _buildCodeField({
+  Widget _buildPremiumCodeEditor({
     required String label,
-    required TextEditingController controller,
+    required CodeController controller,
     required String language,
-    String? hintText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF64748B),
+            ),
           ),
         ),
-        const SizedBox(height: 8),
         Container(
-          height: 350,
+          width: double.infinity,
           decoration: BoxDecoration(
             color: const Color(0xFF0F172A),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF334155)),
+            border: Border.all(color: const Color(0xFF334155), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
+          clipBehavior: Clip.antiAlias,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
               Container(
@@ -2246,90 +2215,53 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                 ),
                 decoration: const BoxDecoration(
                   color: Color(0xFF1E293B),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    _buildDot(const Color(0xFFEF4444)),
-                    const SizedBox(width: 6),
-                    _buildDot(const Color(0xFFF59E0B)),
-                    const SizedBox(width: 6),
-                    _buildDot(const Color(0xFF10B981)),
-                    const SizedBox(width: 12),
+                    _buildDot(const Color(0xFFFF5F56)),
+                    const SizedBox(width: 8),
+                    _buildDot(const Color(0xFFFFBD2E)),
+                    const SizedBox(width: 8),
+                    _buildDot(const Color(0xFF27C93F)),
+                    const SizedBox(width: 16),
                     Text(
-                      language.toUpperCase(),
+                      '${language[0] + language.substring(1).toLowerCase()} Editor',
                       style: const TextStyle(
                         color: Color(0xFF94A3B8),
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
+                        fontFamily: 'monospace',
                       ),
                     ),
                   ],
                 ),
               ),
-              // Body
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Gutter
-                    Container(
-                      width: 45,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF0F172A),
-                        border: Border(
-                          right: BorderSide(color: Color(0xFF334155)),
-                        ),
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        child: Column(
-                          children: List.generate(
-                            max(1, controller.text.split('\n').length),
-                            (i) => Text(
-                              '${i + 1}',
-                              style: const TextStyle(
-                                color: Color(0xFF475569),
-                                fontSize: 13,
-                                fontFamily: 'monospace',
-                                height: 1.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+              // Code Area
+              CodeTheme(
+                data: CodeThemeData(styles: atomOneDarkTheme),
+                child: CodeField(
+                  controller: controller,
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'monospace',
+                    height: 1.5,
+                  ),
+                  lineNumberStyle: const LineNumberStyle(
+                    width: 45,
+                    margin: 16,
+                    textStyle: TextStyle(
+                      color: Color(0xFF475569),
+                      fontSize: 12,
+                      fontFamily: 'monospace',
                     ),
-                    // Editor
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: TextFormField(
-                          controller: controller,
-                          decoration: InputDecoration(
-                            hintText: hintText,
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          maxLines: null,
-                          cursorColor: Colors.white,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                            color: Color(0xFFE2E8F0),
-                          ),
-                          onChanged: (v) {
-                            setState(() {
-                              // Trigger rebuild for gutter
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                  decoration: const BoxDecoration(color: Color(0xFF0F172A)),
+                  maxLines: null,
+                  minLines: 5,
                 ),
               ),
             ],
@@ -2362,27 +2294,21 @@ class _TestCaseData {
 
 class _CodeTemplateData {
   String language;
-  String codeTemplate = '';
-  String runnableTemplate = '';
-
-  late final TextEditingController codeController;
-  late final TextEditingController runnableController;
+  late final CodeController codeController;
+  late final CodeController runnableController;
 
   _CodeTemplateData({
     this.language = 'KOTLIN',
     String codeTemplate = '',
     String runnableTemplate = '',
   }) {
-    this.codeTemplate = codeTemplate;
-    this.runnableTemplate = runnableTemplate;
-
-    codeController = _PremiumCodeController(
+    codeController = CodeController(
       text: codeTemplate.replaceAll('\\n', '\n'),
-      language: language,
+      language: _getLanguage(language),
     );
-    runnableController = _PremiumCodeController(
+    runnableController = CodeController(
       text: runnableTemplate.replaceAll('\\n', '\n'),
-      language: language,
+      language: _getLanguage(language),
     );
   }
 
@@ -2391,189 +2317,64 @@ class _CodeTemplateData {
     runnableController.dispose();
   }
 
+  void updateContent(String code, String runnable) {
+    codeController.text = code.replaceAll('\\n', '\n');
+    runnableController.text = runnable.replaceAll('\\n', '\n');
+  }
+
   void updateControllers() {
-    codeController.text = codeTemplate.replaceAll('\\n', '\n');
-    runnableController.text = runnableTemplate.replaceAll('\\n', '\n');
-    (codeController as _PremiumCodeController).language = language;
-    (runnableController as _PremiumCodeController).language = language;
+    codeController.language = _getLanguage(language);
+    runnableController.language = _getLanguage(language);
   }
 
   void updateLanguage(String lang) {
     language = lang;
-    (codeController as _PremiumCodeController).language = lang;
-    (runnableController as _PremiumCodeController).language = lang;
+    codeController.language = _getLanguage(lang);
+    runnableController.language = _getLanguage(lang);
+
+    // Automatically update to default template for the new language
+    final defaults = getDefaultTemplates(lang);
+    updateContent(defaults['code']!, defaults['runnable']!);
   }
-}
 
-class _PremiumCodeController extends TextEditingController {
-  String language;
-  _PremiumCodeController({required String text, required this.language})
-    : super(text: text);
-
-  @override
-  TextSpan buildTextSpan({
-    required BuildContext context,
-    TextStyle? style,
-    required bool withComposing,
-  }) {
-    return _highlightCode(text, language);
-  }
-}
-
-TextSpan _highlightCode(String code, String language) {
-  final lang = language.toLowerCase();
-  const keywords = {
-    'python': [
-      'def',
-      'return',
-      'if',
-      'else',
-      'elif',
-      'for',
-      'while',
-      'import',
-      'from',
-      'as',
-      'class',
-      'try',
-      'except',
-      'pass',
-      'print',
-      'in',
-      'is',
-      'not',
-    ],
-    'kotlin': [
-      'fun',
-      'val',
-      'var',
-      'if',
-      'else',
-      'when',
-      'for',
-      'while',
-      'return',
-      'class',
-      'interface',
-      'object',
-      'override',
-      'import',
-      'package',
-      'void',
-    ],
-    'dart': [
-      'void',
-      'final',
-      'var',
-      'if',
-      'else',
-      'return',
-      'class',
-      'import',
-      'package',
-      'async',
-      'await',
-      'late',
-      'dynamic',
-      'static',
-      'override',
-    ],
-  };
-
-  final kwList = keywords[lang] ?? keywords['kotlin']!;
-  final spans = <TextSpan>[];
-
-  final combinedRegex = RegExp(
-    r'(".*?")|'
-    r"('.*?')|"
-    r'(\/\/.*)|'
-    r'(\/\*[\s\S]*?\*\/)|'
-    r'(#.*)|'
-    r'([a-zA-Z_][a-zA-Z0-9_]*)|'
-    r'(\d+(\.\d*)?)|'
-    r'([{}()\[\]])|'
-    r'([+\-*/%=<>!&|^~,.:;])|'
-    r'(\s+)',
-  );
-
-  final matches = combinedRegex.allMatches(code).toList();
-
-  for (var i = 0; i < matches.length; i++) {
-    final match = matches[i];
-    final text = match.group(0)!;
-
-    if (match.group(1) != null || match.group(2) != null) {
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFF86EFAC)),
-        ),
-      );
-    } else if (match.group(3) != null ||
-        match.group(4) != null ||
-        match.group(5) != null) {
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(
-            color: Color(0xFF64748B),
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    } else if (match.group(6) != null) {
-      final word = match.group(6)!;
-      if (kwList.contains(word)) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(
-              color: Color(0xFFC084FC),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        );
-      } else if (i + 1 < matches.length &&
-          matches[i + 1].group(0)!.trim().startsWith('(')) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFF60A5FA)),
-          ),
-        );
-      } else {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFFE2E8F0)),
-          ),
-        );
-      }
-    } else if (match.group(7) != null) {
-      // Numbers
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFFFDE68A)),
-        ),
-      );
-    } else if (match.group(9) != null || match.group(10) != null) {
-      // Punctuation/Operators
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFF94A3B8)),
-        ),
-      );
-    } else {
-      spans.add(
-        TextSpan(
-          text: text,
-          style: const TextStyle(color: Color(0xFFE2E8F0)),
-        ),
-      );
+  static Map<String, String> getDefaultTemplates(String lang) {
+    switch (lang.toUpperCase()) {
+      case 'KOTLIN':
+        return {
+          'code':
+              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
+          'runnable':
+              "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}",
+        };
+      case 'DART':
+        return {
+          'code':
+              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
+          'runnable':
+              "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}",
+        };
+      case 'PYTHON':
+        return {
+          'code':
+              "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
+          'runnable':
+              "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())",
+        };
+      default:
+        return {'code': '', 'runnable': ''};
     }
   }
 
-  return TextSpan(children: spans);
+  dynamic _getLanguage(String lang) {
+    switch (lang.toUpperCase()) {
+      case 'KOTLIN':
+        return kotlin;
+      case 'DART':
+        return dart;
+      case 'PYTHON':
+        return python;
+      default:
+        return kotlin;
+    }
+  }
 }
