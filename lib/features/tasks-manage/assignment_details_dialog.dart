@@ -176,7 +176,7 @@ class _AssignmentDetailsDialogState
                                     ),
                                   ],
                                 ),
-                                if (ex.inputValues.isNotEmpty) ...[
+                                if (ex.inputText.isNotEmpty) ...[
                                   const SizedBox(height: 8),
                                   const Text(
                                     'Inputs (Parameters):',
@@ -196,7 +196,7 @@ class _AssignmentDetailsDialogState
                                           color: const Color(0xFFE2E8F0)),
                                     ),
                                     child: Text(
-                                      ex.inputValues.join('\n'),
+                                      ex.inputText.join('\n'),
                                       style: const TextStyle(
                                           fontFamily: 'monospace',
                                           fontSize: 12),
@@ -348,20 +348,16 @@ class _AssignmentDetailsDialogState
                                   ],
                                 ),
                                 const SizedBox(height: 12),
-                                if (template.commentTemplate != null &&
-                                    template.commentTemplate!.isNotEmpty) ...[
+                                if ((template.codeTemplate ?? '').isNotEmpty ||
+                                    (template.commentTemplate ?? '').isNotEmpty ||
+                                    (template.functionTemplate ?? '').isNotEmpty) ...[
                                   _buildReadOnlyCodeField(
-                                    label: 'Comment Template',
-                                    code: template.commentTemplate!,
-                                    language: template.language,
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                                if (template.functionTemplate != null &&
-                                    template.functionTemplate!.isNotEmpty) ...[
-                                  _buildReadOnlyCodeField(
-                                    label: 'Function Template',
-                                    code: template.functionTemplate!,
+                                    label: 'Code Template',
+                                    code: (template.codeTemplate?.isNotEmpty ??
+                                            false)
+                                        ? template.codeTemplate!
+                                        : '${template.commentTemplate ?? ''}\n\n${template.functionTemplate ?? ''}'
+                                            .trim(),
                                     language: template.language,
                                   ),
                                   const SizedBox(height: 16),

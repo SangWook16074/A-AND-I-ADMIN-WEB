@@ -1171,9 +1171,9 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
 
   // Code Templates
   final List<_CodeTemplateData> _codeTemplates = [
-    _CodeTemplateData(language: 'KOTLIN'),
-    _CodeTemplateData(language: 'DART'),
-    _CodeTemplateData(language: 'PYTHON'),
+    _CodeTemplateData(language: 'KOTLIN', codeTemplate: ''),
+    _CodeTemplateData(language: 'DART', codeTemplate: ''),
+    _CodeTemplateData(language: 'PYTHON', codeTemplate: ''),
   ];
 
   late TextEditingController _startAtController;
@@ -1187,26 +1187,20 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
 
     // Initialize with default values for first template
     final kTemplate = _codeTemplates[0];
-    kTemplate.commentTemplate =
-        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
-    kTemplate.functionTemplate =
-        "fun solution(): String {\n    var answer = \"\"\n    return answer\n}";
+    kTemplate.codeTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}";
     kTemplate.runnableTemplate =
         "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}";
 
     final dTemplate = _codeTemplates[1];
-    dTemplate.commentTemplate =
-        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
-    dTemplate.functionTemplate =
-        "String solution() {\n  var answer = '';\n  return answer;\n}";
+    dTemplate.codeTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}";
     dTemplate.runnableTemplate =
         "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}";
 
     final pTemplate = _codeTemplates[2];
-    pTemplate.commentTemplate =
-        "\"\"\"\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n\"\"\"";
-    pTemplate.functionTemplate =
-        "def solution():\n    answer = ''\n    return answer";
+    pTemplate.codeTemplate =
+        "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer";
     pTemplate.runnableTemplate =
         "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())";
 
@@ -1912,10 +1906,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               _codeTemplates.add(
                                 _CodeTemplateData(
                                   language: 'KOTLIN',
-                                  commentTemplate:
-                                      '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
-                                  functionTemplate:
-                                      'fun solution(): String {\n    var answer = ""\n    return answer\n}',
+                                  codeTemplate:
+                                      '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
                                   runnableTemplate:
                                       'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
                                 ),
@@ -2005,17 +1997,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ),
                           const SizedBox(height: 12),
                           _buildCodeField(
-                            label: '코멘트 템플릿 (Comment)',
-                            controller: template.commentController,
+                            label: '코드 템플릿',
+                            controller: template.codeController,
                             language: template.language,
-                            hintText: '/*\\n[문제]\\n...*/',
-                          ),
-                          const SizedBox(height: 16),
-                          _buildCodeField(
-                            label: '함수 템플릿 (Function)',
-                            controller: template.functionController,
-                            language: template.language,
-                            hintText: 'fun solution() { ... }',
+                            hintText: '/* ... */\n\nfun solution() { ... }',
                           ),
                           const SizedBox(height: 16),
                           _buildCodeField(
@@ -2062,9 +2047,18 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .map(
                                 (e) => AssignmentTestCase(
                                   seq: e.key + 1,
-                                  inputValues: e.value.inputs
-                                      .map((e) => e.replaceAll('\\n', '\n'))
-                                      .toList(),
+                                  inputText: e.value.inputs.map((input) {
+                                    final trimmed = input.trim();
+                                    if (trimmed.toLowerCase() == 'true') {
+                                      return true;
+                                    }
+                                    if (trimmed.toLowerCase() == 'false') {
+                                      return false;
+                                    }
+                                    final numVal = num.tryParse(trimmed);
+                                    if (numVal != null) return numVal;
+                                    return trimmed.replaceAll('\\n', '\n');
+                                  }).toList(),
                                   outputText: e.value.output.replaceAll(
                                     '\\n',
                                     '\n',
@@ -2079,10 +2073,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .map(
                                 (e) => CodeTemplate(
                                   language: e.language,
-                                  commentTemplate: e.commentController.text
-                                      .trim(),
-                                  functionTemplate: e.functionController.text
-                                      .trim(),
+                                  codeTemplate: e.codeController.text.trim(),
                                   runnableTemplate: e.runnableController.text
                                       .trim(),
                                 ),
@@ -2153,39 +2144,33 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             _testCases.add(_TestCaseData());
                             _codeTemplates.clear();
                             _codeTemplates.add(
-                              _CodeTemplateData(language: 'KOTLIN'),
+                              _CodeTemplateData(language: 'KOTLIN', codeTemplate: ''),
                             );
                             _codeTemplates.add(
-                              _CodeTemplateData(language: 'DART'),
+                              _CodeTemplateData(language: 'DART', codeTemplate: ''),
                             );
                             _codeTemplates.add(
-                              _CodeTemplateData(language: 'PYTHON'),
+                              _CodeTemplateData(language: 'PYTHON', codeTemplate: ''),
                             );
 
                             // Re-apply defaults to the new templates
                             final k = _codeTemplates[0];
-                            k.commentTemplate =
-                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
-                            k.functionTemplate =
-                                'fun solution(): String {\n    var answer = ""\n    return answer\n}';
+                            k.codeTemplate =
+                                "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}";
                             k.runnableTemplate =
                                 'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}';
 
                             final d = _codeTemplates[1];
-                            d.commentTemplate =
-                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
-                            d.functionTemplate =
-                                'String solution() {\n  var answer = "";\n  return answer;\n}';
+                            d.codeTemplate =
+                                "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}";
                             d.runnableTemplate =
-                                'String solution() {\n  var answer = "Hello World!";\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}';
+                                "String solution() {\n  return 'Hello World!';\n}\n\nvoid main() {\n  print(solution());\n}";
 
                             final p = _codeTemplates[2];
-                            p.commentTemplate =
-                                '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""';
-                            p.functionTemplate =
-                                'def solution():\n    answer = ""\n    return answer';
+                            p.codeTemplate =
+                                "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer";
                             p.runnableTemplate =
-                                'def solution():\n    answer = "Hello World!"\n    return answer\n\nif __name__ == "__main__":\n    print(solution())';
+                                "def solution():\n    return 'Hello World!'\n\nif __name__ == '__main__':\n    print(solution())";
 
                             for (var t in _codeTemplates) {
                               t.updateControllers();
@@ -2377,30 +2362,22 @@ class _TestCaseData {
 
 class _CodeTemplateData {
   String language;
-  String commentTemplate = '';
-  String functionTemplate = '';
+  String codeTemplate = '';
   String runnableTemplate = '';
 
-  late final TextEditingController commentController;
-  late final TextEditingController functionController;
+  late final TextEditingController codeController;
   late final TextEditingController runnableController;
 
   _CodeTemplateData({
     this.language = 'KOTLIN',
-    String commentTemplate = '',
-    String functionTemplate = '',
+    String codeTemplate = '',
     String runnableTemplate = '',
   }) {
-    this.commentTemplate = commentTemplate;
-    this.functionTemplate = functionTemplate;
+    this.codeTemplate = codeTemplate;
     this.runnableTemplate = runnableTemplate;
 
-    commentController = _PremiumCodeController(
-      text: commentTemplate.replaceAll('\\n', '\n'),
-      language: language,
-    );
-    functionController = _PremiumCodeController(
-      text: functionTemplate.replaceAll('\\n', '\n'),
+    codeController = _PremiumCodeController(
+      text: codeTemplate.replaceAll('\\n', '\n'),
       language: language,
     );
     runnableController = _PremiumCodeController(
@@ -2410,24 +2387,20 @@ class _CodeTemplateData {
   }
 
   void dispose() {
-    commentController.dispose();
-    functionController.dispose();
+    codeController.dispose();
     runnableController.dispose();
   }
 
   void updateControllers() {
-    commentController.text = commentTemplate.replaceAll('\\n', '\n');
-    functionController.text = functionTemplate.replaceAll('\\n', '\n');
+    codeController.text = codeTemplate.replaceAll('\\n', '\n');
     runnableController.text = runnableTemplate.replaceAll('\\n', '\n');
-    (commentController as _PremiumCodeController).language = language;
-    (functionController as _PremiumCodeController).language = language;
+    (codeController as _PremiumCodeController).language = language;
     (runnableController as _PremiumCodeController).language = language;
   }
 
   void updateLanguage(String lang) {
     language = lang;
-    (commentController as _PremiumCodeController).language = lang;
-    (functionController as _PremiumCodeController).language = lang;
+    (codeController as _PremiumCodeController).language = lang;
     (runnableController as _PremiumCodeController).language = lang;
   }
 }

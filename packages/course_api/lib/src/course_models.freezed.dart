@@ -2353,7 +2353,7 @@ as String,
 /// @nodoc
 mixin _$AssignmentTestCase {
 
- int get seq; List<String> get inputValues; String? get outputText; String get visibility;
+ int get seq;@JsonKey(fromJson: _inputTextFromJson) List<dynamic> get inputText; String? get outputText; String get visibility;
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2366,16 +2366,16 @@ $AssignmentTestCaseCopyWith<AssignmentTestCase> get copyWith => _$AssignmentTest
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other.inputValues, inputValues)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other.inputText, inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(inputValues),outputText,visibility);
+int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(inputText),outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentTestCase(seq: $seq, inputValues: $inputValues, outputText: $outputText, visibility: $visibility)';
+  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
 }
 
 
@@ -2386,7 +2386,7 @@ abstract mixin class $AssignmentTestCaseCopyWith<$Res>  {
   factory $AssignmentTestCaseCopyWith(AssignmentTestCase value, $Res Function(AssignmentTestCase) _then) = _$AssignmentTestCaseCopyWithImpl;
 @useResult
 $Res call({
- int seq, List<String> inputValues, String? outputText, String visibility
+ int seq,@JsonKey(fromJson: _inputTextFromJson) List<dynamic> inputText, String? outputText, String visibility
 });
 
 
@@ -2403,11 +2403,11 @@ class _$AssignmentTestCaseCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputValues = null,Object? outputText = freezed,Object? visibility = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? seq = null,Object? inputText = null,Object? outputText = freezed,Object? visibility = null,}) {
   return _then(_self.copyWith(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
-as int,inputValues: null == inputValues ? _self.inputValues : inputValues // ignore: cast_nullable_to_non_nullable
-as List<String>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
+as int,inputText: null == inputText ? _self.inputText : inputText // ignore: cast_nullable_to_non_nullable
+as List<dynamic>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -2494,10 +2494,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq, @JsonKey(fromJson: _inputTextFromJson)  List<dynamic> inputText,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
-return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   return orElse();
 
 }
@@ -2515,10 +2515,10 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq, @JsonKey(fromJson: _inputTextFromJson)  List<dynamic> inputText,  String? outputText,  String visibility)  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase():
-return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2535,10 +2535,10 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq,  List<String> inputValues,  String? outputText,  String visibility)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq, @JsonKey(fromJson: _inputTextFromJson)  List<dynamic> inputText,  String? outputText,  String visibility)?  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
-return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
+return $default(_that.seq,_that.inputText,_that.outputText,_that.visibility);case _:
   return null;
 
 }
@@ -2550,15 +2550,15 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 @JsonSerializable()
 
 class _AssignmentTestCase implements AssignmentTestCase {
-  const _AssignmentTestCase({required this.seq, final  List<String> inputValues = const [], this.outputText, this.visibility = 'PUBLIC'}): _inputValues = inputValues;
+  const _AssignmentTestCase({required this.seq, @JsonKey(fromJson: _inputTextFromJson) final  List<dynamic> inputText = const [], this.outputText, this.visibility = 'PUBLIC'}): _inputText = inputText;
   factory _AssignmentTestCase.fromJson(Map<String, dynamic> json) => _$AssignmentTestCaseFromJson(json);
 
 @override final  int seq;
- final  List<String> _inputValues;
-@override@JsonKey() List<String> get inputValues {
-  if (_inputValues is EqualUnmodifiableListView) return _inputValues;
+ final  List<dynamic> _inputText;
+@override@JsonKey(fromJson: _inputTextFromJson) List<dynamic> get inputText {
+  if (_inputText is EqualUnmodifiableListView) return _inputText;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_inputValues);
+  return EqualUnmodifiableListView(_inputText);
 }
 
 @override final  String? outputText;
@@ -2577,16 +2577,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other._inputValues, _inputValues)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssignmentTestCase&&(identical(other.seq, seq) || other.seq == seq)&&const DeepCollectionEquality().equals(other._inputText, _inputText)&&(identical(other.outputText, outputText) || other.outputText == outputText)&&(identical(other.visibility, visibility) || other.visibility == visibility));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(_inputValues),outputText,visibility);
+int get hashCode => Object.hash(runtimeType,seq,const DeepCollectionEquality().hash(_inputText),outputText,visibility);
 
 @override
 String toString() {
-  return 'AssignmentTestCase(seq: $seq, inputValues: $inputValues, outputText: $outputText, visibility: $visibility)';
+  return 'AssignmentTestCase(seq: $seq, inputText: $inputText, outputText: $outputText, visibility: $visibility)';
 }
 
 
@@ -2597,7 +2597,7 @@ abstract mixin class _$AssignmentTestCaseCopyWith<$Res> implements $AssignmentTe
   factory _$AssignmentTestCaseCopyWith(_AssignmentTestCase value, $Res Function(_AssignmentTestCase) _then) = __$AssignmentTestCaseCopyWithImpl;
 @override @useResult
 $Res call({
- int seq, List<String> inputValues, String? outputText, String visibility
+ int seq,@JsonKey(fromJson: _inputTextFromJson) List<dynamic> inputText, String? outputText, String visibility
 });
 
 
@@ -2614,11 +2614,11 @@ class __$AssignmentTestCaseCopyWithImpl<$Res>
 
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputValues = null,Object? outputText = freezed,Object? visibility = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? seq = null,Object? inputText = null,Object? outputText = freezed,Object? visibility = null,}) {
   return _then(_AssignmentTestCase(
 seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
-as int,inputValues: null == inputValues ? _self._inputValues : inputValues // ignore: cast_nullable_to_non_nullable
-as List<String>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
+as int,inputText: null == inputText ? _self._inputText : inputText // ignore: cast_nullable_to_non_nullable
+as List<dynamic>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -3190,7 +3190,7 @@ as int?,
 /// @nodoc
 mixin _$SubmissionGuide {
 
- String? get title; String? get description; List<String> get commentSections;
+ String? get title; String? get description;@JsonKey(fromJson: _commentSectionsFromJson) List<String> get commentSections;
 /// Create a copy of SubmissionGuide
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3223,7 +3223,7 @@ abstract mixin class $SubmissionGuideCopyWith<$Res>  {
   factory $SubmissionGuideCopyWith(SubmissionGuide value, $Res Function(SubmissionGuide) _then) = _$SubmissionGuideCopyWithImpl;
 @useResult
 $Res call({
- String? title, String? description, List<String> commentSections
+ String? title, String? description,@JsonKey(fromJson: _commentSectionsFromJson) List<String> commentSections
 });
 
 
@@ -3330,7 +3330,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title,  String? description,  List<String> commentSections)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title,  String? description, @JsonKey(fromJson: _commentSectionsFromJson)  List<String> commentSections)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SubmissionGuide() when $default != null:
 return $default(_that.title,_that.description,_that.commentSections);case _:
@@ -3351,7 +3351,7 @@ return $default(_that.title,_that.description,_that.commentSections);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title,  String? description,  List<String> commentSections)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title,  String? description, @JsonKey(fromJson: _commentSectionsFromJson)  List<String> commentSections)  $default,) {final _that = this;
 switch (_that) {
 case _SubmissionGuide():
 return $default(_that.title,_that.description,_that.commentSections);case _:
@@ -3371,7 +3371,7 @@ return $default(_that.title,_that.description,_that.commentSections);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title,  String? description,  List<String> commentSections)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title,  String? description, @JsonKey(fromJson: _commentSectionsFromJson)  List<String> commentSections)?  $default,) {final _that = this;
 switch (_that) {
 case _SubmissionGuide() when $default != null:
 return $default(_that.title,_that.description,_that.commentSections);case _:
@@ -3386,13 +3386,13 @@ return $default(_that.title,_that.description,_that.commentSections);case _:
 @JsonSerializable()
 
 class _SubmissionGuide implements SubmissionGuide {
-  const _SubmissionGuide({this.title, this.description, final  List<String> commentSections = const []}): _commentSections = commentSections;
+  const _SubmissionGuide({this.title, this.description, @JsonKey(fromJson: _commentSectionsFromJson) final  List<String> commentSections = const []}): _commentSections = commentSections;
   factory _SubmissionGuide.fromJson(Map<String, dynamic> json) => _$SubmissionGuideFromJson(json);
 
 @override final  String? title;
 @override final  String? description;
  final  List<String> _commentSections;
-@override@JsonKey() List<String> get commentSections {
+@override@JsonKey(fromJson: _commentSectionsFromJson) List<String> get commentSections {
   if (_commentSections is EqualUnmodifiableListView) return _commentSections;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_commentSections);
@@ -3432,7 +3432,7 @@ abstract mixin class _$SubmissionGuideCopyWith<$Res> implements $SubmissionGuide
   factory _$SubmissionGuideCopyWith(_SubmissionGuide value, $Res Function(_SubmissionGuide) _then) = __$SubmissionGuideCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, String? description, List<String> commentSections
+ String? title, String? description,@JsonKey(fromJson: _commentSectionsFromJson) List<String> commentSections
 });
 
 
@@ -3465,7 +3465,7 @@ as List<String>,
 /// @nodoc
 mixin _$CodeTemplate {
 
- String get language; String? get commentTemplate; String? get functionTemplate; String? get runnableTemplate;
+ String get language; String? get codeTemplate; String? get runnableTemplate; String? get commentTemplate; String? get functionTemplate;
 /// Create a copy of CodeTemplate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3478,16 +3478,16 @@ $CodeTemplateCopyWith<CodeTemplate> get copyWith => _$CodeTemplateCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.codeTemplate, codeTemplate) || other.codeTemplate == codeTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,language,commentTemplate,functionTemplate,runnableTemplate);
+int get hashCode => Object.hash(runtimeType,language,codeTemplate,runnableTemplate,commentTemplate,functionTemplate);
 
 @override
 String toString() {
-  return 'CodeTemplate(language: $language, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate, runnableTemplate: $runnableTemplate)';
+  return 'CodeTemplate(language: $language, codeTemplate: $codeTemplate, runnableTemplate: $runnableTemplate, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate)';
 }
 
 
@@ -3498,7 +3498,7 @@ abstract mixin class $CodeTemplateCopyWith<$Res>  {
   factory $CodeTemplateCopyWith(CodeTemplate value, $Res Function(CodeTemplate) _then) = _$CodeTemplateCopyWithImpl;
 @useResult
 $Res call({
- String language, String? commentTemplate, String? functionTemplate, String? runnableTemplate
+ String language, String? codeTemplate, String? runnableTemplate, String? commentTemplate, String? functionTemplate
 });
 
 
@@ -3515,12 +3515,13 @@ class _$CodeTemplateCopyWithImpl<$Res>
 
 /// Create a copy of CodeTemplate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? language = null,Object? commentTemplate = freezed,Object? functionTemplate = freezed,Object? runnableTemplate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? language = null,Object? codeTemplate = freezed,Object? runnableTemplate = freezed,Object? commentTemplate = freezed,Object? functionTemplate = freezed,}) {
   return _then(_self.copyWith(
 language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
-as String,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
-as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
+as String,codeTemplate: freezed == codeTemplate ? _self.codeTemplate : codeTemplate // ignore: cast_nullable_to_non_nullable
 as String?,runnableTemplate: freezed == runnableTemplate ? _self.runnableTemplate : runnableTemplate // ignore: cast_nullable_to_non_nullable
+as String?,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
+as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -3606,10 +3607,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String language,  String? codeTemplate,  String? runnableTemplate,  String? commentTemplate,  String? functionTemplate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CodeTemplate() when $default != null:
-return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+return $default(_that.language,_that.codeTemplate,_that.runnableTemplate,_that.commentTemplate,_that.functionTemplate);case _:
   return orElse();
 
 }
@@ -3627,10 +3628,10 @@ return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String language,  String? codeTemplate,  String? runnableTemplate,  String? commentTemplate,  String? functionTemplate)  $default,) {final _that = this;
 switch (_that) {
 case _CodeTemplate():
-return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+return $default(_that.language,_that.codeTemplate,_that.runnableTemplate,_that.commentTemplate,_that.functionTemplate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3647,10 +3648,10 @@ return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String language,  String? commentTemplate,  String? functionTemplate,  String? runnableTemplate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String language,  String? codeTemplate,  String? runnableTemplate,  String? commentTemplate,  String? functionTemplate)?  $default,) {final _that = this;
 switch (_that) {
 case _CodeTemplate() when $default != null:
-return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_that.runnableTemplate);case _:
+return $default(_that.language,_that.codeTemplate,_that.runnableTemplate,_that.commentTemplate,_that.functionTemplate);case _:
   return null;
 
 }
@@ -3662,13 +3663,14 @@ return $default(_that.language,_that.commentTemplate,_that.functionTemplate,_tha
 @JsonSerializable()
 
 class _CodeTemplate implements CodeTemplate {
-  const _CodeTemplate({required this.language, this.commentTemplate, this.functionTemplate, this.runnableTemplate});
+  const _CodeTemplate({required this.language, this.codeTemplate, this.runnableTemplate, this.commentTemplate, this.functionTemplate});
   factory _CodeTemplate.fromJson(Map<String, dynamic> json) => _$CodeTemplateFromJson(json);
 
 @override final  String language;
+@override final  String? codeTemplate;
+@override final  String? runnableTemplate;
 @override final  String? commentTemplate;
 @override final  String? functionTemplate;
-@override final  String? runnableTemplate;
 
 /// Create a copy of CodeTemplate
 /// with the given fields replaced by the non-null parameter values.
@@ -3683,16 +3685,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CodeTemplate&&(identical(other.language, language) || other.language == language)&&(identical(other.codeTemplate, codeTemplate) || other.codeTemplate == codeTemplate)&&(identical(other.runnableTemplate, runnableTemplate) || other.runnableTemplate == runnableTemplate)&&(identical(other.commentTemplate, commentTemplate) || other.commentTemplate == commentTemplate)&&(identical(other.functionTemplate, functionTemplate) || other.functionTemplate == functionTemplate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,language,commentTemplate,functionTemplate,runnableTemplate);
+int get hashCode => Object.hash(runtimeType,language,codeTemplate,runnableTemplate,commentTemplate,functionTemplate);
 
 @override
 String toString() {
-  return 'CodeTemplate(language: $language, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate, runnableTemplate: $runnableTemplate)';
+  return 'CodeTemplate(language: $language, codeTemplate: $codeTemplate, runnableTemplate: $runnableTemplate, commentTemplate: $commentTemplate, functionTemplate: $functionTemplate)';
 }
 
 
@@ -3703,7 +3705,7 @@ abstract mixin class _$CodeTemplateCopyWith<$Res> implements $CodeTemplateCopyWi
   factory _$CodeTemplateCopyWith(_CodeTemplate value, $Res Function(_CodeTemplate) _then) = __$CodeTemplateCopyWithImpl;
 @override @useResult
 $Res call({
- String language, String? commentTemplate, String? functionTemplate, String? runnableTemplate
+ String language, String? codeTemplate, String? runnableTemplate, String? commentTemplate, String? functionTemplate
 });
 
 
@@ -3720,12 +3722,13 @@ class __$CodeTemplateCopyWithImpl<$Res>
 
 /// Create a copy of CodeTemplate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? language = null,Object? commentTemplate = freezed,Object? functionTemplate = freezed,Object? runnableTemplate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? language = null,Object? codeTemplate = freezed,Object? runnableTemplate = freezed,Object? commentTemplate = freezed,Object? functionTemplate = freezed,}) {
   return _then(_CodeTemplate(
 language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
-as String,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
-as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
+as String,codeTemplate: freezed == codeTemplate ? _self.codeTemplate : codeTemplate // ignore: cast_nullable_to_non_nullable
 as String?,runnableTemplate: freezed == runnableTemplate ? _self.runnableTemplate : runnableTemplate // ignore: cast_nullable_to_non_nullable
+as String?,commentTemplate: freezed == commentTemplate ? _self.commentTemplate : commentTemplate // ignore: cast_nullable_to_non_nullable
+as String?,functionTemplate: freezed == functionTemplate ? _self.functionTemplate : functionTemplate // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

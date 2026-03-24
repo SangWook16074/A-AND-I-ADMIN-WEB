@@ -102,7 +102,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     _status = fullAssignment.status;
     _testCases = fullAssignment.metadata.testCases
         .map((tc) => _TestCaseData(
-              inputs: tc.inputValues,
+              inputs: tc.inputText.map((e) => e.toString()).toList(),
               output: tc.outputText ?? '',
               visibility: tc.visibility,
             ))
@@ -122,12 +122,14 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         fullAssignment.metadata.problemDetail?.classification?.difficultyStep ??
         1;
 
-    _submissionGuideTitle = fullAssignment.metadata.submissionGuide?.title ?? '';
-    _submissionGuideDescription =
-        fullAssignment.metadata.submissionGuide?.description ?? '';
-    _commentSectionsText =
-        (fullAssignment.metadata.submissionGuide?.commentSections ?? [])
-            .join('\n');
+    final guide = fullAssignment.metadata.submissionGuide;
+    _submissionGuideTitle = (guide?.title == '문제 풀이 템플릿') ? '' : (guide?.title ?? '');
+    _submissionGuideDescription = (guide?.description == '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.')
+        ? ''
+        : (guide?.description ?? '');
+    _commentSectionsText = (guide?.commentSections.join('\n') == '문제\n해석\n풀이')
+        ? ''
+        : (guide?.commentSections ?? []).join('\n');
 
     _requirementsText = fullAssignment.metadata.requirements
         .map((e) => e.requirementText)
@@ -137,8 +139,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         .map(
           (e) => _CodeTemplateData(
             language: e.language,
-            commentTemplate: e.commentTemplate ?? '',
-            functionTemplate: e.functionTemplate ?? '',
+            codeTemplate: e.codeTemplate ??
+                '${e.commentTemplate ?? ''}\n\n${e.functionTemplate ?? ''}'
+                    .trim(),
             runnableTemplate: e.runnableTemplate ?? '',
           ),
         )
@@ -148,27 +151,22 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       _codeTemplates = [
         _CodeTemplateData(
           language: 'KOTLIN',
-          commentTemplate:
-              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
-          functionTemplate:
-              'fun solution(): String {\n    var answer = ""\n    return answer\n}',
+          codeTemplate:
+              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
           runnableTemplate:
               'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
         ),
         _CodeTemplateData(
           language: 'DART',
-          commentTemplate:
-              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
-          functionTemplate:
-              'String solution() {\n    var answer = "";\n    return answer;\n}',
+          codeTemplate:
+              '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n    var answer = "";\n    return answer;\n}',
           runnableTemplate:
               'String solution() {\n    var answer = "Hello World!";\n    return answer;\n}\n\nvoid main() {\n    print(solution());\n}',
         ),
         _CodeTemplateData(
           language: 'PYTHON',
-          commentTemplate:
-              '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""',
-          functionTemplate: 'def solution():\n    answer = ""\n    return answer',
+          codeTemplate:
+              '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""\n\ndef solution():\n    answer = ""\n    return answer',
           runnableTemplate:
               'def solution():\n    answer = "Hello World!"\n    return answer\n\nif __name__ == "__main__":\n    print(solution())',
         ),
@@ -263,9 +261,14 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           .map(
             (e) => AssignmentTestCase(
               seq: e.key + 1,
-              inputValues: e.value.inputs
-                  .map((e) => e.replaceAll('\\n', '\n'))
-                  .toList(),
+              inputText: e.value.inputs.map((input) {
+                final trimmed = input.trim();
+                if (trimmed.toLowerCase() == 'true') return true;
+                if (trimmed.toLowerCase() == 'false') return false;
+                final numVal = num.tryParse(trimmed);
+                if (numVal != null) return numVal;
+                return trimmed.replaceAll('\\n', '\n');
+              }).toList(),
               outputText: e.value.output.replaceAll('\\n', '\n'),
               visibility: e.value.visibility,
             ),
@@ -277,8 +280,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           .map(
             (e) => CodeTemplate(
               language: e.language,
-              commentTemplate: e.commentController.text,
-              functionTemplate: e.functionController.text,
+              codeTemplate: e.codeController.text,
               runnableTemplate: e.runnableController.text,
             ),
           )
@@ -780,10 +782,8 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                             setState(() {
                               _codeTemplates.add(_CodeTemplateData(
                                 language: 'KOTLIN',
-                                commentTemplate:
-                                    '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
-                                functionTemplate:
-                                    'fun solution(): String {\n    var answer = ""\n    return answer\n}',
+                                codeTemplate:
+                                    '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = ""\n    return answer\n}',
                                 runnableTemplate:
                                     'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
                               ));
@@ -860,14 +860,8 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                               ),
                               const SizedBox(height: 12),
                               _buildPremiumCodeEditor(
-                                label: '주석 템플릿 (Comment Template)',
-                                controller: template.commentController,
-                                language: template.language,
-                              ),
-                              const SizedBox(height: 12),
-                              _buildPremiumCodeEditor(
-                                label: '함수 템플릿 (Function Template)',
-                                controller: template.functionController,
+                                label: '코드 템플릿 (Code Template)',
+                                controller: template.codeController,
                                 language: template.language,
                               ),
                               const SizedBox(height: 12),
@@ -1061,19 +1055,15 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
 class _CodeTemplateData {
   String language;
-  final TextEditingController commentController;
-  final TextEditingController functionController;
+  final TextEditingController codeController;
   final TextEditingController runnableController;
 
   _CodeTemplateData({
     this.language = 'KOTLIN',
-    String commentTemplate = '',
-    String functionTemplate = '',
+    String codeTemplate = '',
     String runnableTemplate = '',
-  })  : commentController = _PremiumCodeController(
-            text: commentTemplate.replaceAll('\\n', '\n'), language: language),
-        functionController = _PremiumCodeController(
-            text: functionTemplate.replaceAll('\\n', '\n'), language: language),
+  })  : codeController = _PremiumCodeController(
+            text: codeTemplate.replaceAll('\\n', '\n'), language: language),
         runnableController = _PremiumCodeController(
             text: runnableTemplate.replaceAll('\\n', '\n'),
             language: language) {
@@ -1081,15 +1071,13 @@ class _CodeTemplateData {
   }
 
   void dispose() {
-    commentController.dispose();
-    functionController.dispose();
+    codeController.dispose();
     runnableController.dispose();
   }
 
   void updateLanguage(String lang) {
     language = lang;
-    (commentController as _PremiumCodeController).language = lang;
-    (functionController as _PremiumCodeController).language = lang;
+    (codeController as _PremiumCodeController).language = lang;
     (runnableController as _PremiumCodeController).language = lang;
   }
 }

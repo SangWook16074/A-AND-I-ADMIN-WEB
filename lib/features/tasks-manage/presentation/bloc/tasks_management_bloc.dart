@@ -279,12 +279,10 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         weekNo: weekNo,
         status: status,
       );
-      if (state.selectedCourse?.slug == courseSlug) {
-        state = state.copyWith(
-          selectedCourseAssignments: assignments,
-          isLoadingDetails: false,
-        );
-      }
+      state = state.copyWith(
+        selectedCourseAssignments: assignments,
+        isLoadingDetails: false,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoadingDetails: false,

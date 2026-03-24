@@ -219,11 +219,9 @@ Map<String, dynamic> _$AssignmentRequirementToJson(
 _AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
     _AssignmentTestCase(
       seq: (json['seq'] as num).toInt(),
-      inputValues:
-          (json['inputValues'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      inputText: json['inputText'] == null
+          ? const []
+          : _inputTextFromJson(json['inputText']),
       outputText: json['outputText'] as String?,
       visibility: json['visibility'] as String? ?? 'PUBLIC',
     );
@@ -231,7 +229,7 @@ _AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$AssignmentTestCaseToJson(_AssignmentTestCase instance) =>
     <String, dynamic>{
       'seq': instance.seq,
-      'inputValues': instance.inputValues,
+      'inputText': instance.inputText,
       'outputText': instance.outputText,
       'visibility': instance.visibility,
     };
@@ -272,11 +270,9 @@ _SubmissionGuide _$SubmissionGuideFromJson(Map<String, dynamic> json) =>
     _SubmissionGuide(
       title: json['title'] as String?,
       description: json['description'] as String?,
-      commentSections:
-          (json['commentSections'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      commentSections: json['commentSections'] == null
+          ? const []
+          : _commentSectionsFromJson(json['commentSections']),
     );
 
 Map<String, dynamic> _$SubmissionGuideToJson(_SubmissionGuide instance) =>
@@ -289,17 +285,19 @@ Map<String, dynamic> _$SubmissionGuideToJson(_SubmissionGuide instance) =>
 _CodeTemplate _$CodeTemplateFromJson(Map<String, dynamic> json) =>
     _CodeTemplate(
       language: json['language'] as String,
+      codeTemplate: json['codeTemplate'] as String?,
+      runnableTemplate: json['runnableTemplate'] as String?,
       commentTemplate: json['commentTemplate'] as String?,
       functionTemplate: json['functionTemplate'] as String?,
-      runnableTemplate: json['runnableTemplate'] as String?,
     );
 
 Map<String, dynamic> _$CodeTemplateToJson(_CodeTemplate instance) =>
     <String, dynamic>{
       'language': instance.language,
+      'codeTemplate': instance.codeTemplate,
+      'runnableTemplate': instance.runnableTemplate,
       'commentTemplate': instance.commentTemplate,
       'functionTemplate': instance.functionTemplate,
-      'runnableTemplate': instance.runnableTemplate,
     };
 
 _Assignment _$AssignmentFromJson(Map<String, dynamic> json) => _Assignment(

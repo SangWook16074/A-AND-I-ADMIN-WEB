@@ -131,13 +131,29 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
 abstract class AssignmentTestCase with _$AssignmentTestCase {
   const factory AssignmentTestCase({
     required int seq,
-    @Default([]) List<String> inputValues,
+    @JsonKey(fromJson: _inputTextFromJson) @Default([]) List<dynamic> inputText,
     String? outputText,
     @Default('PUBLIC') String visibility,
   }) = _AssignmentTestCase;
 
   factory AssignmentTestCase.fromJson(Map<String, dynamic> json) =>
       _$AssignmentTestCaseFromJson(json);
+}
+
+List<dynamic> _inputTextFromJson(dynamic json) {
+  if (json == null) return const <dynamic>[];
+  if (json is List) {
+    try {
+      return List<dynamic>.from(json);
+    } catch (_) {
+      return const <dynamic>[];
+    }
+  }
+  if (json is String) {
+    if (json.trim().isEmpty) return const <dynamic>[];
+    return <dynamic>[json];
+  }
+  return <dynamic>[json.toString()];
 }
 
 @freezed
@@ -168,20 +184,35 @@ abstract class SubmissionGuide with _$SubmissionGuide {
   const factory SubmissionGuide({
     String? title,
     String? description,
-    @Default([]) List<String> commentSections,
+    @JsonKey(fromJson: _commentSectionsFromJson)
+    @Default([])
+    List<String> commentSections,
   }) = _SubmissionGuide;
 
   factory SubmissionGuide.fromJson(Map<String, dynamic> json) =>
       _$SubmissionGuideFromJson(json);
 }
 
+List<String> _commentSectionsFromJson(dynamic json) {
+  if (json == null) return const [];
+  if (json is List) {
+    return json.map((e) => e?.toString() ?? '').toList();
+  }
+  if (json is String) {
+    if (json.trim().isEmpty) return const [];
+    return [json];
+  }
+  return const [];
+}
+
 @freezed
 abstract class CodeTemplate with _$CodeTemplate {
   const factory CodeTemplate({
     required String language,
+    String? codeTemplate,
+    String? runnableTemplate,
     String? commentTemplate,
     String? functionTemplate,
-    String? runnableTemplate,
   }) = _CodeTemplate;
 
   factory CodeTemplate.fromJson(Map<String, dynamic> json) =>
