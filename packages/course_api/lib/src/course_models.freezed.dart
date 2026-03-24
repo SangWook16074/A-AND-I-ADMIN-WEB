@@ -2299,7 +2299,7 @@ as String,
 /// @nodoc
 mixin _$AssignmentTestCase {
 
- int get seq;@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> get inputValues; String? get outputText; String get visibility;
+ int get seq;@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> get inputValues; String? get outputText; TestCaseVisibility get visibility;
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2332,7 +2332,7 @@ abstract mixin class $AssignmentTestCaseCopyWith<$Res>  {
   factory $AssignmentTestCaseCopyWith(AssignmentTestCase value, $Res Function(AssignmentTestCase) _then) = _$AssignmentTestCaseCopyWithImpl;
 @useResult
 $Res call({
- int seq,@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> inputValues, String? outputText, String visibility
+ int seq,@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> inputValues, String? outputText, TestCaseVisibility visibility
 });
 
 
@@ -2355,7 +2355,7 @@ seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
 as int,inputValues: null == inputValues ? _self.inputValues : inputValues // ignore: cast_nullable_to_non_nullable
 as List<dynamic>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
-as String,
+as TestCaseVisibility,
   ));
 }
 
@@ -2440,7 +2440,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  String visibility)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  TestCaseVisibility visibility)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
 return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
@@ -2461,7 +2461,7 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  String visibility)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  TestCaseVisibility visibility)  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase():
 return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
@@ -2481,7 +2481,7 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  String visibility)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)  List<dynamic> inputValues,  String? outputText,  TestCaseVisibility visibility)?  $default,) {final _that = this;
 switch (_that) {
 case _AssignmentTestCase() when $default != null:
 return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);case _:
@@ -2496,7 +2496,7 @@ return $default(_that.seq,_that.inputValues,_that.outputText,_that.visibility);c
 @JsonSerializable()
 
 class _AssignmentTestCase implements AssignmentTestCase {
-  const _AssignmentTestCase({required this.seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) final  List<dynamic> inputValues = const [], this.outputText, this.visibility = 'PUBLIC'}): _inputValues = inputValues;
+  const _AssignmentTestCase({required this.seq, @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) final  List<dynamic> inputValues = const [], this.outputText, this.visibility = TestCaseVisibility.public}): _inputValues = inputValues;
   factory _AssignmentTestCase.fromJson(Map<String, dynamic> json) => _$AssignmentTestCaseFromJson(json);
 
 @override final  int seq;
@@ -2508,7 +2508,7 @@ class _AssignmentTestCase implements AssignmentTestCase {
 }
 
 @override final  String? outputText;
-@override@JsonKey() final  String visibility;
+@override@JsonKey() final  TestCaseVisibility visibility;
 
 /// Create a copy of AssignmentTestCase
 /// with the given fields replaced by the non-null parameter values.
@@ -2543,7 +2543,7 @@ abstract mixin class _$AssignmentTestCaseCopyWith<$Res> implements $AssignmentTe
   factory _$AssignmentTestCaseCopyWith(_AssignmentTestCase value, $Res Function(_AssignmentTestCase) _then) = __$AssignmentTestCaseCopyWithImpl;
 @override @useResult
 $Res call({
- int seq,@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> inputValues, String? outputText, String visibility
+ int seq,@JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson) List<dynamic> inputValues, String? outputText, TestCaseVisibility visibility
 });
 
 
@@ -2566,7 +2566,7 @@ seq: null == seq ? _self.seq : seq // ignore: cast_nullable_to_non_nullable
 as int,inputValues: null == inputValues ? _self._inputValues : inputValues // ignore: cast_nullable_to_non_nullable
 as List<dynamic>,outputText: freezed == outputText ? _self.outputText : outputText // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
-as String,
+as TestCaseVisibility,
   ));
 }
 

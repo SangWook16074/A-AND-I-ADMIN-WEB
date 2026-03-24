@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:aandi_course_api/aandi_course_api.dart';
 import 'presentation/bloc/tasks_management_bloc.dart';
 import 'presentation/bloc/tasks_management_event.dart';
 
@@ -160,16 +161,16 @@ class _AssignmentDetailsDialogState
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: ex.visibility == 'PUBLIC'
-                                            ? Colors.blue.withOpacity(0.1)
-                                            : Colors.grey.withOpacity(0.1),
+                                        color: ex.visibility == TestCaseVisibility.public
+                                            ? Colors.blue.withValues(alpha: 0.1)
+                                            : Colors.grey.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
-                                        ex.visibility,
+                                        ex.visibility.name.toUpperCase(),
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: ex.visibility == 'PUBLIC'
+                                          color: ex.visibility == TestCaseVisibility.public
                                               ? Colors.blue
                                               : Colors.grey,
                                           fontWeight: FontWeight.w800,

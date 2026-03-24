@@ -1791,25 +1791,25 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             onSaved: (v) => testCase.output = v?.trim() ?? '',
                           ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
+                          DropdownButtonFormField<TestCaseVisibility>(
                             initialValue: testCase.visibility,
                             decoration: const InputDecoration(
                               labelText: '공개 여부 (Visibility)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
                             ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'PUBLIC',
-                                child: Text('PUBLIC'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PRIVATE',
-                                child: Text('PRIVATE'),
-                              ),
-                            ],
+                            items: TestCaseVisibility.values.map((v) {
+                              return DropdownMenuItem(
+                                value: v,
+                                child: Text(v.name.toUpperCase()),
+                              );
+                            }).toList(),
                             onChanged: (v) {
-                              if (v != null) testCase.visibility = v;
+                              if (v != null) {
+                                setState(() {
+                                  testCase.visibility = v;
+                                });
+                              }
                             },
                           ),
                         ],
@@ -2087,7 +2087,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
             border: Border.all(color: const Color(0xFF334155), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -2228,15 +2228,15 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
 class _TestCaseData {
   List<String> inputs;
   String output;
-  String visibility;
+  TestCaseVisibility visibility;
 
   _TestCaseData({
     List<String>? inputs,
     String? output,
-    String? visibility,
+    TestCaseVisibility? visibility,
   })  : inputs = inputs ?? [],
         output = output ?? '',
-        visibility = visibility ?? 'PUBLIC';
+        visibility = visibility ?? TestCaseVisibility.public;
 }
 
 class _CodeTemplateData {

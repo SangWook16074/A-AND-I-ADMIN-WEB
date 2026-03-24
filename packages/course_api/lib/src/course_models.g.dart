@@ -215,7 +215,12 @@ _AssignmentTestCase _$AssignmentTestCaseFromJson(Map<String, dynamic> json) =>
           ? const []
           : _inputValuesFromJson(json['inputValues']),
       outputText: json['outputText'] as String?,
-      visibility: json['visibility'] as String? ?? 'PUBLIC',
+      visibility:
+          $enumDecodeNullable(
+            _$TestCaseVisibilityEnumMap,
+            json['visibility'],
+          ) ??
+          TestCaseVisibility.public,
     );
 
 Map<String, dynamic> _$AssignmentTestCaseToJson(_AssignmentTestCase instance) =>
@@ -223,8 +228,14 @@ Map<String, dynamic> _$AssignmentTestCaseToJson(_AssignmentTestCase instance) =>
       'seq': instance.seq,
       'inputValues': instance.inputValues,
       'outputText': instance.outputText,
-      'visibility': instance.visibility,
+      'visibility': _$TestCaseVisibilityEnumMap[instance.visibility]!,
     };
+
+const _$TestCaseVisibilityEnumMap = {
+  TestCaseVisibility.public: 'PUBLIC',
+  TestCaseVisibility.hidden: 'HIDDEN',
+  TestCaseVisibility.excluded: 'EXCLUDED',
+};
 
 _CodeTemplate _$CodeTemplateFromJson(Map<String, dynamic> json) =>
     _CodeTemplate(

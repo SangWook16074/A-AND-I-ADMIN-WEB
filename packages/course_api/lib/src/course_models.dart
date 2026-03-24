@@ -125,6 +125,15 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
       _$AssignmentRequirementFromJson(json);
 }
 
+enum TestCaseVisibility {
+  @JsonValue('PUBLIC')
+  public,
+  @JsonValue('HIDDEN')
+  hidden,
+  @JsonValue('EXCLUDED')
+  excluded,
+}
+
 @freezed
 abstract class AssignmentTestCase with _$AssignmentTestCase {
   const factory AssignmentTestCase({
@@ -133,7 +142,7 @@ abstract class AssignmentTestCase with _$AssignmentTestCase {
     @Default([])
     List<dynamic> inputValues,
     String? outputText,
-    @Default('PUBLIC') String visibility,
+    @Default(TestCaseVisibility.public) TestCaseVisibility visibility,
   }) = _AssignmentTestCase;
 
   factory AssignmentTestCase.fromJson(Map<String, dynamic> json) =>
