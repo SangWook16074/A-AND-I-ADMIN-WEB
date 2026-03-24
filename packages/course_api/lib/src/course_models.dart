@@ -95,8 +95,6 @@ abstract class AssignmentMetadata with _$AssignmentMetadata {
     @Default([]) List<LearningGoal> learningGoals,
     @Default([]) List<AssignmentRequirement> requirements,
     @Default([]) List<AssignmentTestCase> testCases,
-    ProblemDetail? problemDetail,
-    SubmissionGuide? submissionGuide,
     @Default([]) List<CodeTemplate> codeTemplates,
     @Default({}) Map<String, dynamic> attributes,
   }) = _AssignmentMetadata;
@@ -158,54 +156,6 @@ List<dynamic> _inputValuesFromJson(dynamic json) {
   return <dynamic>[json.toString()];
 }
 
-@freezed
-abstract class ProblemDetail with _$ProblemDetail {
-  const factory ProblemDetail({
-    String? inputDescription,
-    String? outputDescription,
-    ProblemClassification? classification,
-  }) = _ProblemDetail;
-
-  factory ProblemDetail.fromJson(Map<String, dynamic> json) =>
-      _$ProblemDetailFromJson(json);
-}
-
-@freezed
-abstract class ProblemClassification with _$ProblemClassification {
-  const factory ProblemClassification({
-    String? algorithmStep,
-    int? difficultyStep,
-  }) = _ProblemClassification;
-
-  factory ProblemClassification.fromJson(Map<String, dynamic> json) =>
-      _$ProblemClassificationFromJson(json);
-}
-
-@freezed
-abstract class SubmissionGuide with _$SubmissionGuide {
-  const factory SubmissionGuide({
-    String? title,
-    String? description,
-    @JsonKey(fromJson: _commentSectionsFromJson)
-    @Default([])
-    List<String> commentSections,
-  }) = _SubmissionGuide;
-
-  factory SubmissionGuide.fromJson(Map<String, dynamic> json) =>
-      _$SubmissionGuideFromJson(json);
-}
-
-List<String> _commentSectionsFromJson(dynamic json) {
-  if (json == null) return const [];
-  if (json is List) {
-    return json.map((e) => e?.toString() ?? '').toList();
-  }
-  if (json is String) {
-    if (json.trim().isEmpty) return const [];
-    return [json];
-  }
-  return const [];
-}
 
 @freezed
 abstract class CodeTemplate with _$CodeTemplate {

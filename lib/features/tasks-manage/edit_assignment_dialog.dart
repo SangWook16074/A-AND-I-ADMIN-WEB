@@ -38,16 +38,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   late String _status;
   late List<_TestCaseData> _testCases;
 
-  // Problem Detail fields
-  late String _inputDescription;
-  late String _outputDescription;
-  late String _algorithmStep;
-  late int _difficultyStep;
 
-  // Submission Guide fields
-  late String _submissionGuideTitle;
-  late String _submissionGuideDescription;
-  late final CodeController _commentSectionsController;
 
   // Code Templates
   late List<_CodeTemplateData> _codeTemplates;
@@ -63,9 +54,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     super.initState();
     _startAtController = TextEditingController();
     _endAtController = TextEditingController();
-    _commentSectionsController = CodeController(
-      language: dart, // just for basic highlighting or structure
-    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(tasksManagementBlocProvider.notifier)
@@ -120,58 +108,48 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       _testCases.add(_TestCaseData());
     }
 
-    _inputDescription =
-        fullAssignment.metadata.problemDetail?.inputDescription ?? '';
-    _outputDescription =
-        fullAssignment.metadata.problemDetail?.outputDescription ?? '';
-    _algorithmStep =
-        fullAssignment.metadata.problemDetail?.classification?.algorithmStep ??
-        'STEP0';
-    _difficultyStep =
-        fullAssignment.metadata.problemDetail?.classification?.difficultyStep ??
-        1;
 
-    final guide = fullAssignment.metadata.submissionGuide;
-    _submissionGuideTitle = (guide?.title == '문제 풀이 템플릿')
-        ? ''
-        : (guide?.title ?? '');
-    _submissionGuideDescription =
-        (guide?.description == '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.')
-        ? ''
-        : (guide?.description ?? '');
-    _commentSectionsController.text =
-        (guide?.commentSections.join('\n') == '문제\n해석\n풀이')
-        ? ''
-        : (guide?.commentSections ?? []).join('\n');
 
     _requirementsText = fullAssignment.metadata.requirements
         .map((e) => e.requirementText)
         .join('\n');
 
-    _codeTemplates = fullAssignment.metadata.codeTemplates
-        .map(
-          (e) => _CodeTemplateData(
-            language: e.language,
-            codeTemplate:
-                e.codeTemplate ??
-                '${e.commentTemplate ?? ''}\n\n${e.functionTemplate ?? ''}'
-                    .trim(),
-            runnableTemplate: e.runnableTemplate ?? '',
-          ),
-        )
-        .toList();
+    _codeTemplates = fullAssignment.metadata.codeTemplates.map((e) {
+      String code = '';
+      if (e.codeTemplate != null && e.codeTemplate!.isNotEmpty) {
+        code = e.codeTemplate!;
+      } else {
+        final comment = (e.commentTemplate ?? '').replaceAll('\\n', '\n');
+        final function = (e.functionTemplate ?? '').replaceAll('\\n', '\n');
+        code = '$comment\n$function'.trim();
+      }
+      return _CodeTemplateData(
+        language: e.language,
+        codeTemplate: code,
+      );
+    }).toList();
 
     if (_codeTemplates.isEmpty) {
-      _codeTemplates = [
-        _CodeTemplateData(language: 'KOTLIN'),
-        _CodeTemplateData(language: 'DART'),
-        _CodeTemplateData(language: 'PYTHON'),
-      ];
+      final track = fullAssignment.metadata.attributes['targetTrack']?.toString().toUpperCase() ?? '';
+      
+      if (track == 'SP') {
+        _language = 'KOTLIN';
+        _codeTemplates = [_CodeTemplateData(language: 'KOTLIN')];
+      } else if (track == 'FL') {
+        _language = 'DART';
+        _codeTemplates = [_CodeTemplateData(language: 'DART')];
+      } else {
+        _language = 'KOTLIN';
+        _codeTemplates = [
+          _CodeTemplateData(language: 'KOTLIN'),
+          _CodeTemplateData(language: 'DART'),
+          _CodeTemplateData(language: 'PYTHON'),
+        ];
+      }
 
       for (var t in _codeTemplates) {
         final defaults = _CodeTemplateData.getDefaultTemplates(t.language);
         t.codeController.text = defaults['code']!;
-        t.runnableController.text = defaults['runnable']!;
       }
     }
   }
@@ -183,7 +161,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     for (var t in _codeTemplates) {
       t.dispose();
     }
-    _commentSectionsController.dispose();
     super.dispose();
   }
 
@@ -281,31 +258,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       final codeTemplateList = _codeTemplates
           .where((e) => e.language.isNotEmpty)
           .map(
-            (e) {
-              final code = e.codeController.text.trim();
-              String? comment;
-              String? function;
-              
-              if (code.contains('*/')) {
-                final parts = code.split('*/');
-                comment = '${parts[0]}*/'.trim();
-                function = parts.sublist(1).join('*/').trim();
-              } else if (code.contains("'''")) {
-                final parts = code.split("'''");
-                if (parts.length >= 3) {
-                  comment = "'''${parts[1]}'''".trim();
-                  function = parts.sublist(2).join("'''").trim();
-                }
-              }
-
-              return CodeTemplate(
-                language: e.language,
-                codeTemplate: code,
-                runnableTemplate: e.runnableController.text,
-                commentTemplate: comment,
-                functionTemplate: function,
-              );
-            },
+            (e) => CodeTemplate(
+              language: e.language,
+              functionTemplate: e.codeController.text.trim(),
+            ),
           )
           .toList();
 
@@ -338,25 +294,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           },
           requirements: requirements,
           testCases: testCases,
-          problemDetail: ProblemDetail(
-            inputDescription: _inputDescription,
-            outputDescription: _outputDescription,
-            classification: ProblemClassification(
-              algorithmStep: _algorithmStep,
-              difficultyStep: _difficultyStep,
-            ),
-          ),
-          submissionGuide: SubmissionGuide(
-            title: _submissionGuideTitle,
-            description: _submissionGuideDescription,
-            commentSections: _commentSectionsController.text.isEmpty
-                ? []
-                : _commentSectionsController.text
-                      .split('\n')
-                      .map((e) => e.trim())
-                      .where((e) => e.isNotEmpty)
-                      .toList(),
-          ),
           codeTemplates: codeTemplateList,
         ),
       );
@@ -379,7 +316,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     final state = ref.watch(tasksManagementBlocProvider);
     final isLoading = state.isLoadingDetails;
     final fullAssignment = state.selectedAssignment;
-    String commentSectionsText = '';
 
     if (isLoading ||
         fullAssignment == null ||
@@ -623,21 +559,53 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              TextFormField(
-                                initialValue: testCase.inputs.join('\n'),
-                                decoration: const InputDecoration(
-                                  labelText: '입력 (Inputs, 한 줄에 하나씩)',
-                                  filled: true,
-                                  fillColor: Color(0xFFFAFAFA),
-                                  hintText: 'param1\nparam2',
+                              const Text(
+                                '입력값 (Inputs)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF64748B),
                                 ),
-                                maxLines: 4,
-                                onSaved: (v) => testCase.inputs =
-                                    v
-                                        ?.split('\n')
-                                        .map((e) => e.trim())
-                                        .toList() ??
-                                    [],
+                              ),
+                              const SizedBox(height: 8),
+                              ...testCase.inputs.asMap().entries.map((inputEntry) {
+                                final inputIndex = inputEntry.key;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          initialValue: inputEntry.value,
+                                          decoration: InputDecoration(
+                                            labelText: '입력 ${inputIndex + 1}',
+                                            filled: true,
+                                            fillColor: const Color(0xFFFAFAFA),
+                                            isDense: true,
+                                          ),
+                                          onChanged: (v) => testCase.inputs[inputIndex] = v,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 20),
+                                        onPressed: () {
+                                          setState(() {
+                                            testCase.inputs.removeAt(inputIndex);
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                              TextButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    testCase.inputs.add('');
+                                  });
+                                },
+                                icon: const Icon(Icons.add, size: 16),
+                                label: const Text('입력값 추가', style: TextStyle(fontSize: 12)),
                               ),
                               const SizedBox(height: 12),
                               TextFormField(
@@ -684,114 +652,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                       const SizedBox(height: 12),
                       const Divider(),
                       const SizedBox(height: 12),
-                      const Text(
-                        '문제 상세 정보 (Problem Detail)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _inputDescription,
-                        decoration: const InputDecoration(
-                          labelText: '입력 설명 (Input Description)',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        onSaved: (v) => _inputDescription = v?.trim() ?? '',
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _outputDescription,
-                        decoration: const InputDecoration(
-                          labelText: '출력 설명 (Output Description)',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        onSaved: (v) => _outputDescription = v?.trim() ?? '',
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _algorithmStep,
-                              decoration: const InputDecoration(
-                                labelText: '알고리즘 단계 (Algorithm Step)',
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'STEP0',
-                              ),
-                              onSaved: (v) =>
-                                  _algorithmStep = v?.trim() ?? 'STEP0',
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _difficultyStep.toString(),
-                              decoration: const InputDecoration(
-                                labelText: '난이도 단계 (Difficulty Step)',
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
-                              keyboardType: TextInputType.number,
-                              onSaved: (v) =>
-                                  _difficultyStep = int.tryParse(v ?? '1') ?? 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(),
-                      const SizedBox(height: 12),
-                      const Text(
-                        '제출 가이드 (Submission Guide)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _submissionGuideTitle,
-                        decoration: const InputDecoration(
-                          labelText: '가이드 제목',
-                          hintText: '문제 풀이 템플릿',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        onSaved: (v) => _submissionGuideTitle = v?.trim() ?? '',
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _submissionGuideDescription,
-                        decoration: const InputDecoration(
-                          labelText: '가이드 설명',
-                          hintText: '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        maxLines: 2,
-                        onSaved: (v) =>
-                            _submissionGuideDescription = v?.trim() ?? '',
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: commentSectionsText,
-                        decoration: const InputDecoration(
-                          labelText: '코멘트 섹션 (Comment Sections - 줄바꿈으로 구분)',
-                          filled: true,
-                          fillColor: Color(0xFFFAFAFA),
-                          hintText: '문제\n해석\n풀이',
-                        ),
-                        maxLines: 3,
-                        onSaved: (v) => commentSectionsText = v?.trim() ?? '',
-                      ),
-                      const SizedBox(height: 24),
-                      const Divider(),
-                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -809,7 +669,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                   _CodeTemplateData(
                                     language: 'KOTLIN',
                                     codeTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['code'] ?? '',
-                                    runnableTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['runnable'] ?? '',
                                   ),
                                 );
                               });
@@ -883,12 +742,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                               _buildPremiumCodeEditor(
                                 label: '코드 템플릿 (Code Template)',
                                 controller: template.codeController,
-                                language: template.language,
-                              ),
-                              const SizedBox(height: 12),
-                              _buildPremiumCodeEditor(
-                                label: '실행 가능 템플릿 (Runnable Template)',
-                                controller: template.runnableController,
                                 language: template.language,
                               ),
                             ],
@@ -1038,37 +891,29 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 class _CodeTemplateData {
   String language;
   late final CodeController codeController;
-  late final CodeController runnableController;
 
   _CodeTemplateData({
     this.language = 'KOTLIN',
-    String codeTemplate = '',
-    String runnableTemplate = '',
+    String? codeTemplate,
   }) {
+    // If we only have the old codeTemplate, use it.
     codeController = CodeController(
-      text: codeTemplate.replaceAll('\\n', '\n'),
-      language: _getLanguage(language),
-    );
-    runnableController = CodeController(
-      text: runnableTemplate.replaceAll('\\n', '\n'),
+      text: (codeTemplate ?? '').replaceAll('\\n', '\n'),
       language: _getLanguage(language),
     );
   }
 
   void dispose() {
     codeController.dispose();
-    runnableController.dispose();
   }
 
   void updateLanguage(String lang) {
     language = lang;
     codeController.language = _getLanguage(lang);
-    runnableController.language = _getLanguage(lang);
 
     // Automatically update to default template for the new language
     final defaults = getDefaultTemplates(lang);
     codeController.text = defaults['code']!;
-    runnableController.text = defaults['runnable']!;
   }
 
   static Map<String, String> getDefaultTemplates(String lang) {
@@ -1076,20 +921,17 @@ class _CodeTemplateData {
       case 'KOTLIN':
         return {
           'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
-          'runnable': "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}",
         };
       case 'DART':
         return {
           'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
-          'runnable': "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}",
         };
       case 'PYTHON':
         return {
           'code': "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
-          'runnable': "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())",
         };
       default:
-        return {'code': '', 'runnable': ''};
+        return {'code': ''};
     }
   }
 
@@ -1114,7 +956,9 @@ class _TestCaseData {
 
   _TestCaseData({
     List<String>? inputs,
-    this.output = '',
-    this.visibility = 'PUBLIC',
-  }) : inputs = inputs ?? [];
+    String? output,
+    String? visibility,
+  })  : inputs = inputs ?? [],
+        output = output ?? '',
+        visibility = visibility ?? 'PUBLIC';
 }

@@ -243,97 +243,6 @@ class _AssignmentDetailsDialogState
                         ),
                         const SizedBox(height: 16),
                       ],
-                      if (assignment.metadata.submissionGuide != null) ...[
-                        const Text(
-                          '제출 가이드',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                assignment.metadata.submissionGuide!.title ??
-                                    '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                assignment
-                                        .metadata
-                                        .submissionGuide!
-                                        .description ??
-                                    '',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF475569),
-                                ),
-                              ),
-                              if (assignment
-                                  .metadata
-                                  .submissionGuide!
-                                  .commentSections
-                                  .isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                const Text(
-                                  '주석 섹션:',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF64748B),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: assignment
-                                      .metadata
-                                      .submissionGuide!
-                                      .commentSections
-                                      .map(
-                                        (s) => Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            border: Border.all(
-                                              color: const Color(0xFFCBD5E1),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            s,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
                       if (assignment.metadata.codeTemplates.isNotEmpty) ...[
                         const Text(
                           '코드 템플릿',
@@ -376,11 +285,10 @@ class _AssignmentDetailsDialogState
                                         .isNotEmpty) ...[
                                   _buildReadOnlyCodeField(
                                     label: 'Code Template',
-                                    code:
-                                        (template.codeTemplate?.isNotEmpty ??
+                                    code: (template.codeTemplate?.isNotEmpty ??
                                             false)
                                         ? template.codeTemplate!
-                                        : '${template.commentTemplate ?? ''}\n\n${template.functionTemplate ?? ''}'
+                                        : '${template.commentTemplate ?? ''}\n${template.functionTemplate ?? ''}'
                                               .trim(),
                                     language: template.language,
                                   ),
