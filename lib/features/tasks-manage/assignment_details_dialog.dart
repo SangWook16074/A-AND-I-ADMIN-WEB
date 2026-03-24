@@ -288,7 +288,8 @@ class _AssignmentDetailsDialogState
                                     code: (template.codeTemplate?.isNotEmpty ??
                                             false)
                                         ? template.codeTemplate!
-                                        : '${template.commentTemplate ?? ''}\n${template.functionTemplate ?? ''}'
+                                            .replaceAll('\\n', '\n')
+                                        : '${(template.commentTemplate ?? '').replaceAll('\\n', '\n')}\n${(template.functionTemplate ?? '').replaceAll('\\n', '\n')}'
                                               .trim(),
                                     language: template.language,
                                   ),

@@ -1155,10 +1155,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _startAt = '';
   String _endAt = '';
 
-  List<String> _learningGoals = [];
+  List<String> _learningGoals = [''];
   String _language = 'kotlin';
 
-  String _requirementsText = '';
+  List<String> _requirements = [''];
   final List<_TestCaseData> _testCases = [_TestCaseData()];
 
 
@@ -1641,37 +1641,31 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       ],
                     ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '학습 목표 (줄바꿈으로 구분)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: '함수 분리\n코드 컨벤션',
-                    ),
-                    maxLines: 3,
-                    onSaved: (v) {
-                      if (v != null && v.trim().isNotEmpty) {
-                        _learningGoals = v
-                            .split('\n')
-                            .map((e) => e.trim())
-                            .where((e) => e.isNotEmpty)
-                            .toList();
-                      } else {
-                        _learningGoals = [];
-                      }
-                    },
+                  const SizedBox(height: 12),
+                  _buildDynamicFieldSection(
+                    title: '학습 목표',
+                    items: _learningGoals,
+                    onAdd: () => setState(() => _learningGoals.add('')),
+                    onRemove: (index) =>
+                        setState(() => _learningGoals.removeAt(index)),
+                    onChanged: (index, value) =>
+                        _learningGoals[index] = value,
+                    label: '학습 목표',
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '요구사항 (줄바꿈으로 구분)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: '함수 분리 필수\n예외 처리 필수',
-                    ),
-                    maxLines: 3,
-                    onSaved: (v) => _requirementsText = v?.trim() ?? '',
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  _buildDynamicFieldSection(
+                    title: '요구사항 (Requirements)',
+                    items: _requirements,
+                    onAdd: () => setState(() => _requirements.add('')),
+                    onRemove: (index) =>
+                        setState(() => _requirements.removeAt(index)),
+                    onChanged: (index, value) =>
+                        _requirements[index] = value,
+                    label: '요구사항',
                   ),
+                  const SizedBox(height: 12),
                   const SizedBox(height: 12),
                   const Divider(),
                   const SizedBox(height: 12),
@@ -1944,10 +1938,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                         if (_formKey.currentState?.validate() ?? false) {
                           _formKey.currentState?.save();
 
-                          final reqList = _requirementsText.isEmpty
-                              ? <AssignmentRequirement>[]
-                              : _requirementsText
-                                    .split('\n')
+                          final reqList = _requirements
                                     .where((e) => e.trim().isNotEmpty)
                                     .toList()
                                     .asMap()
@@ -2016,12 +2007,14 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       description: _description,
                                       difficulty: _difficulty,
                                       learningGoals: _learningGoals
+                                          .where((e) => e.trim().isNotEmpty)
+                                          .toList()
                                           .asMap()
                                           .entries
                                           .map(
                                             (e) => LearningGoal(
                                               sortOrder: e.key + 1,
-                                              learningGoalText: e.value,
+                                              learningGoalText: e.value.trim(),
                                             ),
                                           )
                                           .toList(),
@@ -2173,6 +2166,61 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       width: 10,
       height: 10,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+  Widget _buildDynamicFieldSection({
+    required String title,
+    required List<String> items,
+    required VoidCallback onAdd,
+    required Function(int) onRemove,
+    required Function(int, String) onChanged,
+    required String label,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+            TextButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add, size: 18),
+              label: Text('$label 추가'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ...items.asMap().entries.map((entry) {
+          final index = entry.key;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: entry.value,
+                    decoration: InputDecoration(
+                      labelText: '$label ${index + 1}',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (v) => onChanged(index, v),
+                  ),
+                ),
+                if (items.length > 1)
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    onPressed: () => onRemove(index),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }

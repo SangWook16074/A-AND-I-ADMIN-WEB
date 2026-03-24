@@ -33,7 +33,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   late String _description;
   late String _startAt;
   late String _endAt;
-  late String _learningGoals;
+  late List<String> _learningGoalList;
   late String _language;
   late String _status;
   late List<_TestCaseData> _testCases;
@@ -42,7 +42,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
   // Code Templates
   late List<_CodeTemplateData> _codeTemplates;
-  late String _requirementsText;
+  late List<String> _requirementList;
 
   late final TextEditingController _startAtController;
   late final TextEditingController _endAtController;
@@ -90,9 +90,15 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       _endAtController.text = _endAt;
     }
 
-    _learningGoals = fullAssignment.metadata.learningGoals
+    _learningGoalList = fullAssignment.metadata.learningGoals
         .map((e) => e.learningGoalText)
-        .join('\n');
+        .toList();
+    if (_learningGoalList.isEmpty) _learningGoalList.add('');
+
+    _requirementList = fullAssignment.metadata.requirements
+        .map((e) => e.requirementText)
+        .toList();
+    if (_requirementList.isEmpty) _requirementList.add('');
     _language = fullAssignment.metadata.attributes['language'] ?? 'kotlin';
     _status = fullAssignment.status;
     _testCases = fullAssignment.metadata.testCases
@@ -110,14 +116,11 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
 
 
 
-    _requirementsText = fullAssignment.metadata.requirements
-        .map((e) => e.requirementText)
-        .join('\n');
 
     _codeTemplates = fullAssignment.metadata.codeTemplates.map((e) {
       String code = '';
       if (e.codeTemplate != null && e.codeTemplate!.isNotEmpty) {
-        code = e.codeTemplate!;
+        code = e.codeTemplate!.replaceAll('\\n', '\n');
       } else {
         final comment = (e.commentTemplate ?? '').replaceAll('\\n', '\n');
         final function = (e.functionTemplate ?? '').replaceAll('\\n', '\n');
@@ -220,20 +223,32 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final requirements = _requirementsText
-          .split('\n')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
+      final learningGoalListPayload = _learningGoalList
+          .where((e) => e.trim().isNotEmpty)
+          .toList()
+          .asMap()
+          .entries
+          .map(
+            (e) => LearningGoal(
+              sortOrder: e.key + 1,
+              learningGoalText: e.value.trim(),
+            ),
+          )
+          .toList();
+
+      final requirementListPayload = _requirementList
+          .where((e) => e.trim().isNotEmpty)
           .toList()
           .asMap()
           .entries
           .map(
             (e) => AssignmentRequirement(
               sortOrder: e.key + 1,
-              requirementText: e.value,
+              requirementText: e.value.trim(),
             ),
           )
           .toList();
+
       final testCases = _testCases
           .asMap()
           .entries
@@ -274,25 +289,12 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
           title: _title,
           difficulty: _difficulty,
           description: _description.isEmpty ? null : _description,
-          learningGoals: _learningGoals
-              .split('\n')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList()
-              .asMap()
-              .entries
-              .map(
-                (e) => LearningGoal(
-                  sortOrder: e.key + 1,
-                  learningGoalText: e.value,
-                ),
-              )
-              .toList(),
+          learningGoals: learningGoalListPayload,
           attributes: {
             ...fullAssignment.metadata.attributes,
             'language': _language,
           },
-          requirements: requirements,
+          requirements: requirementListPayload,
           testCases: testCases,
           codeTemplates: codeTemplateList,
         ),
@@ -460,29 +462,33 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _learningGoals,
-                        decoration: const InputDecoration(
-                          labelText: '학습 목표 (줄바꿈으로 구분)',
-                          hintText: '입력 파싱\n함수 분리',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        maxLines: 3,
-                        onSaved: (v) => _learningGoals = v?.trim() ?? '',
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      _buildDynamicFieldSection(
+                        title: '학습 목표',
+                        items: _learningGoalList,
+                        onAdd: () => setState(() => _learningGoalList.add('')),
+                        onRemove: (index) =>
+                            setState(() => _learningGoalList.removeAt(index)),
+                        onChanged: (index, value) =>
+                            _learningGoalList[index] = value,
+                        label: '학습 목표',
                       ),
                       const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _requirementsText,
-                        decoration: const InputDecoration(
-                          labelText: '필수 요구사항 (Requirements, 줄바꿈으로 구분)',
-                          hintText: '함수 분리 필수\n예외 처리 필수',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        maxLines: 3,
-                        onSaved: (v) => _requirementsText = v?.trim() ?? '',
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      _buildDynamicFieldSection(
+                        title: '필수 요구사항 (Requirements)',
+                        items: _requirementList,
+                        onAdd: () => setState(() => _requirementList.add('')),
+                        onRemove: (index) =>
+                            setState(() => _requirementList.removeAt(index)),
+                        onChanged: (index, value) =>
+                            _requirementList[index] = value,
+                        label: '요구사항',
                       ),
+                      const SizedBox(height: 12),
+                      const Divider(),
                       const SizedBox(height: 12),
                       TextFormField(
                         initialValue: _language,
@@ -875,6 +881,62 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildDynamicFieldSection({
+    required String title,
+    required List<String> items,
+    required VoidCallback onAdd,
+    required Function(int) onRemove,
+    required Function(int, String) onChanged,
+    required String label,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+            TextButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add, size: 18),
+              label: Text('$label 추가'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ...items.asMap().entries.map((entry) {
+          final index = entry.key;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: entry.value,
+                    decoration: InputDecoration(
+                      labelText: '$label ${index + 1}',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (v) => onChanged(index, v),
+                  ),
+                ),
+                if (items.length > 1)
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    onPressed: () => onRemove(index),
+                  ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }
