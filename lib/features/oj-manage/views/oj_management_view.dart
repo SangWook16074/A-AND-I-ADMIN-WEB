@@ -923,6 +923,13 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
   }
 
   Widget _buildTestCaseItem(TestCase tc) {
+    final List<String> argDisplays = [];
+    for (int i = 0; i < tc.args.length; i++) {
+      final type = i < tc.argTypes.length ? tc.argTypes[i] : 'UNKNOWN';
+      argDisplays.add('${tc.args[i]} ($type)');
+    }
+    final String argsText = '[${argDisplays.join(', ')}]';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -951,7 +958,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
                   Clipboard.setData(
                     ClipboardData(
                       text:
-                          'Args: ${tc.args.join(', ')}\nOutput: ${tc.expectedOutput}',
+                          'Args: $argsText\nOutput: ${tc.expectedOutput} (${tc.expectedOutputType})',
                     ),
                   );
                   ScaffoldMessenger.of(
@@ -973,11 +980,11 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           ),
           const SizedBox(height: 4),
-          _buildCodeBlock(tc.args.toString()),
+          _buildCodeBlock(argsText),
           const SizedBox(height: 12),
-          const Text(
-            'Expected Output:',
-            style: TextStyle(
+          Text(
+            'Expected Output (${tc.expectedOutputType}):',
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: Color(0xFF6B7280),
@@ -990,7 +997,8 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     );
   }
 
-  Widget _buildCodeBlock(String code) {
+  Widget _buildCodeBlock(dynamic code) {
+    final String displayCode = code.toString();
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -999,7 +1007,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
         borderRadius: BorderRadius.circular(6),
       ),
       child: SelectableText(
-        code,
+        displayCode,
         style: const TextStyle(
           color: Colors.greenAccent,
           fontFamily: 'monospace',
