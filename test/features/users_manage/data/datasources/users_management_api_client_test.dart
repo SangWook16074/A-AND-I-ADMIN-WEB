@@ -26,12 +26,13 @@ void main() {
 
       final created = await apiClient.createUser(
         accessToken: 'access-token',
+        role: AuthRole.user,
         provisionType: AdminUserProvisionType.invite,
         cohort: 7,
       );
 
       expect(captured.method, 'POST');
-      expect(captured.uri.toString(), 'https://api.example.com/v1/admin/users');
+      expect(captured.uri.toString(), 'https://api.example.com/v1/admin/user');
       expect(
         _headerValue(captured.headers, 'authorization'),
         'Bearer access-token',

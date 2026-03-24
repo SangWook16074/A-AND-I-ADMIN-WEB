@@ -43,6 +43,22 @@ class AdminApiClient {
     );
   }
 
+  Future<AdminUserSummary> lookupUser({
+    required String accessToken,
+    required String code,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path: '/v1/users/lookup',
+      queryParameters: {'code': code},
+    );
+
+    return AdminUserSummary.fromJson(
+      _readMapData(response.body, statusCode: response.statusCode),
+    );
+  }
+
   Future<CreateAdminUserResponse> createUser({
     required String accessToken,
     required AuthRole role,
@@ -52,6 +68,7 @@ class AdminApiClient {
     final response = await _requestJson(
       method: 'POST',
       accessToken: accessToken,
+      path: '/v1/admin/users',
       data: {
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
@@ -147,9 +164,13 @@ class AdminApiClient {
     bool allowEmptySuccessBody = false,
     String? path,
     String pathSuffix = '',
+    Map<String, dynamic>? queryParameters,
   }) async {
+    final uri = Uri.parse(
+      '$baseUrl${path ?? _usersPath}$pathSuffix',
+    ).replace(queryParameters: queryParameters);
     final response = await dio.requestUri<dynamic>(
-      Uri.parse('$baseUrl${path ?? _usersPath}$pathSuffix'),
+      uri,
       data: data,
       options: Options(
         method: method,

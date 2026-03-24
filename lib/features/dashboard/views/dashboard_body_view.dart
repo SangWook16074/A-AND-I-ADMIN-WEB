@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../oj-manage/views/oj_management_view.dart';
 import '../../tasks-manage/task_management_view.dart';
 import '../../users-manage/users_management_view.dart';
 import '../dashboard_nav_view_model.dart';
@@ -24,6 +25,10 @@ class DashboardBodyView extends StatelessWidget {
         onLogout: onLogout,
       ),
       DashboardNavTab.tasksManage => TaskManagementView(
+        showLogoutButton: !isDesktop,
+        onLogout: onLogout,
+      ),
+      DashboardNavTab.ojManage => OJManagementView(
         showLogoutButton: !isDesktop,
         onLogout: onLogout,
       ),

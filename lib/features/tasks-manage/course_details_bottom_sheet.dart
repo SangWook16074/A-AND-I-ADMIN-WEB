@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
+import 'dart:math';
 import 'package:aandi_course_api/aandi_course_api.dart';
 
 import 'task_management.dart';
 import 'assignment_details_dialog.dart';
 import 'edit_assignment_dialog.dart';
 
-enum _EnrollmentActionStatus { enrolled, dropped, banned, deleted }
+enum _EnrollmentActionStatus { enabled, banned, deleted }
 
 void showCourseDetailsBottomSheet(BuildContext context, CourseSummary course) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    isDismissible: false,
+    enableDrag: false,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -50,7 +53,6 @@ class _CourseDetailsBottomSheetState
   @override
   Widget build(BuildContext context) {
     ref.listen(tasksManagementBlocProvider, (previous, next) {
-
       if (previous?.isDeleting == true && next.isDeleting == false) {
         if (next.errorMessage == null) {
           Navigator.of(context).pop();
@@ -197,6 +199,13 @@ class _CourseDetailsBottomSheetState
                           );
                         },
                 ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Color(0xFF555555),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -251,164 +260,240 @@ class _CourseDetailsBottomSheetState
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(
-          '코스 수정',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        content: SizedBox(
-          width: 440,
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    initialValue: title,
-                    decoration: const InputDecoration(
-                      labelText: '제목',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSaved: (v) => title = v?.trim() ?? title,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? '제목을 입력해주세요.' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    initialValue: description,
-                    decoration: const InputDecoration(
-                      labelText: '설명',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 2,
-                    onSaved: (v) => description = v?.trim() ?? '',
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text(
+              '코스 수정',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            content: SizedBox(
+              width: 440,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: phase,
-                          decoration: const InputDecoration(
-                            labelText: '단계 (Phase)',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'BASIC',
-                              child: Text('BASIC'),
+                      TextFormField(
+                        initialValue: title,
+                        decoration: const InputDecoration(
+                          labelText: '제목',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSaved: (v) => title = v?.trim() ?? title,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? '제목을 입력해주세요.'
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        initialValue: description,
+                        decoration: const InputDecoration(
+                          labelText: '설명',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 2,
+                        onSaved: (v) => description = v?.trim() ?? '',
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              initialValue: phase,
+                              decoration: const InputDecoration(
+                                labelText: '단계 (Phase)',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'BASIC',
+                                  child: Text('BASIC'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'CS',
+                                  child: Text('CS'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'FRAMEWORK',
+                                  child: Text('FRAMEWORK'),
+                                ),
+                              ],
+                              onChanged: (v) => phase = v ?? phase,
+                              onSaved: (v) => phase = v ?? phase,
                             ),
-                            DropdownMenuItem(value: 'CS', child: Text('CS')),
-                            DropdownMenuItem(
-                              value: 'FRAMEWORK',
-                              child: Text('FRAMEWORK'),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              initialValue: fieldTag,
+                              decoration: const InputDecoration(
+                                labelText: '트랙 (Field Tag)',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'FL',
+                                  child: Text('FL'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'SP',
+                                  child: Text('SP'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'NO',
+                                  child: Text('NO'),
+                                ),
+                              ],
+                              onChanged: (v) => fieldTag = v ?? fieldTag,
+                              onSaved: (v) => fieldTag = v ?? fieldTag,
                             ),
-                          ],
-                          onChanged: (v) => phase = v ?? phase,
-                          onSaved: (v) => phase = v ?? phase,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: fieldTag,
-                          decoration: const InputDecoration(
-                            labelText: '트랙 (Field Tag)',
-                            border: OutlineInputBorder(),
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'FL', child: Text('FL')),
-                            DropdownMenuItem(value: 'SP', child: Text('SP')),
-                            DropdownMenuItem(value: 'NO', child: Text('NO')),
-                          ],
-                          onChanged: (v) => fieldTag = v ?? fieldTag,
-                          onSaved: (v) => fieldTag = v ?? fieldTag,
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: status,
+                        decoration: const InputDecoration(
+                          labelText: '상태 (Status)',
+                          border: OutlineInputBorder(),
                         ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'DRAFT',
+                            child: Text('DRAFT'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'PUBLISHED',
+                            child: Text('PUBLISHED'),
+                          ),
+                        ],
+                        onChanged: (v) => status = v ?? status,
+                        onSaved: (v) => status = v ?? status,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DatePickerFieldInline(
+                              label: '시작일',
+                              initialValue: startDate,
+                              onChanged: (v) => startDate = v,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _DatePickerFieldInline(
+                              label: '종료일',
+                              initialValue: endDate,
+                              onChanged: (v) => endDate = v,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: status,
-                    decoration: const InputDecoration(
-                      labelText: '상태 (Status)',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'DRAFT', child: Text('DRAFT')),
-                      DropdownMenuItem(
-                        value: 'PUBLISHED',
-                        child: Text('PUBLISHED'),
-                      ),
-                    ],
-                    onChanged: (v) => status = v ?? status,
-                    onSaved: (v) => status = v ?? status,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: startDate,
-                          decoration: const InputDecoration(
-                            labelText: '시작일 (YYYY-MM-DD)',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSaved: (v) => startDate = v?.trim() ?? '',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: endDate,
-                          decoration: const InputDecoration(
-                            labelText: '종료일 (YYYY-MM-DD)',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSaved: (v) => endDate = v?.trim() ?? '',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() ?? false) {
-                formKey.currentState?.save();
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(color: Color(0xFF8A8A8A)),
+                ),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() ?? false) {
+                    formKey.currentState?.save();
 
-                ref
-                    .read(tasksManagementBlocProvider.notifier)
-                    .add(
-                      TasksManagementUpdateCourseRequested(
-                        courseSlug: course.slug,
-                        request: UpdateCourseRequest(
-                          fieldTag: fieldTag,
-                          startDate: startDate,
-                          endDate: endDate,
-                          title: title,
-                          description: description,
-                          phase: phase,
-                          status: status,
-                        ),
-                      ),
-                    );
-                Navigator.pop(dialogContext);
-              }
-            },
-            child: const Text('수정'),
-          ),
-        ],
+                    ref
+                        .read(tasksManagementBlocProvider.notifier)
+                        .add(
+                          TasksManagementUpdateCourseRequested(
+                            courseSlug: course.slug,
+                            request: UpdateCourseRequest(
+                              fieldTag: fieldTag,
+                              startDate: startDate,
+                              endDate: endDate,
+                              title: title,
+                              description: description,
+                              phase: phase,
+                              status: status,
+                            ),
+                          ),
+                        );
+                    Navigator.pop(dialogContext);
+                  }
+                },
+                child: const Text('수정'),
+              ),
+            ],
+          );
+        },
       ),
+    );
+  }
+}
+
+class _DatePickerFieldInline extends StatefulWidget {
+  const _DatePickerFieldInline({
+    required this.label,
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String initialValue;
+  final Function(String) onChanged;
+
+  @override
+  State<_DatePickerFieldInline> createState() => _DatePickerFieldInlineState();
+}
+
+class _DatePickerFieldInlineState extends State<_DatePickerFieldInline> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        border: const OutlineInputBorder(),
+        suffixIcon: const Icon(Icons.calendar_today, size: 18),
+      ),
+      onTap: () async {
+        final current = DateTime.tryParse(_controller.text) ?? DateTime.now();
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: current,
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2101),
+        );
+        if (picked != null) {
+          final formatted =
+              '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+          _controller.text = formatted;
+          widget.onChanged(formatted);
+        }
+      },
     );
   }
 }
@@ -430,20 +515,36 @@ class _EnrollmentsTab extends ConsumerStatefulWidget {
 
 class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   final _formKey = GlobalKey<FormState>();
-  String _userId = '';
+  String _publicCode = '';
   bool _isUpdatingEnrollmentStatus = false;
-  Timer? _searchTimer;
+  late final TextEditingController _userLookupController;
+
+  @override
+  void initState() {
+    super.initState();
+    _userLookupController = TextEditingController();
+    _userLookupController.addListener(() {
+      if (_userLookupController.text.isEmpty) {
+        ref
+            .read(tasksManagementBlocProvider.notifier)
+            .add(const TasksManagementClearUserSearch());
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _searchTimer?.cancel();
+    _userLookupController.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final request = AddEnrollmentRequest(userId: _userId);
+      final searchedUser = ref.read(tasksManagementBlocProvider).searchedUser;
+      final request = AddEnrollmentRequest(
+        publicCode: searchedUser?.publicCode ?? _publicCode,
+      );
       ref
           .read(tasksManagementBlocProvider.notifier)
           .add(
@@ -452,7 +553,10 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               request: request,
             ),
           );
-      ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
+      _userLookupController.clear();
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(const TasksManagementClearUserSearch());
       _formKey.currentState!.reset();
       FocusScope.of(context).unfocus();
     }
@@ -461,7 +565,12 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading && widget.enrollments == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -487,24 +596,51 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final enrollment = widget.enrollments![index];
+                final statusColor = enrollment.status == 'ENABLED'
+                    ? const Color(0xFF10B981)
+                    : enrollment.status == 'BANNED'
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFF6B7280);
+
                 return Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEAEAEA)),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: const Color(0xFFF0F0F0),
-                        child: Text(
-                          enrollment.userId.isNotEmpty
-                              ? enrollment.userId.substring(0, 1).toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                            color: Color(0xFF1A1A1A),
-                            fontWeight: FontWeight.w700,
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            (enrollment.username?.isNotEmpty ?? false)
+                                ? enrollment.username!
+                                      .substring(0, 1)
+                                      .toUpperCase()
+                                : (enrollment.userId.isNotEmpty
+                                      ? enrollment.userId
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                      : '?'),
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ),
@@ -513,34 +649,79 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'User ID: ${enrollment.userId}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  enrollment.username ?? 'Unknown',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                if (enrollment.publicCode != null) ...[
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    enrollment.publicCode!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.blue[600],
+                                      fontWeight: FontWeight.w600,
+                                      backgroundColor: Colors.blue[50]
+                                          ?.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '상태: ${enrollment.status}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: enrollment.status == 'ENROLLED'
-                                    ? Colors.green[700]
-                                    : enrollment.status == 'BANNED'
-                                    ? Colors.red[700]
-                                    : const Color(0xFF8A8A8A),
-                                fontWeight: FontWeight.w600,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    enrollment.status,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                if (enrollment.joinedAt != null) ...[
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '등록: ${_formatDateTime(enrollment.joinedAt!)}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF9CA3AF),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             if (enrollment.banReason != null &&
                                 enrollment.banReason!.trim().isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                '제한 사유: ${enrollment.banReason}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF8A8A8A),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '사유: ${enrollment.banReason}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.red[700],
+                                  ),
                                 ),
                               ),
                             ],
@@ -549,8 +730,12 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                       ),
                       const SizedBox(width: 12),
                       PopupMenuButton<_EnrollmentActionStatus>(
-                        tooltip: '상태 변경',
+                        tooltip: '관리',
                         enabled: !_isUpdatingEnrollmentStatus,
+                        icon: const Icon(
+                          Icons.more_horiz,
+                          color: Color(0xFF9CA3AF),
+                        ),
                         onSelected: (value) {
                           if (value == _EnrollmentActionStatus.deleted) {
                             _showDeleteEnrollmentDialog(enrollment);
@@ -563,40 +748,32 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         },
                         itemBuilder: (context) => const [
                           PopupMenuItem(
-                            value: _EnrollmentActionStatus.enrolled,
-                            child: Text('ENROLLED'),
-                          ),
-                          PopupMenuItem(
-                            value: _EnrollmentActionStatus.dropped,
-                            child: Text('DROPPED'),
+                            value: _EnrollmentActionStatus.enabled,
+                            child: Text('상태: ENABLED'),
                           ),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.banned,
-                            child: Text('BANNED'),
+                            child: Text('상태: BANNED'),
                           ),
-                          const PopupMenuDivider(),
+                          PopupMenuDivider(),
                           PopupMenuItem(
                             value: _EnrollmentActionStatus.deleted,
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.delete_outline_rounded,
+                                  Icons.delete_outline,
                                   color: Colors.red,
                                   size: 20,
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  '수강생 삭제',
+                                  '목록에서 삭제',
                                   style: TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
                           ),
                         ],
-                        child: const Padding(
-                          padding: EdgeInsets.all(4),
-                          child: Icon(Icons.more_vert),
-                        ),
                       ),
                     ],
                   ),
@@ -628,37 +805,81 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextFormField(
-                              decoration: const InputDecoration(
-                                labelText: 'User ID',
+                              controller: _userLookupController,
+                              decoration: InputDecoration(
+                                labelText: 'Code',
+                                hintText: '유저 코드 입력',
                                 filled: true,
                                 fillColor: Colors.white,
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    final query = _userLookupController.text
+                                        .trim();
+                                    if (query.isNotEmpty) {
+                                      ref
+                                          .read(
+                                            tasksManagementBlocProvider
+                                                .notifier,
+                                          )
+                                          .add(
+                                            TasksManagementUserSearchRequested(
+                                              query: query,
+                                            ),
+                                          );
+                                    }
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Center(
+                                      widthFactor: 1,
+                                      child: Text(
+                                        '조회',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              onChanged: (v) {
-                                _searchTimer?.cancel();
-                                if (v.isEmpty) {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(const TasksManagementClearUserSearch());
-                                  return;
-                                }
-                                _searchTimer = Timer(const Duration(milliseconds: 500), () {
-                                  ref.read(tasksManagementBlocProvider.notifier).add(TasksManagementUserSearchRequested(query: v.trim()));
-                                });
-                              },
-                              onSaved: (v) => _userId = v?.trim() ?? '',
+                              onSaved: (v) => _publicCode = v?.trim() ?? '',
                               validator: (v) =>
                                   v == null || v.trim().isEmpty ? '필수' : null,
                             ),
-                            if (ref.watch(tasksManagementBlocProvider).isSearchingUser)
+                            if (ref
+                                .watch(tasksManagementBlocProvider)
+                                .isSearchingUser)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: SizedBox(
                                   width: 12,
                                   height: 12,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).searchedUser != null)
+                            else if (ref
+                                    .watch(tasksManagementBlocProvider)
+                                    .searchedUser !=
+                                null)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8, left: 12),
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  left: 12,
+                                ),
                                 child: Text(
                                   '존재하는 사용자: ${ref.watch(tasksManagementBlocProvider).searchedUser!.nickname ?? ref.watch(tasksManagementBlocProvider).searchedUser!.id} (${ref.watch(tasksManagementBlocProvider).searchedUser!.username})',
                                   style: const TextStyle(
@@ -668,7 +889,9 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                                   ),
                                 ),
                               )
-                            else if (ref.watch(tasksManagementBlocProvider).userNotFound)
+                            else if (ref
+                                .watch(tasksManagementBlocProvider)
+                                .userNotFound)
                               const Padding(
                                 padding: EdgeInsets.only(top: 8, left: 12),
                                 child: Text(
@@ -736,14 +959,13 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '대상: ${enrollment.userId}',
+                    '대상: ${enrollment.username ?? enrollment.userId}',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '변경 상태: ${switch (status) {
-                      _EnrollmentActionStatus.enrolled => 'ENROLLED',
-                      _EnrollmentActionStatus.dropped => 'DROPPED',
+                      _EnrollmentActionStatus.enabled => 'ENABLED',
                       _EnrollmentActionStatus.banned => 'BANNED',
                       _EnrollmentActionStatus.deleted => 'DELETED',
                     }}',
@@ -795,10 +1017,16 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 });
 
                 final targetStatus = switch (status) {
-                  _EnrollmentActionStatus.enrolled => 'ENROLLED',
-                  _EnrollmentActionStatus.dropped => 'DROPPED',
-                  _EnrollmentActionStatus.banned => 'BANNED',
-                  _EnrollmentActionStatus.deleted => 'DELETED',
+                  _EnrollmentActionStatus.enabled => EnrollmentStatus.enabled,
+                  _EnrollmentActionStatus.banned => EnrollmentStatus.banned,
+                  _EnrollmentActionStatus.deleted => throw UnimplementedError(
+                    'Delete is separate',
+                  ),
+                };
+
+                final statusString = switch (targetStatus) {
+                  EnrollmentStatus.enabled => 'ENABLED',
+                  EnrollmentStatus.banned => 'BANNED',
                 };
 
                 ref
@@ -809,7 +1037,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                         userId: enrollment.userId,
                         request: UpdateEnrollmentStatusRequest(
                           status: targetStatus,
-                          banReason: targetStatus == 'BANNED'
+                          banReason: targetStatus == EnrollmentStatus.banned
                               ? banReason
                               : null,
                         ),
@@ -819,7 +1047,7 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${enrollment.userId} 상태를 $targetStatus(으)로 변경 요청했습니다.',
+                      '${enrollment.username ?? enrollment.userId} 상태를 $statusString(으)로 변경 요청했습니다.',
                     ),
                   ),
                 );
@@ -847,28 +1075,31 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
         content: Text(
-          '정말로 ${enrollment.userId} 수강생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+          '정말로 ${enrollment.username ?? enrollment.userId} 수강생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
           style: const TextStyle(height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(
-              '취소',
-              style: TextStyle(color: Color(0xFF8A8A8A)),
-            ),
+            child: const Text('취소', style: TextStyle(color: Color(0xFF8A8A8A))),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              ref.read(tasksManagementBlocProvider.notifier).add(
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
                     TasksManagementDeleteEnrollmentRequested(
                       courseSlug: widget.courseSlug,
                       userId: enrollment.userId,
                     ),
                   );
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${enrollment.userId} 수강생을 삭제 요청했습니다.')),
+                SnackBar(
+                  content: Text(
+                    '${enrollment.username ?? enrollment.userId} 수강생을 삭제 요청했습니다.',
+                  ),
+                ),
               );
             },
             child: const Text(
@@ -879,6 +1110,19 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
         ],
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dt) {
+    final now = DateTime.now();
+    final difference = now.difference(dt);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}분 전';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}시간 전';
+    } else {
+      return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
+    }
   }
 }
 
@@ -908,12 +1152,127 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _startAt = '';
   String _endAt = '';
 
-  int? _timeLimitMinutes;
   List<String> _learningGoals = [];
   String _language = 'kotlin';
 
   String _requirementsText = '';
-  final List<_ExampleData> _examples = [_ExampleData()];
+  final List<_TestCaseData> _testCases = [_TestCaseData()];
+
+  // Problem Detail fields
+  String _inputDescription = '';
+  String _outputDescription = '';
+  String _algorithmStep = 'STEP0';
+  int _difficultyStep = 1;
+
+  // Submission Guide fields
+  String _submissionGuideTitle = '';
+  String _submissionGuideDescription = '';
+  String _commentSectionsText = '';
+
+  // Code Templates
+  final List<_CodeTemplateData> _codeTemplates = [
+    _CodeTemplateData(language: 'KOTLIN'),
+    _CodeTemplateData(language: 'DART'),
+    _CodeTemplateData(language: 'PYTHON'),
+  ];
+
+  late TextEditingController _startAtController;
+  late TextEditingController _endAtController;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAtController = TextEditingController();
+    _endAtController = TextEditingController();
+
+    // Initialize with default values for first template
+    final kTemplate = _codeTemplates[0];
+    kTemplate.commentTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
+    kTemplate.functionTemplate =
+        "fun solution(): String {\n    var answer = \"\"\n    return answer\n}";
+    kTemplate.runnableTemplate =
+        "fun solution(): String {\n    var answer = \"Hello World!\"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}";
+
+    final dTemplate = _codeTemplates[1];
+    dTemplate.commentTemplate =
+        "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/";
+    dTemplate.functionTemplate =
+        "String solution() {\n  var answer = '';\n  return answer;\n}";
+    dTemplate.runnableTemplate =
+        "String solution() {\n  var answer = 'Hello World!';\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}";
+
+    final pTemplate = _codeTemplates[2];
+    pTemplate.commentTemplate =
+        "\"\"\"\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n\"\"\"";
+    pTemplate.functionTemplate =
+        "def solution():\n    answer = ''\n    return answer";
+    pTemplate.runnableTemplate =
+        "def solution():\n    answer = 'Hello World!'\n    return answer\n\nif __name__ == '__main__':\n    print(solution())";
+
+    for (var t in _codeTemplates) {
+      t.updateControllers();
+    }
+  }
+
+  @override
+  void dispose() {
+    _startAtController.dispose();
+    _endAtController.dispose();
+    for (var t in _codeTemplates) {
+      t.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _selectDateTime(bool isStart) async {
+    final DateTime now = DateTime.now();
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate == null) return;
+
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(now),
+    );
+
+    if (pickedTime == null) return;
+
+    final DateTime fullDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      final offset = fullDateTime.timeZoneOffset;
+      final hours = offset.inHours.abs().toString().padLeft(2, '0');
+      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      final sign = offset.isNegative ? '-' : '+';
+      final formattedIso =
+          '${fullDateTime.toIso8601String().split('.').first}$sign$hours:$minutes';
+
+      if (isStart) {
+        _startAt = formattedIso;
+        _startAtController.text = _formatFullDateTime(fullDateTime);
+      } else {
+        _endAt = formattedIso;
+        _endAtController.text = _formatFullDateTime(fullDateTime);
+      }
+    });
+  }
+
+  String _formatFullDateTime(DateTime dt) {
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1028,6 +1387,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
+                                    barrierDismissible: false,
                                     builder: (context) => EditAssignmentDialog(
                                       courseSlug: widget.courseSlug,
                                       assignment: assignment,
@@ -1220,23 +1580,33 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    controller: _startAtController,
+                    readOnly: true,
+                    onTap: () => _selectDateTime(true),
                     decoration: const InputDecoration(
-                      labelText: '시작일시 (예: 2026-03-03T09:00:00+09:00)',
+                      labelText: '시작일시 (달력에서 선택)',
                       filled: true,
                       fillColor: Colors.white,
+                      suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
-                    onSaved: (v) => _startAt = v?.trim() ?? '',
-                    validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                    onSaved: (v) => _startAt = _startAt.trim(),
+                    validator: (v) =>
+                        v == null || v.isEmpty ? '시작일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    controller: _endAtController,
+                    readOnly: true,
+                    onTap: () => _selectDateTime(false),
                     decoration: const InputDecoration(
-                      labelText: '종료일시 (예: 2026-03-11T08:59:59+09:00)',
+                      labelText: '종료일시 (달력에서 선택)',
                       filled: true,
                       fillColor: Colors.white,
+                      suffixIcon: Icon(Icons.calendar_today, size: 20),
                     ),
-                    onSaved: (v) => _endAt = v?.trim() ?? '',
-                    validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                    onSaved: (v) => _endAt = _endAt.trim(),
+                    validator: (v) =>
+                        v == null || v.isEmpty ? '종료일시를 선택해주세요.' : null,
                   ),
                   const SizedBox(height: 12),
                   const Divider(),
@@ -1248,7 +1618,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(
+                      /* Expanded(
                         child: TextFormField(
                           decoration: const InputDecoration(
                             labelText: '제한 시간 (분)',
@@ -1259,7 +1629,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           onSaved: (v) =>
                               _timeLimitMinutes = int.tryParse(v ?? ''),
                         ),
-                      ),
+                      ), */
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextFormField(
@@ -1277,16 +1647,18 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   const SizedBox(height: 12),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: '학습 목표 (쉼표로 구분)',
+                      labelText: '학습 목표 (줄바꿈으로 구분)',
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: '함수 분리, 코드 컨벤션',
+                      hintText: '함수 분리\n코드 컨벤션',
                     ),
+                    maxLines: 3,
                     onSaved: (v) {
                       if (v != null && v.trim().isNotEmpty) {
                         _learningGoals = v
-                            .split(',')
+                            .split('\n')
                             .map((e) => e.trim())
+                            .where((e) => e.isNotEmpty)
                             .toList();
                       } else {
                         _learningGoals = [];
@@ -1317,18 +1689,18 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            _examples.add(_ExampleData());
+                            _testCases.add(_TestCaseData());
                           });
                         },
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('예제 추가'),
+                        label: const Text('테스트케이스 추가'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  ..._examples.asMap().entries.map((entry) {
+                  ..._testCases.asMap().entries.map((entry) {
                     final index = entry.key;
-                    final example = entry.value;
+                    final testCase = entry.value;
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
@@ -1344,13 +1716,13 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '예제 ${index + 1}',
+                                '테스트케이스 ${index + 1}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13,
                                 ),
                               ),
-                              if (_examples.length > 1)
+                              if (_testCases.length > 1)
                                 IconButton(
                                   icon: const Icon(
                                     Icons.remove_circle_outline,
@@ -1359,7 +1731,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _examples.removeAt(index);
+                                      _testCases.removeAt(index);
                                     });
                                   },
                                   padding: EdgeInsets.zero,
@@ -1369,45 +1741,294 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            initialValue: example.input,
+                            initialValue: testCase.inputs.join('\n'),
                             decoration: const InputDecoration(
-                              labelText: '예제 입력 (Input)',
+                              labelText: '입력 (Inputs, 한 줄에 하나씩)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
-                              hintText: 'ADD 1\\nCLOSE',
+                              hintText: 'param1\nparam2',
                             ),
-                            maxLines: 2,
-                            onSaved: (v) => example.input = v?.trim() ?? '',
+                            maxLines: 4,
+                            onSaved: (v) => testCase.inputs =
+                                v?.split('\n').map((e) => e.trim()).toList() ??
+                                [],
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            initialValue: example.output,
+                            initialValue: testCase.output,
                             decoration: const InputDecoration(
-                              labelText: '예제 출력 (Output)',
+                              labelText: '출력 (Output)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
                               hintText: '+1',
                             ),
                             maxLines: 2,
-                            onSaved: (v) => example.output = v?.trim() ?? '',
+                            onSaved: (v) => testCase.output = v?.trim() ?? '',
                           ),
                           const SizedBox(height: 12),
-                          TextFormField(
-                            initialValue: example.description,
+                          DropdownButtonFormField<String>(
+                            initialValue: testCase.visibility,
                             decoration: const InputDecoration(
-                              labelText: '예제 설명 (Description)',
+                              labelText: '공개 여부 (Visibility)',
                               filled: true,
                               fillColor: Color(0xFFFAFAFA),
-                              hintText: '기본 동작',
                             ),
-                            onSaved: (v) =>
-                                example.description = v?.trim() ?? '',
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'PUBLIC',
+                                child: Text('PUBLIC'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PRIVATE',
+                                child: Text('PRIVATE'),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) testCase.visibility = v;
+                            },
                           ),
                         ],
                       ),
                     );
                   }),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '문제 상세 정보 (Problem Detail)',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: _inputDescription,
+                    decoration: const InputDecoration(
+                      labelText: '입력 설명 (Input Description)',
+                      filled: true,
+                      fillColor: Color(0xFFFAFAFA),
+                    ),
+                    onSaved: (v) => _inputDescription = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: _outputDescription,
+                    decoration: const InputDecoration(
+                      labelText: '출력 설명 (Output Description)',
+                      filled: true,
+                      fillColor: Color(0xFFFAFAFA),
+                    ),
+                    onSaved: (v) => _outputDescription = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: _algorithmStep,
+                          decoration: const InputDecoration(
+                            labelText: '알고리즘 단계 (Algorithm Step)',
+                            filled: true,
+                            fillColor: Color(0xFFFAFAFA),
+                            hintText: 'STEP0',
+                          ),
+                          onSaved: (v) => _algorithmStep = v?.trim() ?? 'STEP0',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: _difficultyStep.toString(),
+                          decoration: const InputDecoration(
+                            labelText: '난이도 단계 (Difficulty Step)',
+                            filled: true,
+                            fillColor: Color(0xFFFAFAFA),
+                          ),
+                          keyboardType: TextInputType.number,
+                          onSaved: (v) =>
+                              _difficultyStep = int.tryParse(v ?? '1') ?? 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '제출 가이드 (Submission Guide)',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: _submissionGuideTitle,
+                    decoration: const InputDecoration(
+                      labelText: '가이드 제목 (Guide Title)',
+                      filled: true,
+                      fillColor: Color(0xFFFAFAFA),
+                      hintText: '문제 풀이 템플릿',
+                    ),
+                    onSaved: (v) => _submissionGuideTitle = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: _submissionGuideDescription,
+                    decoration: const InputDecoration(
+                      labelText: '가이드 설명 (Description)',
+                      filled: true,
+                      fillColor: Color(0xFFFAFAFA),
+                      hintText: '제출 코드 상단에는 문제-해석-풀이 주석을 작성해야 합니다.',
+                    ),
+                    maxLines: 2,
+                    onSaved: (v) =>
+                        _submissionGuideDescription = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: _commentSectionsText,
+                    decoration: const InputDecoration(
+                      labelText: '코멘트 섹션 (Comment Sections - 줄바꿈으로 구분)',
+                      filled: true,
+                      fillColor: Color(0xFFFAFAFA),
+                      hintText: '문제\n해석\n풀이',
+                    ),
+                    maxLines: 3,
+                    onSaved: (v) => _commentSectionsText = v?.trim() ?? '',
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '코드 템플릿 (Code Templates)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            setState(() {
+                              _codeTemplates.add(
+                                _CodeTemplateData(
+                                  language: 'KOTLIN',
+                                  commentTemplate:
+                                      '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/',
+                                  functionTemplate:
+                                      'fun solution(): String {\n    var answer = ""\n    return answer\n}',
+                                  runnableTemplate:
+                                      'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}',
+                                ),
+                              );
+                            });
+                          });
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('템플릿 추가'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ..._codeTemplates.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final template = entry.value;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFEAEAEA)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '템플릿 ${index + 1}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              if (_codeTemplates.length > 1)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.remove_circle_outline,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      final removed = _codeTemplates.removeAt(
+                                        index,
+                                      );
+                                      removed.dispose();
+                                    });
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            initialValue: template.language,
+                            decoration: const InputDecoration(
+                              labelText: '언어 (Language)',
+                              filled: true,
+                              fillColor: Color(0xFFFAFAFA),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'KOTLIN',
+                                child: Text('KOTLIN'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'DART',
+                                child: Text('DART'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PYTHON',
+                                child: Text('PYTHON'),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) {
+                                setState(() {
+                                  template.updateLanguage(v);
+                                });
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _buildCodeField(
+                            label: '코멘트 템플릿 (Comment)',
+                            controller: template.commentController,
+                            language: template.language,
+                            hintText: '/*\\n[문제]\\n...*/',
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCodeField(
+                            label: '함수 템플릿 (Function)',
+                            controller: template.functionController,
+                            language: template.language,
+                            hintText: 'fun solution() { ... }',
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCodeField(
+                            label: '실행 가능 템플릿 (Runnable)',
+                            controller: template.runnableController,
+                            language: template.language,
+                            hintText: 'fun main() { ... }',
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
@@ -1430,27 +2051,40 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       ),
                                     )
                                     .toList();
-                          final exampleList = _examples
+                          final testCaseList = _testCases
                               .asMap()
                               .entries
                               .where(
                                 (e) =>
-                                    e.value.input.isNotEmpty ||
-                                    e.value.output.isNotEmpty ||
-                                    e.value.description.isNotEmpty,
+                                    e.value.inputs.isNotEmpty ||
+                                    e.value.output.isNotEmpty,
                               )
                               .map(
-                                (e) => AssignmentExample(
+                                (e) => AssignmentTestCase(
                                   seq: e.key + 1,
-                                  inputText: e.value.input.replaceAll(
-                                    '\\n',
-                                    '\n',
-                                  ),
+                                  inputValues: e.value.inputs
+                                      .map((e) => e.replaceAll('\\n', '\n'))
+                                      .toList(),
                                   outputText: e.value.output.replaceAll(
                                     '\\n',
                                     '\n',
                                   ),
-                                  description: e.value.description,
+                                  visibility: e.value.visibility,
+                                ),
+                              )
+                              .toList();
+
+                          final codeTemplateList = _codeTemplates
+                              .where((e) => e.language.isNotEmpty)
+                              .map(
+                                (e) => CodeTemplate(
+                                  language: e.language,
+                                  commentTemplate: e.commentController.text
+                                      .trim(),
+                                  functionTemplate: e.functionController.text
+                                      .trim(),
+                                  runnableTemplate: e.runnableController.text
+                                      .trim(),
                                 ),
                               )
                               .toList();
@@ -1469,17 +2103,40 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                       title: _title,
                                       description: _description,
                                       difficulty: _difficulty,
-                                      timeLimitMinutes: _timeLimitMinutes,
                                       learningGoals: _learningGoals
                                           .asMap()
                                           .entries
-                                          .map((e) => LearningGoal(
-                                                sortOrder: e.key + 1,
-                                                learningGoalText: e.value,
-                                              ))
+                                          .map(
+                                            (e) => LearningGoal(
+                                              sortOrder: e.key + 1,
+                                              learningGoalText: e.value,
+                                            ),
+                                          )
                                           .toList(),
                                       requirements: reqList,
-                                      examples: exampleList,
+                                      testCases: testCaseList,
+                                      problemDetail: ProblemDetail(
+                                        inputDescription: _inputDescription,
+                                        outputDescription: _outputDescription,
+                                        classification: ProblemClassification(
+                                          algorithmStep: _algorithmStep,
+                                          difficultyStep: _difficultyStep,
+                                        ),
+                                      ),
+                                      submissionGuide: SubmissionGuide(
+                                        title: _submissionGuideTitle,
+                                        description:
+                                            _submissionGuideDescription,
+                                        commentSections:
+                                            _commentSectionsText.isEmpty
+                                            ? []
+                                            : _commentSectionsText
+                                                  .split('\n')
+                                                  .map((e) => e.trim())
+                                                  .where((e) => e.isNotEmpty)
+                                                  .toList(),
+                                      ),
+                                      codeTemplates: codeTemplateList,
                                       attributes: _language.isNotEmpty
                                           ? {'language': _language}
                                           : {},
@@ -1492,8 +2149,51 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           );
                           _formKey.currentState?.reset();
                           setState(() {
-                            _examples.clear();
-                            _examples.add(_ExampleData());
+                            _testCases.clear();
+                            _testCases.add(_TestCaseData());
+                            _codeTemplates.clear();
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'KOTLIN'),
+                            );
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'DART'),
+                            );
+                            _codeTemplates.add(
+                              _CodeTemplateData(language: 'PYTHON'),
+                            );
+
+                            // Re-apply defaults to the new templates
+                            final k = _codeTemplates[0];
+                            k.commentTemplate =
+                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
+                            k.functionTemplate =
+                                'fun solution(): String {\n    var answer = ""\n    return answer\n}';
+                            k.runnableTemplate =
+                                'fun solution(): String {\n    var answer = "Hello World!"\n    return answer\n}\n\nfun main() {\n    println(solution())\n}';
+
+                            final d = _codeTemplates[1];
+                            d.commentTemplate =
+                                '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/';
+                            d.functionTemplate =
+                                'String solution() {\n  var answer = "";\n  return answer;\n}';
+                            d.runnableTemplate =
+                                'String solution() {\n  var answer = "Hello World!";\n  return answer;\n}\n\nvoid main() {\n  print(solution());\n}';
+
+                            final p = _codeTemplates[2];
+                            p.commentTemplate =
+                                '"""\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n"""';
+                            p.functionTemplate =
+                                'def solution():\n    answer = ""\n    return answer';
+                            p.runnableTemplate =
+                                'def solution():\n    answer = "Hello World!"\n    return answer\n\nif __name__ == "__main__":\n    print(solution())';
+
+                            for (var t in _codeTemplates) {
+                              t.updateControllers();
+                            }
+
+                            _submissionGuideTitle = '';
+                            _submissionGuideDescription = '';
+                            _commentSectionsText = '';
                           });
                         }
                       },
@@ -1518,10 +2218,389 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       ),
     );
   }
+
+  Widget _buildCodeField({
+    required String label,
+    required TextEditingController controller,
+    required String language,
+    String? hintText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 350,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF334155)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E293B),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: Row(
+                  children: [
+                    _buildDot(const Color(0xFFEF4444)),
+                    const SizedBox(width: 6),
+                    _buildDot(const Color(0xFFF59E0B)),
+                    const SizedBox(width: 6),
+                    _buildDot(const Color(0xFF10B981)),
+                    const SizedBox(width: 12),
+                    Text(
+                      language.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Body
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Gutter
+                    Container(
+                      width: 45,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0F172A),
+                        border: Border(
+                          right: BorderSide(color: Color(0xFF334155)),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
+                          children: List.generate(
+                            max(1, controller.text.split('\n').length),
+                            (i) => Text(
+                              '${i + 1}',
+                              style: const TextStyle(
+                                color: Color(0xFF475569),
+                                fontSize: 13,
+                                fontFamily: 'monospace',
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Editor
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        child: TextFormField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            hintText: hintText,
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          maxLines: null,
+                          cursorColor: Colors.white,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'monospace',
+                            height: 1.5,
+                            color: Color(0xFFE2E8F0),
+                          ),
+                          onChanged: (v) {
+                            setState(() {
+                              // Trigger rebuild for gutter
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
 }
 
-class _ExampleData {
-  String input = '';
-  String output = '';
-  String description = '';
+class _TestCaseData {
+  List<String> inputs;
+  String output;
+  String visibility;
+
+  _TestCaseData({
+    List<String>? inputs,
+    this.output = '',
+    this.visibility = 'PUBLIC',
+  }) : inputs = inputs ?? [];
+}
+
+class _CodeTemplateData {
+  String language;
+  String commentTemplate = '';
+  String functionTemplate = '';
+  String runnableTemplate = '';
+
+  late final TextEditingController commentController;
+  late final TextEditingController functionController;
+  late final TextEditingController runnableController;
+
+  _CodeTemplateData({
+    this.language = 'KOTLIN',
+    String commentTemplate = '',
+    String functionTemplate = '',
+    String runnableTemplate = '',
+  }) {
+    this.commentTemplate = commentTemplate;
+    this.functionTemplate = functionTemplate;
+    this.runnableTemplate = runnableTemplate;
+
+    commentController = _PremiumCodeController(
+      text: commentTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+    functionController = _PremiumCodeController(
+      text: functionTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+    runnableController = _PremiumCodeController(
+      text: runnableTemplate.replaceAll('\\n', '\n'),
+      language: language,
+    );
+  }
+
+  void dispose() {
+    commentController.dispose();
+    functionController.dispose();
+    runnableController.dispose();
+  }
+
+  void updateControllers() {
+    commentController.text = commentTemplate.replaceAll('\\n', '\n');
+    functionController.text = functionTemplate.replaceAll('\\n', '\n');
+    runnableController.text = runnableTemplate.replaceAll('\\n', '\n');
+    (commentController as _PremiumCodeController).language = language;
+    (functionController as _PremiumCodeController).language = language;
+    (runnableController as _PremiumCodeController).language = language;
+  }
+
+  void updateLanguage(String lang) {
+    language = lang;
+    (commentController as _PremiumCodeController).language = lang;
+    (functionController as _PremiumCodeController).language = lang;
+    (runnableController as _PremiumCodeController).language = lang;
+  }
+}
+
+class _PremiumCodeController extends TextEditingController {
+  String language;
+  _PremiumCodeController({required String text, required this.language})
+    : super(text: text);
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    return _highlightCode(text, language);
+  }
+}
+
+TextSpan _highlightCode(String code, String language) {
+  final lang = language.toLowerCase();
+  const keywords = {
+    'python': [
+      'def',
+      'return',
+      'if',
+      'else',
+      'elif',
+      'for',
+      'while',
+      'import',
+      'from',
+      'as',
+      'class',
+      'try',
+      'except',
+      'pass',
+      'print',
+      'in',
+      'is',
+      'not',
+    ],
+    'kotlin': [
+      'fun',
+      'val',
+      'var',
+      'if',
+      'else',
+      'when',
+      'for',
+      'while',
+      'return',
+      'class',
+      'interface',
+      'object',
+      'override',
+      'import',
+      'package',
+      'void',
+    ],
+    'dart': [
+      'void',
+      'final',
+      'var',
+      'if',
+      'else',
+      'return',
+      'class',
+      'import',
+      'package',
+      'async',
+      'await',
+      'late',
+      'dynamic',
+      'static',
+      'override',
+    ],
+  };
+
+  final kwList = keywords[lang] ?? keywords['kotlin']!;
+  final spans = <TextSpan>[];
+
+  final combinedRegex = RegExp(
+    r'(".*?")|'
+    r"('.*?')|"
+    r'(\/\/.*)|'
+    r'(\/\*[\s\S]*?\*\/)|'
+    r'(#.*)|'
+    r'([a-zA-Z_][a-zA-Z0-9_]*)|'
+    r'(\d+(\.\d*)?)|'
+    r'([{}()\[\]])|'
+    r'([+\-*/%=<>!&|^~,.:;])|'
+    r'(\s+)',
+  );
+
+  final matches = combinedRegex.allMatches(code).toList();
+
+  for (var i = 0; i < matches.length; i++) {
+    final match = matches[i];
+    final text = match.group(0)!;
+
+    if (match.group(1) != null || match.group(2) != null) {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFF86EFAC)),
+        ),
+      );
+    } else if (match.group(3) != null ||
+        match.group(4) != null ||
+        match.group(5) != null) {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(
+            color: Color(0xFF64748B),
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    } else if (match.group(6) != null) {
+      final word = match.group(6)!;
+      if (kwList.contains(word)) {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(
+              color: Color(0xFFC084FC),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      } else if (i + 1 < matches.length &&
+          matches[i + 1].group(0)!.trim().startsWith('(')) {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFF60A5FA)),
+          ),
+        );
+      } else {
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Color(0xFFE2E8F0)),
+          ),
+        );
+      }
+    } else if (match.group(7) != null) {
+      // Numbers
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFFFDE68A)),
+        ),
+      );
+    } else if (match.group(9) != null || match.group(10) != null) {
+      // Punctuation/Operators
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFF94A3B8)),
+        ),
+      );
+    } else {
+      spans.add(
+        TextSpan(
+          text: text,
+          style: const TextStyle(color: Color(0xFFE2E8F0)),
+        ),
+      );
+    }
+  }
+
+  return TextSpan(children: spans);
 }

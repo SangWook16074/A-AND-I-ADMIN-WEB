@@ -1,4 +1,5 @@
 import 'package:aandi_auth/aandi_auth.dart';
+import 'package:aandi_admin_api/aandi_admin_api.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -59,6 +60,12 @@ class UsersManagementBloc extends _$UsersManagementBloc {
           cohortOrder: cohortOrder,
           userTrack: userTrack,
         );
+      case UsersManagementCreateRequested(
+        :final role,
+        :final cohort,
+        :final provisionType,
+      ):
+        await createUser(role: role, cohort: cohort, provisionType: provisionType);
       case UsersManagementDeleteRequested(:final userId):
         await deleteUser(userId: userId);
       case UsersManagementUpdateRequested(
@@ -135,6 +142,49 @@ class UsersManagementBloc extends _$UsersManagementBloc {
       // Reload users after successful invite
       await loadUsers();
       
+      state = state.copyWith(
+        status: UsersManagementStatus.success,
+        isCreating: false,
+        clearError: true,
+      );
+    } on UsersManagementApiException catch (e) {
+      state = state.copyWith(
+        status: UsersManagementStatus.failure,
+        isCreating: false,
+        errorMessage: e.message,
+      );
+    } on AuthApiException catch (e) {
+      state = state.copyWith(
+        status: UsersManagementStatus.failure,
+        isCreating: false,
+        errorMessage: e.message,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        status: UsersManagementStatus.failure,
+        isCreating: false,
+        errorMessage: '사용자 대상 초대 메일 발송에 실패했습니다.',
+      );
+    }
+  }
+
+  Future<void> createUser({
+    required AuthRole role,
+    required int cohort,
+    required AdminUserProvisionType provisionType,
+  }) async {
+    state = state.copyWith(isCreating: true, clearError: true);
+
+    try {
+      await ref.read(usersManagementRepositoryProvider).createUser(
+        role: role,
+        cohort: cohort,
+        provisionType: provisionType,
+      );
+
+      // Reload users after successful creation
+      await loadUsers();
+
       state = state.copyWith(
         status: UsersManagementStatus.success,
         isCreating: false,

@@ -69,9 +69,12 @@ abstract class UpdateCourseRequest with _$UpdateCourseRequest {
 @freezed
 abstract class Enrollment with _$Enrollment {
   const factory Enrollment({
-    @Default('') String id,
+    String? courseId,
+    String? courseSlug,
     @Default('') String userId,
-    @Default('ACTIVE') String status,
+    String? username,
+    String? publicCode,
+    @Default('ENABLED') String status,
     DateTime? joinedAt,
     DateTime? droppedAt,
     DateTime? bannedAt,
@@ -89,12 +92,13 @@ abstract class AssignmentMetadata with _$AssignmentMetadata {
     @Default('') String title,
     @Default('MID') String difficulty,
     String? description,
-    int? timeLimitMinutes,
     @Default([]) List<LearningGoal> learningGoals,
     @Default([]) List<AssignmentRequirement> requirements,
-    @Default([]) List<AssignmentExample> examples,
+    @Default([]) List<AssignmentTestCase> testCases,
+    ProblemDetail? problemDetail,
+    SubmissionGuide? submissionGuide,
+    @Default([]) List<CodeTemplate> codeTemplates,
     @Default({}) Map<String, dynamic> attributes,
-    Map<String, dynamic>? problemDetail,
   }) = _AssignmentMetadata;
 
   factory AssignmentMetadata.fromJson(Map<String, dynamic> json) =>
@@ -124,16 +128,64 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
 }
 
 @freezed
-abstract class AssignmentExample with _$AssignmentExample {
-  const factory AssignmentExample({
+abstract class AssignmentTestCase with _$AssignmentTestCase {
+  const factory AssignmentTestCase({
     required int seq,
-    String? inputText,
+    @Default([]) List<String> inputValues,
     String? outputText,
-    String? description,
-  }) = _AssignmentExample;
+    @Default('PUBLIC') String visibility,
+  }) = _AssignmentTestCase;
 
-  factory AssignmentExample.fromJson(Map<String, dynamic> json) =>
-      _$AssignmentExampleFromJson(json);
+  factory AssignmentTestCase.fromJson(Map<String, dynamic> json) =>
+      _$AssignmentTestCaseFromJson(json);
+}
+
+@freezed
+abstract class ProblemDetail with _$ProblemDetail {
+  const factory ProblemDetail({
+    String? inputDescription,
+    String? outputDescription,
+    ProblemClassification? classification,
+  }) = _ProblemDetail;
+
+  factory ProblemDetail.fromJson(Map<String, dynamic> json) =>
+      _$ProblemDetailFromJson(json);
+}
+
+@freezed
+abstract class ProblemClassification with _$ProblemClassification {
+  const factory ProblemClassification({
+    String? algorithmStep,
+    int? difficultyStep,
+  }) = _ProblemClassification;
+
+  factory ProblemClassification.fromJson(Map<String, dynamic> json) =>
+      _$ProblemClassificationFromJson(json);
+}
+
+@freezed
+abstract class SubmissionGuide with _$SubmissionGuide {
+  const factory SubmissionGuide({
+    String? title,
+    String? description,
+    @Default([]) List<String> commentSections,
+  }) = _SubmissionGuide;
+
+  factory SubmissionGuide.fromJson(Map<String, dynamic> json) =>
+      _$SubmissionGuideFromJson(json);
+}
+
+@freezed
+abstract class CodeTemplate with _$CodeTemplate {
+  const factory CodeTemplate({
+    required String language,
+    String? commentTemplate,
+    String? functionTemplate,
+    String? runnableTemplate,
+  }) = _CodeTemplate;
+
+  factory CodeTemplate.fromJson(Map<String, dynamic> json) =>
+      _$CodeTemplateFromJson(json);
 }
 
 @freezed
@@ -175,6 +227,7 @@ abstract class UpdateAssignmentRequest with _$UpdateAssignmentRequest {
     required String startAt,
     required String endAt,
     required AssignmentMetadata metadata,
+    String? status,
   }) = _UpdateAssignmentRequest;
 
   factory UpdateAssignmentRequest.fromJson(Map<String, dynamic> json) =>
@@ -183,18 +236,25 @@ abstract class UpdateAssignmentRequest with _$UpdateAssignmentRequest {
 
 @freezed
 abstract class AddEnrollmentRequest with _$AddEnrollmentRequest {
-  const factory AddEnrollmentRequest({required String userId}) =
+  const factory AddEnrollmentRequest({required String publicCode}) =
       _AddEnrollmentRequest;
 
   factory AddEnrollmentRequest.fromJson(Map<String, dynamic> json) =>
       _$AddEnrollmentRequestFromJson(json);
 }
 
+enum EnrollmentStatus {
+  @JsonValue('ENABLED')
+  enabled,
+  @JsonValue('BANNED')
+  banned,
+}
+
 @freezed
 abstract class UpdateEnrollmentStatusRequest
     with _$UpdateEnrollmentStatusRequest {
   const factory UpdateEnrollmentStatusRequest({
-    required String status,
+    required EnrollmentStatus status,
     String? banReason,
   }) = _UpdateEnrollmentStatusRequest;
 

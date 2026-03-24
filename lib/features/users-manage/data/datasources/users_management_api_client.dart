@@ -86,15 +86,48 @@ class UsersManagementApiClient {
     }
   }
 
+  Future<AdminUserDto> lookupUser({
+    required String accessToken,
+    required String code,
+  }) async {
+    try {
+      final user = await apiClient.lookupUser(
+        accessToken: accessToken,
+        code: code,
+      );
+      return AdminUserDto(
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        nickname: user.nickname,
+        publicCode: user.publicCode,
+        userTrack: user.userTrack,
+        cohort: user.cohort,
+        cohortOrder: user.cohortOrder,
+        forcePasswordChange: user.forcePasswordChange,
+        inviteLink: user.inviteLink,
+        inviteExpiresAt: user.inviteExpiresAt,
+        active: user.active,
+      );
+    } on admin_api.AdminApiException catch (e) {
+      throw UsersManagementApiException(
+        e.message,
+        statusCode: e.statusCode,
+        code: e.code,
+      );
+    }
+  }
+
   Future<AdminUserDto> createUser({
     required String accessToken,
+    required AuthRole role,
     required admin_api.AdminUserProvisionType provisionType,
     required int cohort,
   }) async {
     try {
       final created = await apiClient.createUser(
         accessToken: accessToken,
-        role: AuthRole.user,
+        role: role,
         provisionType: provisionType,
         cohort: cohort,
       );
