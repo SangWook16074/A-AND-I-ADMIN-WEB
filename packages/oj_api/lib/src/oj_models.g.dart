@@ -46,7 +46,7 @@ _SubmissionTestCase _$SubmissionTestCaseFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String,
       timeMs: (json['timeMs'] as num).toDouble(),
       memoryMb: (json['memoryMb'] as num).toDouble(),
-      output: json['output'] as String?,
+      output: json['output'],
       error: json['error'] as String?,
     );
 

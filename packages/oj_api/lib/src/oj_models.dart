@@ -34,7 +34,7 @@ abstract class SubmissionTestCase with _$SubmissionTestCase {
     required String status,
     required double timeMs,
     required double memoryMb,
-    required String? output,
+    required dynamic output,
     required String? error,
   }) = _SubmissionTestCase;
 

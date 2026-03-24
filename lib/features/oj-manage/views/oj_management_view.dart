@@ -870,7 +870,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
                 _buildTableCell(
                   (tc.error != null && tc.error!.isNotEmpty)
                       ? tc.error!
-                      : (tc.output ?? '-'),
+                      : (tc.output?.toString() ?? '-'),
                   isMonospace: true,
                   textColor: tc.error != null ? Colors.redAccent : null,
                 ),

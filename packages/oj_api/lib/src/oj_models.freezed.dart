@@ -577,7 +577,7 @@ as DateTime,
 /// @nodoc
 mixin _$SubmissionTestCase {
 
- int get caseId; String get status; double get timeMs; double get memoryMb; String? get output; String? get error;
+ int get caseId; String get status; double get timeMs; double get memoryMb; dynamic get output; String? get error;
 /// Create a copy of SubmissionTestCase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -590,12 +590,12 @@ $SubmissionTestCaseCopyWith<SubmissionTestCase> get copyWith => _$SubmissionTest
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmissionTestCase&&(identical(other.caseId, caseId) || other.caseId == caseId)&&(identical(other.status, status) || other.status == status)&&(identical(other.timeMs, timeMs) || other.timeMs == timeMs)&&(identical(other.memoryMb, memoryMb) || other.memoryMb == memoryMb)&&(identical(other.output, output) || other.output == output)&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmissionTestCase&&(identical(other.caseId, caseId) || other.caseId == caseId)&&(identical(other.status, status) || other.status == status)&&(identical(other.timeMs, timeMs) || other.timeMs == timeMs)&&(identical(other.memoryMb, memoryMb) || other.memoryMb == memoryMb)&&const DeepCollectionEquality().equals(other.output, output)&&(identical(other.error, error) || other.error == error));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,caseId,status,timeMs,memoryMb,output,error);
+int get hashCode => Object.hash(runtimeType,caseId,status,timeMs,memoryMb,const DeepCollectionEquality().hash(output),error);
 
 @override
 String toString() {
@@ -610,7 +610,7 @@ abstract mixin class $SubmissionTestCaseCopyWith<$Res>  {
   factory $SubmissionTestCaseCopyWith(SubmissionTestCase value, $Res Function(SubmissionTestCase) _then) = _$SubmissionTestCaseCopyWithImpl;
 @useResult
 $Res call({
- int caseId, String status, double timeMs, double memoryMb, String? output, String? error
+ int caseId, String status, double timeMs, double memoryMb, dynamic output, String? error
 });
 
 
@@ -634,7 +634,7 @@ as int,status: null == status ? _self.status : status // ignore: cast_nullable_t
 as String,timeMs: null == timeMs ? _self.timeMs : timeMs // ignore: cast_nullable_to_non_nullable
 as double,memoryMb: null == memoryMb ? _self.memoryMb : memoryMb // ignore: cast_nullable_to_non_nullable
 as double,output: freezed == output ? _self.output : output // ignore: cast_nullable_to_non_nullable
-as String?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -720,7 +720,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int caseId,  String status,  double timeMs,  double memoryMb,  String? output,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int caseId,  String status,  double timeMs,  double memoryMb,  dynamic output,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SubmissionTestCase() when $default != null:
 return $default(_that.caseId,_that.status,_that.timeMs,_that.memoryMb,_that.output,_that.error);case _:
@@ -741,7 +741,7 @@ return $default(_that.caseId,_that.status,_that.timeMs,_that.memoryMb,_that.outp
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int caseId,  String status,  double timeMs,  double memoryMb,  String? output,  String? error)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int caseId,  String status,  double timeMs,  double memoryMb,  dynamic output,  String? error)  $default,) {final _that = this;
 switch (_that) {
 case _SubmissionTestCase():
 return $default(_that.caseId,_that.status,_that.timeMs,_that.memoryMb,_that.output,_that.error);case _:
@@ -761,7 +761,7 @@ return $default(_that.caseId,_that.status,_that.timeMs,_that.memoryMb,_that.outp
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int caseId,  String status,  double timeMs,  double memoryMb,  String? output,  String? error)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int caseId,  String status,  double timeMs,  double memoryMb,  dynamic output,  String? error)?  $default,) {final _that = this;
 switch (_that) {
 case _SubmissionTestCase() when $default != null:
 return $default(_that.caseId,_that.status,_that.timeMs,_that.memoryMb,_that.output,_that.error);case _:
@@ -783,7 +783,7 @@ class _SubmissionTestCase implements SubmissionTestCase {
 @override final  String status;
 @override final  double timeMs;
 @override final  double memoryMb;
-@override final  String? output;
+@override final  dynamic output;
 @override final  String? error;
 
 /// Create a copy of SubmissionTestCase
@@ -799,12 +799,12 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubmissionTestCase&&(identical(other.caseId, caseId) || other.caseId == caseId)&&(identical(other.status, status) || other.status == status)&&(identical(other.timeMs, timeMs) || other.timeMs == timeMs)&&(identical(other.memoryMb, memoryMb) || other.memoryMb == memoryMb)&&(identical(other.output, output) || other.output == output)&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubmissionTestCase&&(identical(other.caseId, caseId) || other.caseId == caseId)&&(identical(other.status, status) || other.status == status)&&(identical(other.timeMs, timeMs) || other.timeMs == timeMs)&&(identical(other.memoryMb, memoryMb) || other.memoryMb == memoryMb)&&const DeepCollectionEquality().equals(other.output, output)&&(identical(other.error, error) || other.error == error));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,caseId,status,timeMs,memoryMb,output,error);
+int get hashCode => Object.hash(runtimeType,caseId,status,timeMs,memoryMb,const DeepCollectionEquality().hash(output),error);
 
 @override
 String toString() {
@@ -819,7 +819,7 @@ abstract mixin class _$SubmissionTestCaseCopyWith<$Res> implements $SubmissionTe
   factory _$SubmissionTestCaseCopyWith(_SubmissionTestCase value, $Res Function(_SubmissionTestCase) _then) = __$SubmissionTestCaseCopyWithImpl;
 @override @useResult
 $Res call({
- int caseId, String status, double timeMs, double memoryMb, String? output, String? error
+ int caseId, String status, double timeMs, double memoryMb, dynamic output, String? error
 });
 
 
@@ -843,7 +843,7 @@ as int,status: null == status ? _self.status : status // ignore: cast_nullable_t
 as String,timeMs: null == timeMs ? _self.timeMs : timeMs // ignore: cast_nullable_to_non_nullable
 as double,memoryMb: null == memoryMb ? _self.memoryMb : memoryMb // ignore: cast_nullable_to_non_nullable
 as double,output: freezed == output ? _self.output : output // ignore: cast_nullable_to_non_nullable
-as String?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
