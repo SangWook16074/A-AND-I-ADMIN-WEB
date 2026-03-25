@@ -1155,14 +1155,11 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
   String _startAt = '';
   String _endAt = '';
 
-  List<String> _learningGoals = [''];
+  final List<String> _learningGoals = [''];
   String _language = 'kotlin';
 
-  List<String> _requirements = [''];
+  final List<String> _requirements = [''];
   final List<_TestCaseData> _testCases = [_TestCaseData()];
-
-
-
 
   // Code Templates
   final List<_CodeTemplateData> _codeTemplates = [];
@@ -1181,17 +1178,15 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
     if (track == 'SP') {
       _language = 'KOTLIN';
       final defaults = _CodeTemplateData.getDefaultTemplates('KOTLIN');
-      _codeTemplates.add(_CodeTemplateData(
-        language: 'KOTLIN',
-        codeTemplate: defaults['code'],
-      ));
+      _codeTemplates.add(
+        _CodeTemplateData(language: 'KOTLIN', codeTemplate: defaults['code']),
+      );
     } else if (track == 'FL') {
       _language = 'DART';
       final defaults = _CodeTemplateData.getDefaultTemplates('DART');
-      _codeTemplates.add(_CodeTemplateData(
-        language: 'DART',
-        codeTemplate: defaults['code'],
-      ));
+      _codeTemplates.add(
+        _CodeTemplateData(language: 'DART', codeTemplate: defaults['code']),
+      );
     } else {
       _language = 'KOTLIN'; // fallback
       _codeTemplates.addAll([
@@ -1209,7 +1204,6 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
         ),
       ]);
     }
-
   }
 
   @override
@@ -1572,6 +1566,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                       DropdownMenuItem(value: 'LOW', child: Text('LOW')),
                       DropdownMenuItem(value: 'MID', child: Text('MID')),
                       DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
+                      DropdownMenuItem(
+                        value: 'VERY_HIGH',
+                        child: Text('VERY_HIGH'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _difficulty = v ?? 'MID'),
                   ),
@@ -1615,12 +1613,19 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                   const SizedBox(height: 12),
                   const SizedBox(height: 12),
                   // Disabled language input if track is set
-                  if (widget.course.targetTrack.toUpperCase() == 'SP' || widget.course.targetTrack.toUpperCase() == 'FL')
+                  if (widget.course.targetTrack.toUpperCase() == 'SP' ||
+                      widget.course.targetTrack.toUpperCase() == 'FL')
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: Text(
                         '사용 언어: $_language',
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF64748B)),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF64748B),
+                        ),
                       ),
                     )
                   else
@@ -1648,8 +1653,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                     onAdd: () => setState(() => _learningGoals.add('')),
                     onRemove: (index) =>
                         setState(() => _learningGoals.removeAt(index)),
-                    onChanged: (index, value) =>
-                        _learningGoals[index] = value,
+                    onChanged: (index, value) => _learningGoals[index] = value,
                     label: '학습 목표',
                   ),
                   const SizedBox(height: 12),
@@ -1661,8 +1665,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                     onAdd: () => setState(() => _requirements.add('')),
                     onRemove: (index) =>
                         setState(() => _requirements.removeAt(index)),
-                    onChanged: (index, value) =>
-                        _requirements[index] = value,
+                    onChanged: (index, value) => _requirements[index] = value,
                     label: '요구사항',
                   ),
                   const SizedBox(height: 12),
@@ -1754,11 +1757,16 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                                         fillColor: const Color(0xFFFAFAFA),
                                         isDense: true,
                                       ),
-                                      onChanged: (v) => testCase.inputs[inputIndex] = v,
+                                      onChanged: (v) =>
+                                          testCase.inputs[inputIndex] = v,
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 20),
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
                                     onPressed: () {
                                       setState(() {
                                         testCase.inputs.removeAt(inputIndex);
@@ -1776,7 +1784,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               });
                             },
                             icon: const Icon(Icons.add, size: 16),
-                            label: const Text('입력값 추가', style: TextStyle(fontSize: 12)),
+                            label: const Text(
+                              '입력값 추가',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -1835,7 +1846,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                             _codeTemplates.add(
                               _CodeTemplateData(
                                 language: 'KOTLIN',
-                                codeTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['code'],
+                                codeTemplate:
+                                    _CodeTemplateData.getDefaultTemplates(
+                                      'KOTLIN',
+                                    )['code'],
                               ),
                             );
                           });
@@ -1939,17 +1953,17 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                           _formKey.currentState?.save();
 
                           final reqList = _requirements
-                                    .where((e) => e.trim().isNotEmpty)
-                                    .toList()
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (e) => AssignmentRequirement(
-                                        sortOrder: e.key + 1,
-                                        requirementText: e.value.trim(),
-                                      ),
-                                    )
-                                    .toList();
+                              .where((e) => e.trim().isNotEmpty)
+                              .toList()
+                              .asMap()
+                              .entries
+                              .map(
+                                (e) => AssignmentRequirement(
+                                  sortOrder: e.key + 1,
+                                  requirementText: e.value.trim(),
+                                ),
+                              )
+                              .toList();
                           final testCaseList = _testCases
                               .asMap()
                               .entries
@@ -1987,7 +2001,8 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                               .map(
                                 (e) => CodeTemplate(
                                   language: e.language,
-                                  functionTemplate: e.codeController.text.trim(),
+                                  functionTemplate: e.codeController.text
+                                      .trim(),
                                 ),
                               )
                               .toList();
@@ -2168,6 +2183,7 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
+
   Widget _buildDynamicFieldSection({
     required String title,
     required List<String> items,
@@ -2213,7 +2229,10 @@ class _AssignmentsTabState extends ConsumerState<_AssignmentsTab> {
                 ),
                 if (items.length > 1)
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     onPressed: () => onRemove(index),
                   ),
               ],
@@ -2234,19 +2253,16 @@ class _TestCaseData {
     List<String>? inputs,
     String? output,
     TestCaseVisibility? visibility,
-  })  : inputs = inputs ?? [],
-        output = output ?? '',
-        visibility = visibility ?? TestCaseVisibility.public;
+  }) : inputs = inputs ?? [],
+       output = output ?? '',
+       visibility = visibility ?? TestCaseVisibility.public;
 }
 
 class _CodeTemplateData {
   String language;
   late final CodeController codeController;
 
-  _CodeTemplateData({
-    this.language = 'KOTLIN',
-    String? codeTemplate,
-  }) {
+  _CodeTemplateData({this.language = 'KOTLIN', String? codeTemplate}) {
     codeController = CodeController(
       text: (codeTemplate ?? '').replaceAll('\\n', '\n'),
       language: _getLanguage(language),

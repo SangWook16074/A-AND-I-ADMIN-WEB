@@ -38,8 +38,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
   late String _status;
   late List<_TestCaseData> _testCases;
 
-
-
   // Code Templates
   late List<_CodeTemplateData> _codeTemplates;
   late List<String> _requirementList;
@@ -114,9 +112,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
       _testCases.add(_TestCaseData());
     }
 
-
-
-
     _codeTemplates = fullAssignment.metadata.codeTemplates.map((e) {
       String code = '';
       if (e.codeTemplate != null && e.codeTemplate!.isNotEmpty) {
@@ -126,15 +121,16 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         final function = (e.functionTemplate ?? '').replaceAll('\\n', '\n');
         code = '$comment\n$function'.trim();
       }
-      return _CodeTemplateData(
-        language: e.language,
-        codeTemplate: code,
-      );
+      return _CodeTemplateData(language: e.language, codeTemplate: code);
     }).toList();
 
     if (_codeTemplates.isEmpty) {
-      final track = fullAssignment.metadata.attributes['targetTrack']?.toString().toUpperCase() ?? '';
-      
+      final track =
+          fullAssignment.metadata.attributes['targetTrack']
+              ?.toString()
+              .toUpperCase() ??
+          '';
+
       if (track == 'SP') {
         _language = 'KOTLIN';
         _codeTemplates = [_CodeTemplateData(language: 'KOTLIN')];
@@ -412,6 +408,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                           DropdownMenuItem(value: 'LOW', child: Text('LOW')),
                           DropdownMenuItem(value: 'MID', child: Text('MID')),
                           DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
+                          DropdownMenuItem(
+                            value: 'VERY_HIGH',
+                            child: Text('VERY_HIGH'),
+                          ),
                         ],
                         onChanged: (v) {
                           if (v != null) _difficulty = v;
@@ -574,7 +574,9 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...testCase.inputs.asMap().entries.map((inputEntry) {
+                              ...testCase.inputs.asMap().entries.map((
+                                inputEntry,
+                              ) {
                                 final inputIndex = inputEntry.key;
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
@@ -589,14 +591,21 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                             fillColor: const Color(0xFFFAFAFA),
                                             isDense: true,
                                           ),
-                                          onChanged: (v) => testCase.inputs[inputIndex] = v,
+                                          onChanged: (v) =>
+                                              testCase.inputs[inputIndex] = v,
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 20),
+                                        icon: const Icon(
+                                          Icons.remove_circle_outline,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
                                         onPressed: () {
                                           setState(() {
-                                            testCase.inputs.removeAt(inputIndex);
+                                            testCase.inputs.removeAt(
+                                              inputIndex,
+                                            );
                                           });
                                         },
                                       ),
@@ -611,7 +620,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                   });
                                 },
                                 icon: const Icon(Icons.add, size: 16),
-                                label: const Text('입력값 추가', style: TextStyle(fontSize: 12)),
+                                label: const Text(
+                                  '입력값 추가',
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ),
                               const SizedBox(height: 12),
                               TextFormField(
@@ -674,7 +686,11 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                                 _codeTemplates.add(
                                   _CodeTemplateData(
                                     language: 'KOTLIN',
-                                    codeTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['code'] ?? '',
+                                    codeTemplate:
+                                        _CodeTemplateData.getDefaultTemplates(
+                                          'KOTLIN',
+                                        )['code'] ??
+                                        '',
                                   ),
                                 );
                               });
@@ -930,7 +946,10 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                 ),
                 if (items.length > 1)
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     onPressed: () => onRemove(index),
                   ),
               ],
@@ -954,10 +973,7 @@ class _CodeTemplateData {
   String language;
   late final CodeController codeController;
 
-  _CodeTemplateData({
-    this.language = 'KOTLIN',
-    String? codeTemplate,
-  }) {
+  _CodeTemplateData({this.language = 'KOTLIN', String? codeTemplate}) {
     // If we only have the old codeTemplate, use it.
     codeController = CodeController(
       text: (codeTemplate ?? '').replaceAll('\\n', '\n'),
@@ -982,15 +998,18 @@ class _CodeTemplateData {
     switch (lang.toUpperCase()) {
       case 'KOTLIN':
         return {
-          'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
+          'code':
+              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
         };
       case 'DART':
         return {
-          'code': "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
+          'code':
+              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
         };
       case 'PYTHON':
         return {
-          'code': "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
+          'code':
+              "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
         };
       default:
         return {'code': ''};
@@ -1020,7 +1039,7 @@ class _TestCaseData {
     List<String>? inputs,
     String? output,
     TestCaseVisibility? visibility,
-  })  : inputs = inputs ?? [],
-        output = output ?? '',
-        visibility = visibility ?? TestCaseVisibility.public;
+  }) : inputs = inputs ?? [],
+       output = output ?? '',
+       visibility = visibility ?? TestCaseVisibility.public;
 }
