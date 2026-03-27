@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../auth/presentation/bloc/auth_bloc.dart';
+import '../../auth/presentation/bloc/auth_event.dart';
 import '../dashboard_nav_view_model.dart';
 
 class DashboardSidebarView extends ConsumerWidget {
@@ -58,6 +60,7 @@ class DashboardSidebarView extends ConsumerWidget {
               ref
                   .read(dashboardNavViewModelProvider.notifier)
                   .selectTab(DashboardNavTab.usersManage);
+              Navigator.maybePop(context);
             },
           ),
           DashboardSidebarItemView(
@@ -68,6 +71,7 @@ class DashboardSidebarView extends ConsumerWidget {
               ref
                   .read(dashboardNavViewModelProvider.notifier)
                   .selectTab(DashboardNavTab.tasksManage);
+              Navigator.maybePop(context);
             },
           ),
           DashboardSidebarItemView(
@@ -78,21 +82,22 @@ class DashboardSidebarView extends ConsumerWidget {
               ref
                   .read(dashboardNavViewModelProvider.notifier)
                   .selectTab(DashboardNavTab.ojManage);
+              Navigator.maybePop(context);
             },
           ),
           const Spacer(),
           const Divider(height: 1, color: Color(0xFFF1F1F1)),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 17,
                   backgroundColor: Color(0xFFEDEDED),
                   child: Icon(Icons.person_rounded, color: Color(0xFF333333)),
                 ),
-                SizedBox(width: 12),
-                Expanded(
+                const SizedBox(width: 12),
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -114,6 +119,15 @@ class DashboardSidebarView extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    ref
+                        .read(authBlocProvider.notifier)
+                        .onEvent(const AuthLogoutRequested());
+                  },
+                  icon: const Icon(Icons.logout_rounded, size: 20),
+                  color: const Color(0xFF8A8A8A),
                 ),
               ],
             ),

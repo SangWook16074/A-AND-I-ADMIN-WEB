@@ -18,15 +18,18 @@ class DashboardPage extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 980;
+
+        void onLogout() {
+          ref
+              .read(authBlocProvider.notifier)
+              .onEvent(const AuthLogoutRequested());
+          context.go('/login');
+        }
+
         final body = DashboardBodyView(
           selectedTab: selectedTab,
+          onLogout: onLogout,
           isDesktop: isDesktop,
-          onLogout: () {
-            ref
-                .read(authBlocProvider.notifier)
-                .onEvent(const AuthLogoutRequested());
-            context.go('/login');
-          },
         );
 
         if (isDesktop) {
@@ -46,9 +49,23 @@ class DashboardPage extends ConsumerWidget {
           appBar: AppBar(
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
+            elevation: 0,
             title: const Text(
               'A&I Admin',
-              style: TextStyle(fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
+                letterSpacing: -0.5,
+              ),
+            ),
+            centerTitle: true,
+            leading: Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu_rounded),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                );
+              },
             ),
             actions: [
               IconButton(
@@ -61,6 +78,9 @@ class DashboardPage extends ConsumerWidget {
                 icon: const Icon(Icons.logout_rounded),
               ),
             ],
+          ),
+          drawer: const Drawer(
+            child: DashboardSidebarView(),
           ),
           body: body,
         );

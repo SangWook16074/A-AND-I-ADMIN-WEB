@@ -110,10 +110,13 @@ class TaskManagementView extends ConsumerWidget {
                           ),
                           title: Row(
                             children: [
-                              Text(
-                                course.metadata.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
+                              Expanded(
+                                child: Text(
+                                  course.metadata.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               const SizedBox(width: 8),
