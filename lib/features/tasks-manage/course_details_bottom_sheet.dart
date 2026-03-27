@@ -113,12 +113,15 @@ class _CourseDetailsBottomSheetState
                     children: [
                       Row(
                         children: [
-                          Text(
-                            widget.course.metadata.title,
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.8,
+                          Flexible(
+                            child: Text(
+                              widget.course.metadata.title,
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.8,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -132,6 +135,12 @@ class _CourseDetailsBottomSheetState
                             label: widget.course.targetTrack,
                             color: Colors.orange[700]!,
                             backgroundColor: Colors.orange[50]!,
+                          ),
+                          const SizedBox(width: 6),
+                          _MetadataChip(
+                            label: widget.course.status,
+                            color: Colors.purple[700]!,
+                            backgroundColor: Colors.purple[50]!,
                           ),
                         ],
                       ),
@@ -152,8 +161,43 @@ class _CourseDetailsBottomSheetState
                               color: Color(0xFF8A8A8A),
                             ),
                           ),
+                          const SizedBox(width: 16),
+                          const Icon(Icons.link_rounded, size: 14, color: Color(0xFF8A8A8A)),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              widget.course.slug,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF8A8A8A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '생성: ${widget.course.createdAt?.toLocal().toString().split('.').first ?? '-'}  |  '
+                        '수정: ${widget.course.updatedAt?.toLocal().toString().split('.').first ?? '-'}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFFB0B0B0),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (widget.course.metadata.attributes.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          '속성: ${widget.course.metadata.attributes}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF8A8A8A),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                       if (widget.course.metadata.description?.isNotEmpty ??
                           false) ...[
                         const SizedBox(height: 12),

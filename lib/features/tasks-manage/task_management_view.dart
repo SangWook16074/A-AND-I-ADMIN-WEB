@@ -110,7 +110,7 @@ class TaskManagementView extends ConsumerWidget {
                           ),
                           title: Row(
                             children: [
-                              Expanded(
+                              Flexible(
                                 child: Text(
                                   course.metadata.title,
                                   style: const TextStyle(
@@ -130,6 +130,12 @@ class TaskManagementView extends ConsumerWidget {
                                 label: course.targetTrack,
                                 color: Colors.orange[700]!,
                                 backgroundColor: Colors.orange[50]!,
+                              ),
+                              const SizedBox(width: 4),
+                              _MetadataChip(
+                                label: course.status,
+                                color: Colors.purple[700]!,
+                                backgroundColor: Colors.purple[50]!,
                               ),
                             ],
                           ),
@@ -161,8 +167,37 @@ class TaskManagementView extends ConsumerWidget {
                                         color: Color(0xFF8A8A8A),
                                       ),
                                     ),
+                                    const SizedBox(width: 12),
+                                    const Icon(Icons.link_rounded, size: 14, color: Color(0xFF8A8A8A)),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        course.slug,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF8A8A8A),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
                                   ],
                                 ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '생성: ${course.createdAt?.toLocal().toString().split('.').first ?? '-'}  |  '
+                                  '수정: ${course.updatedAt?.toLocal().toString().split('.').first ?? '-'}',
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFFB0B0B0)),
+                                ),
+                                if (course.metadata.attributes.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      '속성: ${course.metadata.attributes}',
+                                      style: const TextStyle(fontSize: 11, color: Color(0xFF8A8A8A)),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
