@@ -111,22 +111,58 @@ class _CourseDetailsBottomSheetState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.course.metadata.title,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            widget.course.metadata.title,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.8,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          _MetadataChip(
+                            label: widget.course.metadata.phase,
+                            color: Colors.blue[700]!,
+                            backgroundColor: Colors.blue[50]!,
+                          ),
+                          const SizedBox(width: 6),
+                          _MetadataChip(
+                            label: widget.course.targetTrack,
+                            color: Colors.orange[700]!,
+                            backgroundColor: Colors.orange[50]!,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_today_rounded,
+                            size: 14,
+                            color: Color(0xFF8A8A8A),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${widget.course.startDate ?? '미정'} ~ ${widget.course.endDate ?? '미정'}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ],
                       ),
                       if (widget.course.metadata.description?.isNotEmpty ??
                           false) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Text(
                           widget.course.metadata.description!,
                           style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF666666),
+                            fontSize: 15,
+                            color: Color(0xFF555555),
+                            height: 1.5,
                           ),
                         ),
                       ],
@@ -1114,18 +1150,50 @@ class _EnrollmentsTabState extends ConsumerState<_EnrollmentsTab> {
       ),
     );
   }
+}
 
-  String _formatDateTime(DateTime dt) {
-    final now = DateTime.now();
-    final difference = now.difference(dt);
+class _MetadataChip extends StatelessWidget {
+  const _MetadataChip({
+    required this.label,
+    required this.color,
+    required this.backgroundColor,
+  });
 
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}분 전';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}시간 전';
-    } else {
-      return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
-    }
+  final String label;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: color,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+String _formatDateTime(DateTime dt) {
+  final now = DateTime.now();
+  final difference = now.difference(dt);
+
+  if (difference.inMinutes < 60) {
+    return '${difference.inMinutes}분 전';
+  } else if (difference.inHours < 24) {
+    return '${difference.inHours}시간 전';
+  } else {
+    return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
   }
 }
 

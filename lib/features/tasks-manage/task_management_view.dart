@@ -108,12 +108,60 @@ class TaskManagementView extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                             side: const BorderSide(color: Color(0xFFEAEAEA)),
                           ),
-                          title: Text(
-                            course.metadata.title,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          title: Row(
+                            children: [
+                              Text(
+                                course.metadata.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              _MetadataChip(
+                                label: course.metadata.phase,
+                                color: Colors.blue[700]!,
+                                backgroundColor: Colors.blue[50]!,
+                              ),
+                              const SizedBox(width: 4),
+                              _MetadataChip(
+                                label: course.targetTrack,
+                                color: Colors.orange[700]!,
+                                backgroundColor: Colors.orange[50]!,
+                              ),
+                            ],
                           ),
-                          subtitle: Text(
-                            course.metadata.description ?? '설명 없음',
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  course.metadata.description ?? '설명 없음',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF666666),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.calendar_month_rounded,
+                                      size: 14,
+                                      color: Color(0xFF8A8A8A),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${course.startDate ?? '미정'} ~ ${course.endDate ?? '미정'}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF8A8A8A),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                           trailing: const Icon(Icons.chevron_right_rounded),
                           onTap: () {
@@ -346,6 +394,38 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
       );
     },
   );
+}
+
+class _MetadataChip extends StatelessWidget {
+  const _MetadataChip({
+    required this.label,
+    required this.color,
+    required this.backgroundColor,
+  });
+
+  final String label;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: color,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
 }
 
 String _startDateStr = '';
