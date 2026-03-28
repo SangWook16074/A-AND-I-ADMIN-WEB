@@ -13,7 +13,8 @@ class DashboardSidebarView extends ConsumerWidget {
     final selectedTab = ref.watch(dashboardNavViewModelProvider);
 
     return Container(
-      width: 264,
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 264),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(right: BorderSide(color: Color(0xFFEFEFEF))),

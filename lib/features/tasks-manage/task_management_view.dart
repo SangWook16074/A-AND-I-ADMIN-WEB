@@ -111,31 +111,34 @@ class TaskManagementView extends ConsumerWidget {
                           title: Row(
                             children: [
                               Flexible(
-                                child: Text(
-                                  course.metadata.title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: [
+                                    Text(
+                                      course.metadata.title,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    _MetadataChip(
+                                      label: course.metadata.phase,
+                                      color: Colors.blue[700]!,
+                                      backgroundColor: Colors.blue[50]!,
+                                    ),
+                                    _MetadataChip(
+                                      label: course.targetTrack,
+                                      color: Colors.orange[700]!,
+                                      backgroundColor: Colors.orange[50]!,
+                                    ),
+                                    _MetadataChip(
+                                      label: course.status,
+                                      color: Colors.purple[700]!,
+                                      backgroundColor: Colors.purple[50]!,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              _MetadataChip(
-                                label: course.metadata.phase,
-                                color: Colors.blue[700]!,
-                                backgroundColor: Colors.blue[50]!,
-                              ),
-                              const SizedBox(width: 4),
-                              _MetadataChip(
-                                label: course.targetTrack,
-                                color: Colors.orange[700]!,
-                                backgroundColor: Colors.orange[50]!,
-                              ),
-                              const SizedBox(width: 4),
-                              _MetadataChip(
-                                label: course.status,
-                                color: Colors.purple[700]!,
-                                backgroundColor: Colors.purple[50]!,
                               ),
                             ],
                           ),
