@@ -71,20 +71,21 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     _title = fullAssignment.metadata.title;
     _difficulty = fullAssignment.metadata.difficulty;
     _description = fullAssignment.metadata.description ?? '';
-    _startAt = fullAssignment.startAt;
-    _endAt = fullAssignment.endAt;
-
     try {
-      final start = DateTime.parse(_startAt);
+      final start = DateTime.parse(fullAssignment.startAt).toLocal();
+      _startAt = _toKstIso(start);
       _startAtController.text = _formatFullDateTime(start);
     } catch (_) {
+      _startAt = fullAssignment.startAt;
       _startAtController.text = _startAt;
     }
 
     try {
-      final end = DateTime.parse(_endAt);
+      final end = DateTime.parse(fullAssignment.endAt).toLocal();
+      _endAt = _toKstIso(end);
       _endAtController.text = _formatFullDateTime(end);
     } catch (_) {
+      _endAt = fullAssignment.endAt;
       _endAtController.text = _endAt;
     }
 
@@ -193,13 +194,7 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
     );
 
     setState(() {
-      final offset = fullDateTime.timeZoneOffset;
-      final hours = offset.inHours.abs().toString().padLeft(2, '0');
-      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
-      final sign = offset.isNegative ? '-' : '+';
-      final formattedIso =
-          '${fullDateTime.toIso8601String().split('.').first}$sign$hours:$minutes';
-
+      final formattedIso = _toKstIso(fullDateTime);
       if (isStart) {
         _startAt = formattedIso;
         _startAtController.text = _formatFullDateTime(fullDateTime);
@@ -208,6 +203,13 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
         _endAtController.text = _formatFullDateTime(fullDateTime);
       }
     });
+  }
+
+  String _toKstIso(DateTime dt) {
+    // Keep it local time representation then attach +09:00
+    final dateRef = dt.isUtc ? dt.add(const Duration(hours: 9)) : dt;
+    final iso = dateRef.toIso8601String().split('.').first;
+    return '$iso+09:00';
   }
 
   String _formatFullDateTime(DateTime dt) {
@@ -488,19 +490,6 @@ class _EditAssignmentDialogState extends ConsumerState<EditAssignmentDialog> {
                         label: '요구사항',
                       ),
                       const SizedBox(height: 12),
-                      const Divider(),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        initialValue: _language,
-                        decoration: const InputDecoration(
-                          labelText: '언어 (language)',
-                          hintText: 'kotlin',
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        onSaved: (v) => _language = v?.trim() ?? 'kotlin',
-                      ),
-                      const SizedBox(height: 24),
                       const Divider(),
                       const SizedBox(height: 12),
                       Row(

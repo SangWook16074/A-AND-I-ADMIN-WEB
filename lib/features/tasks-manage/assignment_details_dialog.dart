@@ -86,10 +86,10 @@ class _AssignmentDetailsDialogState
                       _buildDetailRow('제목', assignment.metadata.title),
                       _buildDetailRow('상태', assignment.status),
                       _buildDetailRow('난이도', assignment.metadata.difficulty),
-                      _buildDetailRow('시작일', assignment.startAt),
-                      _buildDetailRow('종료일', assignment.endAt),
+                      _buildDetailRow('시작일', _formatKst(assignment.startAt)),
+                      _buildDetailRow('종료일', _formatKst(assignment.endAt)),
                       if (assignment.publishedAt != null)
-                        _buildDetailRow('배포일', assignment.publishedAt!),
+                        _buildDetailRow('배포일', _formatKst(assignment.publishedAt!)),
                       const SizedBox(height: 16),
                       const Text(
                         '설명',
@@ -327,7 +327,18 @@ class _AssignmentDetailsDialogState
     );
   }
 
+  String _formatKst(String isoString) {
+    try {
+      final dt = DateTime.parse(isoString).toLocal();
+      return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return isoString.replaceAll('+09:00', '');
+    }
+  }
+
   Widget _buildDetailRow(String label, String value) {
+    final displayValue = value.replaceAll('+09:00', '');
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -345,7 +356,7 @@ class _AssignmentDetailsDialogState
           ),
           Expanded(
             child: Text(
-              value,
+              displayValue,
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
