@@ -89,6 +89,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   final List<_CodeTemplateData> _codeTemplates = [_CodeTemplateData()];
 
   bool _showAddForm = false;
+  final Set<int> _collapsedWeeks = {};
 
   @override
   void dispose() {
@@ -141,16 +142,100 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
 
   // ── 과제 목록 ──────────────────────────────────────────────────────────────
   Widget _buildAssignmentList(List<Assignment> assignments) {
+    if (assignments.isEmpty) return _buildEmptyState();
+
+    // 1. 주차별 그룹화
+    final groupedMap = <int, List<Assignment>>{};
+    for (var a in assignments) {
+      groupedMap.update(
+        a.weekNo,
+        (list) => list..add(a),
+        ifAbsent: () => [a],
+      );
+    }
+
+    // 2. 주차 순 정렬
+    final sortedWeeks = groupedMap.keys.toList()..sort();
+
     return Column(
-      children: assignments
-          .map(
-            (a) => _AssignmentCard(
-              assignment: a,
-              courseSlug: widget.course.slug,
-              ref: ref,
+      children: sortedWeeks.map((week) {
+        final weekData = groupedMap[week]!;
+        // 주차 내에서는 순서(orderInWeek)대로 정렬
+        weekData.sort((a, b) => a.orderInWeek.compareTo(b.orderInWeek));
+
+        final isCollapsed = _collapsedWeeks.contains(week);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  if (_collapsedWeeks.contains(week)) {
+                    _collapsedWeeks.remove(week);
+                  } else {
+                    _collapsedWeeks.add(week);
+                  }
+                });
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      isCollapsed
+                          ? Icons.keyboard_arrow_right_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 20,
+                      color: _D.accentBlue,
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 3,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: _D.accentBlue.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(1.5),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '$week주차 (${week}주차 과제 구성)',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: _D.textPrimary,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '총 ${weekData.length}개',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: _D.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          )
-          .toList(),
+            if (!isCollapsed) ...[
+              const SizedBox(height: 4),
+              ...weekData.map(
+                (a) => _AssignmentCard(
+                  assignment: a,
+                  courseSlug: widget.course.slug,
+                  ref: ref,
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -309,11 +394,21 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _SectionHeader(icon: Icons.science_outlined, title: '테스트 예제'),
-              _OutlineButton(
-                icon: Icons.add_rounded,
-                label: '테스트케이스 추가',
-                onPressed: () =>
-                    setState(() => _testCases.add(_TestCaseData())),
+              Row(
+                children: [
+                  _OutlineButton(
+                    icon: Icons.content_paste_rounded,
+                    label: 'JSON 일괄 붙여넣기',
+                    onPressed: () => _showJsonPasteDialog(null, null),
+                  ),
+                  const SizedBox(width: 8),
+                  _OutlineButton(
+                    icon: Icons.add_rounded,
+                    label: '테스트케이스 추가',
+                    onPressed: () =>
+                        setState(() => _testCases.add(_TestCaseData())),
+                  ),
+                ],
               ),
             ],
           ),
@@ -565,27 +660,15 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
                     color: _D.textPrimary,
                   ),
                 ),
-                Row(
-                  children: [
-                    _SmallOutlineButton(
-                      icon: Icons.content_paste_rounded,
-                      label: 'JSON 일괄 붙여넣기',
-                      onPressed: () => _showJsonPasteDialog(index, tc),
+                if (_testCases.length > 1)
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Colors.red,
                     ),
-                    if (_testCases.length > 1) ...[
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 18,
-                          color: Colors.red,
-                        ),
-                        onPressed: () =>
-                            setState(() => _testCases.removeAt(index)),
-                      ),
-                    ],
-                  ],
-                ),
+                    onPressed: () => setState(() => _testCases.removeAt(index)),
+                  ),
               ],
             ),
           ),
@@ -635,6 +718,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
                       children: [
                         Expanded(
                           child: TextFormField(
+                            key: ValueKey('tc_${index}_in_${i}_${entry.value}'),
                             initialValue: entry.value,
                             decoration: _inputDeco('입력값 ${i + 1}'),
                             onChanged: (v) => tc.inputs[i] = v,
@@ -659,9 +743,9 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
                 _buildLabeledField(
                   '출력 (Output)',
                   TextFormField(
+                    key: ValueKey('tc_${index}_out_${tc.output}'),
                     initialValue: tc.output,
-                    decoration: _inputDeco('출력값을 입력하세요', isTextarea: true),
-                    maxLines: 4,
+                    decoration: _inputDeco('출력 결과 (Output)'),
                     onChanged: (v) => tc.output = v,
                   ),
                 ),
@@ -842,13 +926,13 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   }
 
   Widget _dot(Color color) => Container(
-    width: 10,
-    height: 10,
-    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-  );
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      );
 
   // ── JSON 붙여넣기 다이얼로그 ────────────────────────────────────────────────
-  void _showJsonPasteDialog(int tcIndex, _TestCaseData tc) {
+  void _showJsonPasteDialog(int? tcIndex, _TestCaseData? tc) {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
@@ -864,7 +948,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                '예시: {"inputValues": ["1", "2"], "outputText": "3"}',
+                '단일: {"inputValues": ["1", "2"], "outputText": "1"}\n여러개: [{"inputValues": ["1"], "outputText": "1"}, ...]',
                 style: TextStyle(fontSize: 12, color: _D.textLight),
               ),
               const SizedBox(height: 12),
@@ -887,17 +971,59 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
               try {
                 final raw = ctrl.text.trim();
                 final decoded = jsonDecode(raw);
-                if (decoded is Map) {
+
+                if (decoded is List) {
                   setState(() {
-                    final inputsRaw = decoded['inputValues'];
-                    if (inputsRaw is List) {
-                      tc.inputs = inputsRaw.map((e) => e.toString()).toList();
+                    if (tc == null && _testCases.length == 1) {
+                      final first = _testCases[0];
+                      final isFirstEmpty = (first.inputs.isEmpty ||
+                              (first.inputs.length == 1 &&
+                                  first.inputs[0].trim().isEmpty)) &&
+                          first.output.trim().isEmpty;
+                      if (isFirstEmpty) _testCases.clear();
                     }
-                    final outputRaw = decoded['outputText'];
-                    if (outputRaw != null) tc.output = outputRaw.toString();
+
+                    for (var item in decoded) {
+                      if (item is Map) {
+                        final newTc = _TestCaseData();
+                        final inputsRaw = item['inputValues'];
+                        if (inputsRaw is List) {
+                          newTc.inputs =
+                              inputsRaw.map((e) => e.toString()).toList();
+                        }
+                        final outputRaw = item['outputText'];
+                        if (outputRaw != null) {
+                          newTc.output = outputRaw.toString();
+                        }
+                        _testCases.add(newTc);
+                      }
+                    }
                   });
-                  Navigator.of(ctx).pop();
+                } else if (decoded is Map) {
+                  setState(() {
+                    if (tc != null) {
+                      final inputsRaw = decoded['inputValues'];
+                      if (inputsRaw is List) {
+                        tc.inputs = inputsRaw.map((e) => e.toString()).toList();
+                      }
+                      final outputRaw = decoded['outputText'];
+                      if (outputRaw != null) tc.output = outputRaw.toString();
+                    } else {
+                      final newTc = _TestCaseData();
+                      final inputsRaw = decoded['inputValues'];
+                      if (inputsRaw is List) {
+                        newTc.inputs =
+                            inputsRaw.map((e) => e.toString()).toList();
+                      }
+                      final outputRaw = decoded['outputText'];
+                      if (outputRaw != null) {
+                        newTc.output = outputRaw.toString();
+                      }
+                      _testCases.add(newTc);
+                    }
+                  });
                 }
+                Navigator.of(ctx).pop();
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('잘못된 JSON 형식입니다: $e')),

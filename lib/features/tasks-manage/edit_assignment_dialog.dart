@@ -313,11 +313,23 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                             icon: Icons.science_outlined,
                             title: '테스트 예제',
                           ),
-                          _OutlineButton(
-                            icon: Icons.add_rounded,
-                            label: '테스트케이스 추가',
-                            onPressed: () =>
-                                setState(() => _testCases.add(_TestCaseData())),
+                          Row(
+                            children: [
+                              _OutlineButton(
+                                icon: Icons.content_paste_rounded,
+                                label: 'JSON 일괄 붙여넣기',
+                                onPressed: () =>
+                                    _showJsonPasteDialog(null, null),
+                              ),
+                              const SizedBox(width: 8),
+                              _OutlineButton(
+                                icon: Icons.add_rounded,
+                                label: '테스트케이스 추가',
+                                onPressed: () => setState(
+                                  () => _testCases.add(_TestCaseData()),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -571,27 +583,15 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                     color: _D.textPrimary,
                   ),
                 ),
-                Row(
-                  children: [
-                    _SmallOutlineButton(
-                      icon: Icons.content_paste_rounded,
-                      label: 'JSON 일괄 붙여넣기',
-                      onPressed: () => _showJsonPasteDialog(index, tc),
+                if (_testCases.length > 1)
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Colors.red,
                     ),
-                    if (_testCases.length > 1) ...[
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 18,
-                          color: Colors.red,
-                        ),
-                        onPressed: () =>
-                            setState(() => _testCases.removeAt(index)),
-                      ),
-                    ],
-                  ],
-                ),
+                    onPressed: () => setState(() => _testCases.removeAt(index)),
+                  ),
               ],
             ),
           ),
@@ -627,6 +627,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                       children: [
                         Expanded(
                           child: TextFormField(
+                            key: ValueKey('etc_${index}_in_${i}_${entry.value}'),
                             initialValue: entry.value,
                             decoration: _inputDeco('입력값 ${i + 1}'),
                             onChanged: (v) => tc.inputs[i] = v,
@@ -650,6 +651,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                 _buildLabeledField(
                   '출력 (Output)',
                   TextFormField(
+                    key: ValueKey('etc_${index}_out_${tc.output}'),
                     initialValue: tc.output,
                     decoration: _inputDeco('출력값을 입력하세요', isTextarea: true),
                     maxLines: 3,
@@ -902,7 +904,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
     Navigator.of(context).pop();
   }
 
-  void _showJsonPasteDialog(int tcIndex, _TestCaseData tc) {
+  void _showJsonPasteDialog(int? tcIndex, _TestCaseData? tc) {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
@@ -918,7 +920,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                '예시: {"inputValues": ["1", "2"], "outputText": "3"}',
+                '단일: {"inputValues": ["1", "2"], "outputText": "1"}\n여러개: [{"inputValues": ["1"], "outputText": "1"}, ...]',
                 style: TextStyle(fontSize: 12, color: _D.textLight),
               ),
               const SizedBox(height: 12),
@@ -942,17 +944,58 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                 final raw = ctrl.text.trim();
                 final decoded = jsonDecode(raw);
 
-                if (decoded is Map) {
+                if (decoded is List) {
                   setState(() {
-                    final inputsRaw = decoded['inputValues'];
-                    if (inputsRaw is List) {
-                      tc.inputs = inputsRaw.map((e) => e.toString()).toList();
+                    if (tc == null && _testCases.length == 1) {
+                      final first = _testCases[0];
+                      final isFirstEmpty = (first.inputs.isEmpty ||
+                              (first.inputs.length == 1 &&
+                                  first.inputs[0].trim().isEmpty)) &&
+                          first.output.trim().isEmpty;
+                      if (isFirstEmpty) _testCases.clear();
                     }
-                    final outputRaw = decoded['outputText'];
-                    if (outputRaw != null) tc.output = outputRaw.toString();
+
+                    for (var item in decoded) {
+                      if (item is Map) {
+                        final newTc = _TestCaseData();
+                        final inputsRaw = item['inputValues'];
+                        if (inputsRaw is List) {
+                          newTc.inputs =
+                              inputsRaw.map((e) => e.toString()).toList();
+                        }
+                        final outputRaw = item['outputText'];
+                        if (outputRaw != null) {
+                          newTc.output = outputRaw.toString();
+                        }
+                        _testCases.add(newTc);
+                      }
+                    }
                   });
-                  Navigator.of(ctx).pop();
+                } else if (decoded is Map) {
+                  setState(() {
+                    if (tc != null) {
+                      final inputsRaw = decoded['inputValues'];
+                      if (inputsRaw is List) {
+                        tc.inputs = inputsRaw.map((e) => e.toString()).toList();
+                      }
+                      final outputRaw = decoded['outputText'];
+                      if (outputRaw != null) tc.output = outputRaw.toString();
+                    } else {
+                      final newTc = _TestCaseData();
+                      final inputsRaw = decoded['inputValues'];
+                      if (inputsRaw is List) {
+                        newTc.inputs =
+                            inputsRaw.map((e) => e.toString()).toList();
+                      }
+                      final outputRaw = decoded['outputText'];
+                      if (outputRaw != null) {
+                        newTc.output = outputRaw.toString();
+                      }
+                      _testCases.add(newTc);
+                    }
+                  });
                 }
+                Navigator.of(ctx).pop();
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('잘못된 JSON 형식입니다: $e')),
