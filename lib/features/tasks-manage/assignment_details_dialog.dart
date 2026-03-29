@@ -1,363 +1,444 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aandi_course_api/aandi_course_api.dart';
-import 'presentation/bloc/tasks_management_bloc.dart';
-import 'presentation/bloc/tasks_management_event.dart';
+import 'package:code_text_field/code_text_field.dart';
+import 'package:flutter_highlight/themes/atom-one-dark.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/kotlin.dart';
+import 'package:highlight/languages/python.dart';
 
-class AssignmentDetailsDialog extends ConsumerStatefulWidget {
+// ─── 디자인 토큰 (EditAssignmentDialog와 일치시킴) ──────────────────────────────────
+class _D {
+  static const bg = Color(0xFFFFFFFF);
+  static const textPrimary = Color(0xFF0F172B);
+  static const textLight = Color(0xFF90A1B9);
+  static const textDesc = Color(0xFF45556C);
+  static const sectionBorder = Color(0xFFE2E8F0);
+  static const sectionBg = Color(0xFFF8FAFC);
+  static const accentBlue = Color(0xFF155DFC);
+}
+
+// ─── 진입 함수 ──────────────────────────────────────────────────────────────────
+void showAssignmentDetailsDialog(
+  BuildContext context,
+  Assignment assignment,
+  String courseSlug,
+) {
+  showDialog(
+    context: context,
+    builder: (_) => _AssignmentDetailsDialog(
+      assignment: assignment,
+      courseSlug: courseSlug,
+    ),
+  );
+}
+
+// ─── 다이얼로그 위젯 ─────────────────────────────────────────────────────────────
+class _AssignmentDetailsDialog extends ConsumerWidget {
+  final Assignment assignment;
   final String courseSlug;
-  final String assignmentId;
 
-  const AssignmentDetailsDialog({
-    super.key,
+  const _AssignmentDetailsDialog({
+    required this.assignment,
     required this.courseSlug,
-    required this.assignmentId,
   });
 
   @override
-  ConsumerState<AssignmentDetailsDialog> createState() =>
-      _AssignmentDetailsDialogState();
-}
-
-class _AssignmentDetailsDialogState
-    extends ConsumerState<AssignmentDetailsDialog> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(tasksManagementBlocProvider.notifier)
-          .add(
-            TasksManagementAssignmentDetailsRequested(
-              courseSlug: widget.courseSlug,
-              assignmentId: widget.assignmentId,
-            ),
-          );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(tasksManagementBlocProvider);
-    final isLoading = state.isLoadingDetails;
-    final assignment = state.selectedAssignment;
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
+      backgroundColor: _D.bg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        width: 600,
-        padding: const EdgeInsets.all(24),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+      child: SizedBox(
+        width: 1100,
+        height: MediaQuery.of(context).size.height * 0.88,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  '과제 상세 정보',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
+            // 헤더
+            _DialogHeader(
+              title: '과제 상세 정보',
+              onClose: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 16),
-            if (isLoading)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            else if (assignment != null && assignment.id == widget.assignmentId)
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDetailRow('과제 ID', assignment.id),
-                      _buildDetailRow(
-                        '주차 / 순서',
-                        '${assignment.weekNo}주차 / ${assignment.orderInWeek}번째',
+            // 콘텐츠
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(40, 32, 40, 48),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. 기본 정보
+                    _SectionHeader(icon: Icons.info_outline_rounded, title: '기본 정보'),
+                    const SizedBox(height: 16),
+                    _SectionContainer(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              _InfoItem(label: '주차 / 순서', value: '${assignment.weekNo}주차 / ${assignment.orderInWeek}'),
+                              const SizedBox(width: 48),
+                              _InfoItem(label: '난이도', value: assignment.metadata.difficulty),
+                              const SizedBox(width: 48),
+                              _InfoItem(label: '상태', value: assignment.status),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          const Text('과제명', style: TextStyle(fontSize: 13, color: _D.textLight, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          Text(assignment.metadata.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _D.textPrimary)),
+                          const SizedBox(height: 16),
+                          const Text('설명', style: TextStyle(fontSize: 13, color: _D.textLight, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          Text(
+                            assignment.metadata.description?.isNotEmpty == true ? assignment.metadata.description! : '등록된 설명이 없습니다.',
+                            style: const TextStyle(fontSize: 15, color: _D.textDesc, height: 1.6),
+                          ),
+                        ],
                       ),
-                      _buildDetailRow('제목', assignment.metadata.title),
-                      _buildDetailRow('상태', assignment.status),
-                      _buildDetailRow('난이도', assignment.metadata.difficulty),
-                      _buildDetailRow('시작일', _formatKst(assignment.startAt)),
-                      _buildDetailRow('종료일', _formatKst(assignment.endAt)),
-                      if (assignment.publishedAt != null)
-                        _buildDetailRow('배포일', _formatKst(assignment.publishedAt!)),
-                      const SizedBox(height: 16),
-                      const Text(
-                        '설명',
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // 2. 일정 설정
+                    _SectionHeader(icon: Icons.calendar_month_outlined, title: '일정 설정'),
+                    const SizedBox(height: 16),
+                    _SectionContainer(
+                      child: Row(
+                        children: [
+                          _InfoItem(label: '시작 일시', value: _pruneOffset(assignment.startAt)),
+                          const SizedBox(width: 48),
+                          _InfoItem(label: '종료 일시', value: _pruneOffset(assignment.endAt)),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9F9F9),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(assignment.metadata.description ?? '설명 없음'),
-                      ),
-                      const SizedBox(height: 16),
-                      if (assignment.metadata.learningGoals.isNotEmpty) ...[
-                        const Text(
-                          '학습 목표',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 4),
-                        ...assignment.metadata.learningGoals.map(
-                          (goal) => Text('• ${goal.learningGoalText}'),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      if (assignment.metadata.requirements.isNotEmpty) ...[
-                        const Text(
-                          '요구사항',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 4),
-                        ...assignment.metadata.requirements.map(
-                          (req) =>
-                              Text('${req.sortOrder}. ${req.requirementText}'),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      if (assignment.metadata.testCases.isNotEmpty) ...[
-                        const Text(
-                          '테스트케이스',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 8),
-                        ...assignment.metadata.testCases.map(
-                          (ex) => Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Order: ${ex.seq}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: ex.visibility == TestCaseVisibility.public
-                                            ? Colors.blue.withValues(alpha: 0.1)
-                                            : Colors.grey.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        ex.visibility.name.toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: ex.visibility == TestCaseVisibility.public
-                                              ? Colors.blue
-                                              : Colors.grey,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (ex.inputValues.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Inputs (Parameters):',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    margin: const EdgeInsets.only(top: 4),
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      ex.inputValues.join('\n'),
-                                      style: const TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                if (ex.outputText != null &&
-                                    ex.outputText!.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Output:',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    margin: const EdgeInsets.only(top: 4),
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      ex.outputText!,
-                                      style: const TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // 3. 목표 및 요구사항
+                    _SectionHeader(icon: Icons.checklist_rounded, title: '상세 목표 및 요구사항'),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _DetailListCard(
+                            title: '학습 목표',
+                            items: assignment.metadata.learningGoals.map((e) => e.learningGoalText).toList(),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                      ],
-                      if (assignment.metadata.codeTemplates.isNotEmpty) ...[
-                        const Text(
-                          '코드 템플릿',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _DetailListCard(
+                            title: '요구사항',
+                            items: assignment.metadata.requirements.map((e) => e.requirementText).toList(),
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        ...assignment.metadata.codeTemplates.map((template) {
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF1E293B),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        template.language,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                if ((template.codeTemplate ?? '').isNotEmpty ||
-                                    (template.commentTemplate ?? '')
-                                        .isNotEmpty ||
-                                    (template.functionTemplate ?? '')
-                                        .isNotEmpty) ...[
-                                  _buildReadOnlyCodeField(
-                                    label: 'Code Template',
-                                    code: (template.codeTemplate?.isNotEmpty ??
-                                            false)
-                                        ? template.codeTemplate!
-                                            .replaceAll('\\n', '\n')
-                                        : '${(template.commentTemplate ?? '').replaceAll('\\n', '\n')}\n${(template.functionTemplate ?? '').replaceAll('\\n', '\n')}'
-                                              .trim(),
-                                    language: template.language,
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                                if (template.runnableTemplate != null &&
-                                    template.runnableTemplate!.isNotEmpty) ...[
-                                  _buildReadOnlyCodeField(
-                                    label: 'Runnable Template',
-                                    code: template.runnableTemplate!,
-                                    language: template.language,
-                                  ),
-                                ],
-                                const Divider(height: 48),
-                              ],
-                            ),
-                          );
-                        }),
                       ],
-                    ],
-                  ),
-                ),
-              )
-            else
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Text('과제 정보를 불러올 수 없습니다.'),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // 4. 테스트 케이스
+                    _SectionHeader(icon: Icons.science_outlined, title: '테스트 케이스'),
+                    const SizedBox(height: 16),
+                    if (assignment.metadata.testCases.isEmpty)
+                      const Text('등록된 테스트 케이스가 없습니다.')
+                    else
+                      ...assignment.metadata.testCases.asMap().entries.map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _TestCaseViewCard(index: e.key + 1, tc: e.value),
+                        )),
+                    const SizedBox(height: 32),
+
+                    // 5. 코드 템플릿
+                    _SectionHeader(icon: Icons.code_rounded, title: '코드 템플릿'),
+                    const SizedBox(height: 16),
+                    if (assignment.metadata.codeTemplates.isEmpty)
+                      const Text('등록된 코드 템플릿이 없습니다.')
+                    else
+                      ...assignment.metadata.codeTemplates.map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _CodeTemplateViewCard(tmpl: e),
+                        )),
+                  ],
                 ),
               ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  String _formatKst(String isoString) {
-    try {
-      final dt = DateTime.parse(isoString).toLocal();
-      return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } catch (_) {
-      return isoString.replaceAll('+09:00', '');
-    }
-  }
+// ─── 내부 지원 컴포넌트 ─────────────────────────────────────────────────────────
 
-  Widget _buildDetailRow(String label, String value) {
-    final displayValue = value.replaceAll('+09:00', '');
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+class _DialogHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onClose;
+  const _DialogHeader({required this.title, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _D.textPrimary)),
+          IconButton(icon: const Icon(Icons.close_rounded, color: _D.accentBlue), onPressed: onClose),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  const _SectionHeader({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: _D.accentBlue),
+        const SizedBox(width: 8),
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: _D.textPrimary, letterSpacing: -0.4)),
+      ],
+    );
+  }
+}
+
+class _SectionContainer extends StatelessWidget {
+  final Widget child;
+  const _SectionContainer({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _D.sectionBorder),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _InfoItem extends StatelessWidget {
+  final String label;
+  final String value;
+  const _InfoItem({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: _D.textLight, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _D.textPrimary)),
+      ],
+    );
+  }
+}
+
+class _DetailListCard extends StatelessWidget {
+  final String title;
+  final List<String> items;
+  const _DetailListCard({required this.title, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _D.sectionBorder),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Color(0xFF8A8A8A),
-                fontWeight: FontWeight.w600,
-              ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+            ),
+            child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: items.isEmpty
+                ? const Text('등록된 항목이 없습니다.', style: TextStyle(color: _D.textLight, fontSize: 13))
+                : Column(
+                    children: items.map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 6),
+                                child: Icon(Icons.circle, size: 5, color: _D.accentBlue),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(e, style: const TextStyle(fontSize: 14, color: _D.textDesc, height: 1.5))),
+                            ],
+                          ),
+                        )).toList(),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TestCaseViewCard extends StatelessWidget {
+  final int index;
+  final AssignmentTestCase tc;
+  const _TestCaseViewCard({required this.index, required this.tc});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _D.sectionBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('테스트케이스 #$index', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                _MetadataBadge(label: tc.visibility.toString().split('.').last.toUpperCase()),
+              ],
             ),
           ),
-          Expanded(
-            child: Text(
-              displayValue,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('입력', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _D.textLight)),
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    tc.inputValues.map((v) => v.toString()).join(' / '),
+                    style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text('기대 출력', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _D.textLight)),
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
+                  child: Text(tc.outputText ?? '', style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CodeTemplateViewCard extends StatefulWidget {
+  final CodeTemplate tmpl;
+  const _CodeTemplateViewCard({required this.tmpl});
+
+  @override
+  State<_CodeTemplateViewCard> createState() => _CodeTemplateViewCardState();
+}
+
+class _CodeTemplateViewCardState extends State<_CodeTemplateViewCard> {
+  late CodeController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CodeController(
+      text: widget.tmpl.functionTemplate ?? widget.tmpl.codeTemplate ?? '',
+      language: _getHighlightLanguage(widget.tmpl.language),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _D.sectionBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.terminal_rounded, size: 16, color: _D.accentBlue),
+                const SizedBox(width: 8),
+                Text('작성 템플릿: ${widget.tmpl.language}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              ],
+            ),
+          ),
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: const BoxDecoration(color: Color(0xFF0F172A), borderRadius: BorderRadius.vertical(bottom: Radius.circular(11))),
+            child: CodeTheme(
+              data: const CodeThemeData(styles: atomOneDarkTheme),
+              child: SingleChildScrollView(
+                child: CodeField(
+                  controller: _controller,
+                  readOnly: true,
+                  textStyle: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                ),
+              ),
             ),
           ),
         ],
@@ -365,267 +446,45 @@ class _AssignmentDetailsDialogState
     );
   }
 
-  Widget _buildReadOnlyCodeField({
-    required String label,
-    required String code,
-    required String language,
-  }) {
-    final cleanCode = code.replaceAll('\\n', '\n');
-    final lines = cleanCode.split('\n');
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF64748B),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFF334155)),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E293B),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                ),
-                child: Row(
-                  children: [
-                    _buildDot(const Color(0xFFEF4444)),
-                    const SizedBox(width: 5),
-                    _buildDot(const Color(0xFFF59E0B)),
-                    const SizedBox(width: 5),
-                    _buildDot(const Color(0xFF10B981)),
-                  ],
-                ),
-              ),
-              // Body
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Gutter
-                  Container(
-                    width: 35,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        right: BorderSide(color: Color(0xFF334155)),
-                      ),
-                    ),
-                    child: Column(
-                      children: List.generate(
-                        lines.length,
-                        (i) => Text(
-                          '${i + 1}',
-                          style: const TextStyle(
-                            color: Color(0xFF475569),
-                            fontSize: 11,
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Code
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: RichText(
-                        text: _highlightCode(cleanCode, language),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+  dynamic _getHighlightLanguage(String lang) {
+    final l = lang.toUpperCase();
+    if (l == 'DART') return dart;
+    if (l == 'KOTLIN') return kotlin;
+    if (l == 'PYTHON') return python;
+    return dart;
   }
+}
 
-  Widget _buildDot(Color color) {
+String _pruneOffset(String dtStr) {
+  return dtStr
+      .replaceAll('T', ' ')
+      .split('.')
+      .first
+      .split('+')
+      .first
+      .split('Z')
+      .first;
+}
+
+class _MetadataBadge extends StatelessWidget {
+  final String label;
+  const _MetadataBadge({required this.label});
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: 8,
-      height: 8,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-
-  TextSpan _highlightCode(String code, String language) {
-    final lang = language.toLowerCase();
-    const keywords = {
-      'python': [
-        'def',
-        'return',
-        'if',
-        'else',
-        'elif',
-        'for',
-        'while',
-        'import',
-        'from',
-        'as',
-        'class',
-        'try',
-        'except',
-        'pass',
-        'print',
-        'in',
-        'is',
-        'not',
-      ],
-      'kotlin': [
-        'fun',
-        'val',
-        'var',
-        'if',
-        'else',
-        'when',
-        'for',
-        'while',
-        'return',
-        'class',
-        'interface',
-        'object',
-        'override',
-        'import',
-        'package',
-        'void',
-      ],
-      'dart': [
-        'void',
-        'final',
-        'var',
-        'if',
-        'else',
-        'return',
-        'class',
-        'import',
-        'package',
-        'async',
-        'await',
-        'late',
-        'dynamic',
-        'static',
-        'override',
-      ],
-    };
-
-    final kwList = keywords[lang] ?? keywords['kotlin']!;
-    final spans = <TextSpan>[];
-
-    final combinedRegex = RegExp(
-      r'(".*?")|'
-      r"('.*?')|"
-      r'(\/\/.*)|'
-      r'(\/\*[\s\S]*?\*\/)|'
-      r'(#.*)|'
-      r'([a-zA-Z_][a-zA-Z0-9_]*)|'
-      r'(\d+(\.\d*)?)|'
-      r'([{}()\[\]])|'
-      r'([+\-*/%=<>!&|^~,.:;])|'
-      r'(\s+)',
-    );
-
-    final matches = combinedRegex.allMatches(code).toList();
-
-    for (var i = 0; i < matches.length; i++) {
-      final match = matches[i];
-      final text = match.group(0)!;
-
-      if (match.group(1) != null || match.group(2) != null) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFF86EFAC)),
-          ),
-        );
-      } else if (match.group(3) != null ||
-          match.group(4) != null ||
-          match.group(5) != null) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(
-              color: Color(0xFF64748B),
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        );
-      } else if (match.group(6) != null) {
-        final word = match.group(6)!;
-        if (kwList.contains(word)) {
-          spans.add(
-            TextSpan(
-              text: text,
-              style: const TextStyle(
-                color: Color(0xFFC084FC),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          );
-        } else if (i + 1 < matches.length &&
-            matches[i + 1].group(0)!.trim().startsWith('(')) {
-          spans.add(
-            TextSpan(
-              text: text,
-              style: const TextStyle(color: Color(0xFF60A5FA)),
-            ),
-          );
-        } else {
-          spans.add(
-            TextSpan(
-              text: text,
-              style: const TextStyle(color: Color(0xFFE2E8F0)),
-            ),
-          );
-        }
-      } else if (match.group(7) != null) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFFFDE68A)),
-          ),
-        );
-      } else if (match.group(9) != null || match.group(10) != null) {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFF94A3B8)),
-          ),
-        );
-      } else {
-        spans.add(
-          TextSpan(
-            text: text,
-            style: const TextStyle(color: Color(0xFFE2E8F0)),
-          ),
-        );
-      }
-    }
-
-    return TextSpan(
-      children: spans,
-      style: const TextStyle(
-        fontSize: 12,
-        fontFamily: 'monospace',
-        height: 1.5,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: Colors.blue[700],
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }

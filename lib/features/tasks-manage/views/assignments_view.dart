@@ -1,15 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:convert';
 import 'package:aandi_course_api/aandi_course_api.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:highlight/languages/kotlin.dart';
-import 'package:highlight/languages/dart.dart';
-import 'package:highlight/languages/python.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/kotlin.dart';
+import 'package:highlight/languages/python.dart';
+
 import '../task_management.dart';
 import '../edit_assignment_dialog.dart';
 import '../assignment_details_dialog.dart';
 
+// ─── 디자인 토큰 ────────────────────────────────────────────────────────────────
+class _D {
+  static const textPrimary = Color(0xFF0F172B);
+  static const textSub = Color(0xFF62748E);
+  static const textLight = Color(0xFF90A1B9);
+  static const label = Color(0xFF314158);
+  static const inputBorder = Color(0xFFCAD5E2);
+  static const sectionBorder = Color(0xFFE2E8F0);
+  static const sectionBg = Color(0xFFF8FAFC);
+  static const accentBlue = Color(0xFF155DFC);
+}
+
+InputDecoration _inputDeco(String? hint, {bool isTextarea = false}) =>
+    InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: _D.textLight, fontSize: 14),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: isTextarea ? 14 : 10,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: _D.inputBorder),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: _D.inputBorder),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: _D.accentBlue, width: 1.5),
+      ),
+    );
+
+// ─── 메인 위젯 ──────────────────────────────────────────────────────────────────
 class AssignmentsView extends ConsumerStatefulWidget {
   const AssignmentsView({
     super.key,
@@ -23,932 +63,315 @@ class AssignmentsView extends ConsumerStatefulWidget {
   final List<Assignment>? assignments;
 
   @override
-  ConsumerState<AssignmentsView> createState() => AssignmentsViewState();
+  ConsumerState<AssignmentsView> createState() => _AssignmentsViewState();
 }
 
-class AssignmentsViewState extends ConsumerState<AssignmentsView> {
+class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   final _formKey = GlobalKey<FormState>();
 
+  // 기본 정보
   int _weekNo = 1;
   int _orderInWeek = 1;
+  String _difficulty = 'LOW';
   String _title = '';
-  String _difficulty = 'MID';
   String _description = '';
-  String _startAt = '';
-  String _endAt = '';
+  DateTime? _startAt;
+  DateTime? _endAt;
 
+  // 학습 목표 / 요구사항
   final List<String> _learningGoals = [''];
-  String _language = 'kotlin';
-
   final List<String> _requirements = [''];
+
+  // 테스트케이스
   final List<_TestCaseData> _testCases = [_TestCaseData()];
 
-  // Code Templates
-  final List<_CodeTemplateData> _codeTemplates = [];
+  // 코드 템플릿
+  final List<_CodeTemplateData> _codeTemplates = [_CodeTemplateData()];
 
-  late TextEditingController _startAtController;
-  late TextEditingController _endAtController;
-
-  @override
-  void initState() {
-    super.initState();
-    _startAtController = TextEditingController();
-    _endAtController = TextEditingController();
-
-    // Initialize based on track
-    final track = widget.course.targetTrack.toUpperCase();
-    if (track == 'SP') {
-      _language = 'KOTLIN';
-      final defaults = _CodeTemplateData.getDefaultTemplates('KOTLIN');
-      _codeTemplates.add(
-        _CodeTemplateData(language: 'KOTLIN', codeTemplate: defaults['code']),
-      );
-    } else if (track == 'FL') {
-      _language = 'DART';
-      final defaults = _CodeTemplateData.getDefaultTemplates('DART');
-      _codeTemplates.add(
-        _CodeTemplateData(language: 'DART', codeTemplate: defaults['code']),
-      );
-    } else {
-      _language = 'KOTLIN'; // fallback
-      _codeTemplates.addAll([
-        _CodeTemplateData(
-          language: 'KOTLIN',
-          codeTemplate: _CodeTemplateData.getDefaultTemplates('KOTLIN')['code'],
-        ),
-        _CodeTemplateData(
-          language: 'DART',
-          codeTemplate: _CodeTemplateData.getDefaultTemplates('DART')['code'],
-        ),
-        _CodeTemplateData(
-          language: 'PYTHON',
-          codeTemplate: _CodeTemplateData.getDefaultTemplates('PYTHON')['code'],
-        ),
-      ]);
-    }
-  }
+  bool _showAddForm = false;
 
   @override
   void dispose() {
-    _startAtController.dispose();
-    _endAtController.dispose();
     for (var t in _codeTemplates) {
       t.dispose();
     }
     super.dispose();
   }
 
-  Future<void> _selectDateTime(bool isStart) async {
-    final DateTime now = DateTime.now();
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
-
-    if (pickedDate == null) return;
-
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(now),
-    );
-
-    if (pickedTime == null) return;
-
-    final DateTime fullDateTime = DateTime(
-      pickedDate.year,
-      pickedDate.month,
-      pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
-    );
-
-    setState(() {
-      final offset = fullDateTime.timeZoneOffset;
-      final hours = offset.inHours.abs().toString().padLeft(2, '0');
-      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
-      final sign = offset.isNegative ? '-' : '+';
-      final formattedIso =
-          '${fullDateTime.toIso8601String().split('.').first}$sign$hours:$minutes';
-
-      if (isStart) {
-        _startAt = formattedIso;
-        _startAtController.text = _formatFullDateTime(fullDateTime);
-      } else {
-        _endAt = formattedIso;
-        _endAtController.text = _formatFullDateTime(fullDateTime);
-      }
-    });
-  }
-
-  String _formatFullDateTime(DateTime dt) {
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-
   @override
   Widget build(BuildContext context) {
+    final assignments = widget.assignments;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.fromLTRB(32, 28, 32, 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // List existing assignments
-          if (widget.isLoading && widget.assignments == null)
+          // ── 기존 과제 목록 ───────────────────────────────────────────────
+          if (widget.isLoading && assignments == null)
             const Center(
               child: Padding(
-                padding: EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24),
                 child: CircularProgressIndicator(),
               ),
             )
-          else if (widget.assignments != null && widget.assignments!.isNotEmpty)
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.assignments!.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final assignment = widget.assignments![index];
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEAEAEA)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${assignment.weekNo}주차 - ${assignment.metadata.title}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              assignment.status,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '난이도: ${assignment.metadata.difficulty} | 기한: ${assignment.startAt.split('T').first} ~ ${assignment.endAt.split('T').first}',
-                              style: const TextStyle(
-                                color: Color(0xFF8A8A8A),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) =>
-                                        AssignmentDetailsDialog(
-                                          courseSlug: widget.course.slug,
-                                          assignmentId: assignment.id,
-                                        ),
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text(
-                                  '상세 보기',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) => EditAssignmentDialog(
-                                      courseSlug: widget.course.slug,
-                                      assignment: assignment,
-                                    ),
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text(
-                                  '수정',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('과제 삭제'),
-                                      content: const Text(
-                                        '과제와 연관 데이터(요구사항/예시/배포)를 모두 삭제합니다. 계속하시겠습니까?',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: const Text(
-                                            '취소',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            ref
-                                                .read(
-                                                  tasksManagementBlocProvider
-                                                      .notifier,
-                                                )
-                                                .add(
-                                                  TasksManagementAssignmentDeletedRequested(
-                                                    courseSlug:
-                                                        widget.course.slug,
-                                                    assignmentId: assignment.id,
-                                                  ),
-                                                );
-                                          },
-                                          child: const Text(
-                                            '삭제',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text(
-                                  '삭제',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            )
+          else if (assignments == null || assignments.isEmpty)
+            _buildEmptyState()
           else
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text(
-                  '등록된 과제가 없습니다.',
-                  style: TextStyle(color: Color(0xFF8A8A8A)),
+            _buildAssignmentList(assignments),
+
+          const SizedBox(height: 24),
+
+          // ── 새 과제 추가 섹션 ───────────────────────────────────────────
+          _buildAddFormHeader(),
+          if (_showAddForm) ...[const SizedBox(height: 24), _buildAddForm()],
+        ],
+      ),
+    );
+  }
+
+  // ── 빈 상태 ────────────────────────────────────────────────────────────────
+  Widget _buildEmptyState() => const Padding(
+    padding: EdgeInsets.symmetric(vertical: 16),
+    child: Text(
+      '등록된 과제가 없습니다.',
+      style: TextStyle(color: _D.textLight, fontSize: 14),
+    ),
+  );
+
+  // ── 과제 목록 ──────────────────────────────────────────────────────────────
+  Widget _buildAssignmentList(List<Assignment> assignments) {
+    return Column(
+      children: assignments
+          .map(
+            (a) => _AssignmentCard(
+              assignment: a,
+              courseSlug: widget.course.slug,
+              ref: ref,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  // ── 폼 헤더 ─────────────────────────────────────────────────────────────────
+  Widget _buildAddFormHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            '새 과제 추가',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: _D.textPrimary,
+              letterSpacing: -0.89,
+            ),
+          ),
+          _OutlineButton(
+            icon: _showAddForm
+                ? Icons.keyboard_arrow_up_rounded
+                : Icons.add_rounded,
+            label: _showAddForm ? '접기' : '폼 열기',
+            onPressed: () => setState(() => _showAddForm = !_showAddForm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── 전체 추가 폼 ─────────────────────────────────────────────────────────────
+  Widget _buildAddForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. 기본 정보
+          _SectionHeader(icon: Icons.info_outline_rounded, title: '기본 정보'),
+          const SizedBox(height: 12),
+          _SectionContainer(
+            child: Column(
+              children: [
+                // 주차 / 순서 / 난이도
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildLabeledField('주차 (Week)', _buildWeekField()),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: _buildLabeledField(
+                        '순서 (Order)',
+                        _buildOrderField(),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      flex: 2,
+                      child: _buildLabeledField('난이도', _buildDifficultyField()),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          const SizedBox(height: 32),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFEAEAEA)),
-              color: const Color(0xFFFAFAFA),
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '새 과제 추가',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: '주차 (weekNo)',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          keyboardType: TextInputType.number,
-                          onSaved: (v) => _weekNo = int.tryParse(v ?? '1') ?? 1,
-                          validator: (v) =>
-                              v == null || v.isEmpty ? '필수' : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: '순서 (order)',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          keyboardType: TextInputType.number,
-                          onSaved: (v) =>
-                              _orderInWeek = int.tryParse(v ?? '1') ?? 1,
-                          validator: (v) =>
-                              v == null || v.isEmpty ? '필수' : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                const SizedBox(height: 20),
+                _buildLabeledField(
+                  '과제 제목',
                   TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '과제 제목',
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: _inputDeco('과제의 핵심 주제를 입력해주세요'),
                     onSaved: (v) => _title = v?.trim() ?? '',
-                    validator: (v) => v == null || v.isEmpty ? '필수' : null,
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? '필수 항목입니다' : null,
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 20),
+                _buildLabeledField(
+                  '과제 설명',
                   TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: '과제 설명',
-                      filled: true,
-                      fillColor: Colors.white,
+                    decoration: _inputDeco(
+                      '과제에 대한 전반적인 설명을 작성해주세요',
+                      isTextarea: true,
                     ),
-                    maxLines: 3,
+                    maxLines: 5,
                     onSaved: (v) => _description = v?.trim() ?? '',
                   ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: _difficulty,
-                    decoration: const InputDecoration(
-                      labelText: '난이도',
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'LOW', child: Text('LOW')),
-                      DropdownMenuItem(value: 'MID', child: Text('MID')),
-                      DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
-                      DropdownMenuItem(
-                        value: 'VERY_HIGH',
-                        child: Text('VERY_HIGH'),
-                      ),
-                    ],
-                    onChanged: (v) => setState(() => _difficulty = v ?? 'MID'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _startAtController,
-                    readOnly: true,
-                    onTap: () => _selectDateTime(true),
-                    decoration: const InputDecoration(
-                      labelText: '시작일시 (달력에서 선택)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      suffixIcon: Icon(Icons.calendar_today, size: 20),
-                    ),
-                    onSaved: (v) => _startAt = _startAt.trim(),
-                    validator: (v) =>
-                        v == null || v.isEmpty ? '시작일시를 선택해주세요.' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _endAtController,
-                    readOnly: true,
-                    onTap: () => _selectDateTime(false),
-                    decoration: const InputDecoration(
-                      labelText: '종료일시 (달력에서 선택)',
-                      filled: true,
-                      fillColor: Colors.white,
-                      suffixIcon: Icon(Icons.calendar_today, size: 20),
-                    ),
-                    onSaved: (v) => _endAt = _endAt.trim(),
-                    validator: (v) =>
-                        v == null || v.isEmpty ? '종료일시를 선택해주세요.' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  const Text(
-                    '메타데이터 및 제약사항',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 12),
-                  const SizedBox(height: 12),
-                  // Disabled language input if track is set
-                  if (widget.course.targetTrack.toUpperCase() == 'SP' ||
-                      widget.course.targetTrack.toUpperCase() == 'FL')
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        '사용 언어: $_language',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                    )
-                  else
-                    Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: '사용 언어 (예: kotlin)',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                            initialValue: _language,
-                            onSaved: (v) => _language = v?.trim() ?? '',
-                          ),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 12),
-                  const SizedBox(height: 12),
-                  _buildDynamicFieldSection(
-                    title: '학습 목표',
-                    items: _learningGoals,
-                    onAdd: () => setState(() => _learningGoals.add('')),
-                    onRemove: (index) =>
-                        setState(() => _learningGoals.removeAt(index)),
-                    onChanged: (index, value) => _learningGoals[index] = value,
-                    label: '학습 목표',
-                  ),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  _buildDynamicFieldSection(
-                    title: '요구사항 (Requirements)',
-                    items: _requirements,
-                    onAdd: () => setState(() => _requirements.add('')),
-                    onRemove: (index) =>
-                        setState(() => _requirements.removeAt(index)),
-                    onChanged: (index, value) => _requirements[index] = value,
-                    label: '요구사항',
-                  ),
-                  const SizedBox(height: 12),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '테스트 예제',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _testCases.add(_TestCaseData());
-                          });
-                        },
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('테스트케이스 추가'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  ..._testCases.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final testCase = entry.value;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: const Color(0xFFEAEAEA)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '테스트케이스 ${index + 1}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (_testCases.length > 1)
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline,
-                                    color: Colors.red,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _testCases.removeAt(index);
-                                    });
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            '입력값 (Inputs)',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ...testCase.inputs.asMap().entries.map((inputEntry) {
-                            final inputIndex = inputEntry.key;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue: inputEntry.value,
-                                      decoration: InputDecoration(
-                                        labelText: '입력 ${inputIndex + 1}',
-                                        filled: true,
-                                        fillColor: const Color(0xFFFAFAFA),
-                                        isDense: true,
-                                      ),
-                                      onChanged: (v) =>
-                                          testCase.inputs[inputIndex] = v,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.remove_circle_outline,
-                                      color: Colors.red,
-                                      size: 20,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        testCase.inputs.removeAt(inputIndex);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                testCase.inputs.add('');
-                              });
-                            },
-                            icon: const Icon(Icons.add, size: 16),
-                            label: const Text(
-                              '입력값 추가',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            initialValue: testCase.output,
-                            decoration: const InputDecoration(
-                              labelText: '출력 (Output)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                              hintText: '+1',
-                            ),
-                            maxLines: 2,
-                            onSaved: (v) => testCase.output = v?.trim() ?? '',
-                          ),
-                          const SizedBox(height: 12),
-                          DropdownButtonFormField<TestCaseVisibility>(
-                            initialValue: testCase.visibility,
-                            decoration: const InputDecoration(
-                              labelText: '공개 여부 (Visibility)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                            ),
-                            items: TestCaseVisibility.values.map((v) {
-                              return DropdownMenuItem(
-                                value: v,
-                                child: Text(v.name.toUpperCase()),
-                              );
-                            }).toList(),
-                            onChanged: (v) {
-                              if (v != null) {
-                                setState(() {
-                                  testCase.visibility = v;
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '코드 템플릿 (Code Templates)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _codeTemplates.add(
-                              _CodeTemplateData(
-                                language: 'KOTLIN',
-                                codeTemplate:
-                                    _CodeTemplateData.getDefaultTemplates(
-                                      'KOTLIN',
-                                    )['code'],
-                              ),
-                            );
-                          });
-                        },
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('템플릿 추가'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  ..._codeTemplates.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final template = entry.value;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: const Color(0xFFEAEAEA)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '템플릿 ${index + 1}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              if (_codeTemplates.length > 1)
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline,
-                                    color: Colors.red,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      final removed = _codeTemplates.removeAt(
-                                        index,
-                                      );
-                                      removed.dispose();
-                                    });
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
-                            initialValue: template.language,
-                            decoration: const InputDecoration(
-                              labelText: '언어 (Language)',
-                              filled: true,
-                              fillColor: Color(0xFFFAFAFA),
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'KOTLIN',
-                                child: Text('KOTLIN'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'DART',
-                                child: Text('DART'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PYTHON',
-                                child: Text('PYTHON'),
-                              ),
-                            ],
-                            onChanged: (v) {
-                              if (v != null) {
-                                setState(() {
-                                  template.updateLanguage(v);
-                                });
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPremiumCodeEditor(
-                            label: '코드 템플릿',
-                            controller: template.codeController,
-                            language: template.language,
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          _formKey.currentState?.save();
+                ),
+              ],
+            ),
+          ),
 
-                          final reqList = _requirements
-                              .where((e) => e.trim().isNotEmpty)
-                              .toList()
-                              .asMap()
-                              .entries
-                              .map(
-                                (e) => AssignmentRequirement(
-                                  sortOrder: e.key + 1,
-                                  requirementText: e.value.trim(),
-                                ),
-                              )
-                              .toList();
-                          final testCaseList = _testCases
-                              .asMap()
-                              .entries
-                              .where(
-                                (e) =>
-                                    e.value.inputs.isNotEmpty ||
-                                    e.value.output.isNotEmpty,
-                              )
-                              .map(
-                                (e) => AssignmentTestCase(
-                                  seq: e.key + 1,
-                                  inputValues: e.value.inputs.map((input) {
-                                    final trimmed = input.trim();
-                                    if (trimmed.toLowerCase() == 'true') {
-                                      return true;
-                                    }
-                                    if (trimmed.toLowerCase() == 'false') {
-                                      return false;
-                                    }
-                                    final numVal = num.tryParse(trimmed);
-                                    if (numVal != null) return numVal;
-                                    return trimmed.replaceAll('\\n', '\n');
-                                  }).toList(),
-                                  outputText: e.value.output.replaceAll(
-                                    '\\n',
-                                    '\n',
-                                  ),
-                                  visibility: e.value.visibility,
-                                ),
-                              )
-                              .toList();
+          const SizedBox(height: 28),
 
-                          final codeTemplateList = _codeTemplates
-                              .where((e) => e.language.isNotEmpty)
-                              .map(
-                                (e) => CodeTemplate(
-                                  language: e.language,
-                                  functionTemplate: e.codeController.text
-                                      .trim(),
-                                ),
-                              )
-                              .toList();
-
-                          ref
-                              .read(tasksManagementBlocProvider.notifier)
-                              .add(
-                                TasksManagementCreateAssignmentRequested(
-                                  courseSlug: widget.course.slug,
-                                  request: CreateAssignmentRequest(
-                                    weekNo: _weekNo,
-                                    orderInWeek: _orderInWeek,
-                                    startAt: _startAt,
-                                    endAt: _endAt,
-                                    metadata: AssignmentMetadata(
-                                      title: _title,
-                                      description: _description,
-                                      difficulty: _difficulty,
-                                      learningGoals: _learningGoals
-                                          .where((e) => e.trim().isNotEmpty)
-                                          .toList()
-                                          .asMap()
-                                          .entries
-                                          .map(
-                                            (e) => LearningGoal(
-                                              sortOrder: e.key + 1,
-                                              learningGoalText: e.value.trim(),
-                                            ),
-                                          )
-                                          .toList(),
-                                      requirements: reqList,
-                                      testCases: testCaseList,
-                                      codeTemplates: codeTemplateList,
-                                      attributes: _language.isNotEmpty
-                                          ? {'language': _language}
-                                          : {},
-                                    ),
-                                  ),
-                                ),
-                              );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')),
-                          );
-                          setState(() {
-                            for (var t in _codeTemplates) {
-                              t.updateControllers();
-                            }
-                          });
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF1A1A1A),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        '과제 등록',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
+          // 2. 일정 설정
+          _SectionHeader(icon: Icons.calendar_month_outlined, title: '일정 설정'),
+          const SizedBox(height: 12),
+          _SectionContainer(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildLabeledField(
+                    '시작 일시',
+                    _DateTimePickerField(
+                      placeholder: '시작일시 (달력에서 선택)',
+                      onChanged: (dt) => setState(() => _startAt = dt),
                     ),
                   ),
-                ],
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildLabeledField(
+                    '종료 일시',
+                    _DateTimePickerField(
+                      placeholder: '종료일시 (달력에서 선택)',
+                      onChanged: (dt) => setState(() => _endAt = dt),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          // 3. 상세 목표 및 요구사항
+          _SectionHeader(icon: Icons.checklist_rounded, title: '상세 목표 및 요구사항'),
+          const SizedBox(height: 12),
+          _buildDynamicCard(
+            title: '학습 목표',
+            addLabel: '추가하기',
+            items: _learningGoals,
+            onAdd: () => setState(() => _learningGoals.add('')),
+            onRemove: (i) => setState(() => _learningGoals.removeAt(i)),
+            onChanged: (i, v) => _learningGoals[i] = v,
+            placeholder: '학습 목표',
+            multiline: false,
+          ),
+          const SizedBox(height: 12),
+          _buildDynamicCard(
+            title: '요구사항 (Requirements)',
+            addLabel: '추가하기',
+            items: _requirements,
+            onAdd: () => setState(() => _requirements.add('')),
+            onRemove: (i) => setState(() => _requirements.removeAt(i)),
+            onChanged: (i, v) => _requirements[i] = v,
+            placeholder: '요구사항',
+            multiline: true,
+          ),
+
+          const SizedBox(height: 28),
+
+          // 4. 테스트 예제
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _SectionHeader(icon: Icons.science_outlined, title: '테스트 예제'),
+              _OutlineButton(
+                icon: Icons.add_rounded,
+                label: '테스트케이스 추가',
+                onPressed: () =>
+                    setState(() => _testCases.add(_TestCaseData())),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ..._testCases.asMap().entries.map((entry) {
+            final i = entry.key;
+            final tc = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildTestCaseCard(i, tc),
+            );
+          }),
+
+          const SizedBox(height: 28),
+
+          // 5. 코드 템플릿
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _SectionHeader(
+                icon: Icons.code_rounded,
+                title: '코드 템플릿 (Code Templates)',
+              ),
+              _OutlineButton(
+                icon: Icons.add_rounded,
+                label: '템플릿 추가',
+                onPressed: () =>
+                    setState(() => _codeTemplates.add(_CodeTemplateData())),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ..._codeTemplates.asMap().entries.map((entry) {
+            final i = entry.key;
+            final tmpl = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildCodeTemplateCard(i, tmpl),
+            );
+          }),
+
+          const SizedBox(height: 32),
+
+          // 등록 버튼
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _submit,
+              style: FilledButton.styleFrom(
+                backgroundColor: _D.textPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                '과제 등록',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
               ),
             ),
           ),
@@ -957,175 +380,1001 @@ class AssignmentsViewState extends ConsumerState<AssignmentsView> {
     );
   }
 
-  Widget _buildPremiumCodeEditor({
-    required String label,
-    required CodeController controller,
-    required String language,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF64748B),
-            ),
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF334155), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E293B),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    _buildDot(const Color(0xFFFF5F56)),
-                    const SizedBox(width: 8),
-                    _buildDot(const Color(0xFFFFBD2E)),
-                    const SizedBox(width: 8),
-                    _buildDot(const Color(0xFF27C93F)),
-                    const SizedBox(width: 16),
-                    Text(
-                      '${language[0] + language.substring(1).toLowerCase()} Editor',
-                      style: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Code Area
-              CodeTheme(
-                data: CodeThemeData(styles: atomOneDarkTheme),
-                child: CodeField(
-                  controller: controller,
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    fontFamily: 'monospace',
-                    height: 1.5,
-                  ),
-                  lineNumberStyle: const LineNumberStyle(
-                    width: 45,
-                    margin: 16,
-                    textStyle: TextStyle(
-                      color: Color(0xFF475569),
-                      fontSize: 12,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                  decoration: const BoxDecoration(color: Color(0xFF0F172A)),
-                  maxLines: null,
-                  minLines: 5,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildWeekField() => TextFormField(
+    initialValue: '1',
+    decoration: _inputDeco('예: 1'),
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    onSaved: (v) => _weekNo = int.tryParse(v ?? '1') ?? 1,
+    validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
+  );
 
-  Widget _buildDot(Color color) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
+  Widget _buildOrderField() => TextFormField(
+    initialValue: '1',
+    decoration: _inputDeco('예: 1'),
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    onSaved: (v) => _orderInWeek = int.tryParse(v ?? '1') ?? 1,
+    validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
+  );
 
-  Widget _buildDynamicFieldSection({
+  Widget _buildDifficultyField() => DropdownButtonFormField<String>(
+    initialValue: _difficulty,
+    decoration: _inputDeco(null),
+    items: const [
+      DropdownMenuItem(value: 'LOW', child: Text('LOW')),
+      DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM')),
+      DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
+      DropdownMenuItem(value: 'VERY_HIGH', child: Text('VERY_HIGH')),
+    ],
+    onChanged: (v) => setState(() => _difficulty = v ?? _difficulty),
+    onSaved: (v) => _difficulty = v ?? _difficulty,
+  );
+
+  Widget _buildLabeledField(String label, Widget field) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: _D.label,
+          letterSpacing: -0.15,
+        ),
+      ),
+      const SizedBox(height: 6),
+      field,
+    ],
+  );
+
+  Widget _buildDynamicCard({
     required String title,
+    required String addLabel,
     required List<String> items,
     required VoidCallback onAdd,
     required Function(int) onRemove,
     required Function(int, String) onChanged,
-    required String label,
+    required String placeholder,
+    required bool multiline,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-            TextButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Icons.add, size: 18),
-              label: Text('$label 추가'),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _D.sectionBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 헤더
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ...items.asMap().entries.map((entry) {
-          final index = entry.key;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    initialValue: entry.value,
-                    decoration: InputDecoration(
-                      labelText: '$label ${index + 1}',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onChanged: (v) => onChanged(index, v),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: _D.textPrimary,
                   ),
                 ),
-                if (items.length > 1)
+                _SmallOutlineButton(
+                  icon: Icons.add_rounded,
+                  label: addLabel,
+                  onPressed: onAdd,
+                ),
+              ],
+            ),
+          ),
+          // 항목들
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: items.asMap().entries.map((entry) {
+                final i = entry.key;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12, right: 8),
+                        child: Icon(
+                          Icons.drag_indicator,
+                          size: 16,
+                          color: _D.inputBorder,
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: entry.value,
+                          decoration: _inputDeco(
+                            '$placeholder ${i + 1}',
+                            isTextarea: multiline,
+                          ),
+                          maxLines: multiline ? 3 : 1,
+                          onChanged: (v) => onChanged(i, v),
+                        ),
+                      ),
+                      if (items.length > 1)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.remove_circle_outline,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                          onPressed: () => onRemove(i),
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTestCaseCard(int index, _TestCaseData tc) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _D.sectionBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 헤더
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '테스트케이스 ${index + 1}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: _D.textPrimary,
+                  ),
+                ),
+                Row(
+                  children: [
+                    _SmallOutlineButton(
+                      icon: Icons.content_paste_rounded,
+                      label: 'JSON 일괄 붙여넣기',
+                      onPressed: () => _showJsonPasteDialog(index, tc),
+                    ),
+                    if (_testCases.length > 1) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: Colors.red,
+                        ),
+                        onPressed: () =>
+                            setState(() => _testCases.removeAt(index)),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // 내용
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 입력값
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '입력값 (Inputs)',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _D.label,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => setState(() => tc.inputs.add('')),
+                      icon: const Icon(
+                        Icons.add,
+                        size: 16,
+                        color: _D.accentBlue,
+                      ),
+                      label: const Text(
+                        '입력값 추가',
+                        style: TextStyle(fontSize: 14, color: _D.accentBlue),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ...tc.inputs.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: entry.value,
+                            decoration: _inputDeco('입력값 ${i + 1}'),
+                            onChanged: (v) => tc.inputs[i] = v,
+                          ),
+                        ),
+                        if (tc.inputs.length > 1)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              size: 18,
+                              color: Colors.red,
+                            ),
+                            onPressed: () =>
+                                setState(() => tc.inputs.removeAt(i)),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+                // 출력값
+                _buildLabeledField(
+                  '출력 (Output)',
+                  TextFormField(
+                    initialValue: tc.output,
+                    decoration: _inputDeco('출력값을 입력하세요', isTextarea: true),
+                    maxLines: 4,
+                    onChanged: (v) => tc.output = v,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // 공개 여부
+                _buildLabeledField(
+                  '공개 여부 (Visibility)',
+                  DropdownButtonFormField<TestCaseVisibility>(
+                    initialValue: tc.visibility,
+                    decoration: _inputDeco(null),
+                    items: const [
+                      DropdownMenuItem(
+                        value: TestCaseVisibility.public,
+                        child: Text('PUBLIC — 공개'),
+                      ),
+                      DropdownMenuItem(
+                        value: TestCaseVisibility.hidden,
+                        child: Text('HIDDEN — 숨김'),
+                      ),
+                      DropdownMenuItem(
+                        value: TestCaseVisibility.excluded,
+                        child: Text('EXCLUDED — 제외'),
+                      ),
+                    ],
+                    onChanged: (v) =>
+                        setState(() => tc.visibility = v ?? tc.visibility),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeTemplateCard(int index, _CodeTemplateData tmpl) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _D.sectionBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 헤더
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: _D.sectionBg,
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '템플릿 ${index + 1}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: _D.textPrimary,
+                  ),
+                ),
+                if (_codeTemplates.length > 1)
                   IconButton(
                     icon: const Icon(
-                      Icons.remove_circle_outline,
+                      Icons.delete_outline,
+                      size: 18,
                       color: Colors.red,
                     ),
-                    onPressed: () => onRemove(index),
+                    onPressed: () => setState(() {
+                      tmpl.dispose();
+                      _codeTemplates.removeAt(index);
+                    }),
                   ),
               ],
             ),
-          );
-        }),
+          ),
+          // 내용
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLabeledField(
+                  '언어 (Language)',
+                  DropdownButtonFormField<String>(
+                    initialValue: tmpl.language,
+                    decoration: _inputDeco(null),
+                    items: const [
+                      DropdownMenuItem(value: 'KOTLIN', child: Text('KOTLIN')),
+                      DropdownMenuItem(value: 'DART', child: Text('DART')),
+                      DropdownMenuItem(value: 'PYTHON', child: Text('PYTHON')),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) setState(() => tmpl.updateLanguage(v));
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildLabeledField('코드 템플릿', _buildCodeEditor(tmpl)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeEditor(_CodeTemplateData tmpl) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF334155), width: 1.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(color: Color(0xFF1E293B)),
+            child: Row(
+              children: [
+                _dot(const Color(0xFFFF5F56)),
+                const SizedBox(width: 6),
+                _dot(const Color(0xFFFFBD2E)),
+                const SizedBox(width: 6),
+                _dot(const Color(0xFF27C93F)),
+                const SizedBox(width: 12),
+                Text(
+                  '${tmpl.language[0]}${tmpl.language.substring(1).toLowerCase()} Editor',
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          CodeTheme(
+            data: CodeThemeData(styles: atomOneDarkTheme),
+            child: CodeField(
+              controller: tmpl.codeController,
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontFamily: 'monospace',
+                height: 1.5,
+              ),
+              lineNumberStyle: const LineNumberStyle(
+                width: 44,
+                margin: 12,
+                textStyle: TextStyle(
+                  color: Color(0xFF475569),
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
+              ),
+              decoration: const BoxDecoration(color: Color(0xFF0F172A)),
+              maxLines: null,
+              minLines: 8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dot(Color color) => Container(
+    width: 10,
+    height: 10,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
+
+  // ── JSON 붙여넣기 다이얼로그 ────────────────────────────────────────────────
+  void _showJsonPasteDialog(int tcIndex, _TestCaseData tc) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          'JSON 일괄 붙여넣기',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        ),
+        content: SizedBox(
+          width: 480,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '예시: {"inputValues": ["1", "2"], "outputText": "3"}',
+                style: TextStyle(fontSize: 12, color: _D.textLight),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ctrl,
+                maxLines: 6,
+                decoration: _inputDeco('JSON을 붙여넣으세요', isTextarea: true),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('취소', style: TextStyle(color: _D.textLight)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: _D.textPrimary),
+            onPressed: () {
+              try {
+                final raw = ctrl.text.trim();
+                final decoded = jsonDecode(raw);
+                if (decoded is Map) {
+                  setState(() {
+                    final inputsRaw = decoded['inputValues'];
+                    if (inputsRaw is List) {
+                      tc.inputs = inputsRaw.map((e) => e.toString()).toList();
+                    }
+                    final outputRaw = decoded['outputText'];
+                    if (outputRaw != null) tc.output = outputRaw.toString();
+                  });
+                  Navigator.of(ctx).pop();
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('잘못된 JSON 형식입니다: $e')),
+                );
+              }
+            },
+            child: const Text('적용'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  // ── 과제 등록 ────────────────────────────────────────────────────────────────
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    _formKey.currentState?.save();
+
+    if (_startAt == null || _endAt == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('시작일시와 종료일시를 입력해주세요.')));
+      return;
+    }
+
+    final reqList = _requirements
+        .where((e) => e.trim().isNotEmpty)
+        .toList()
+        .asMap()
+        .entries
+        .map(
+          (e) => AssignmentRequirement(
+            sortOrder: e.key + 1,
+            requirementText: e.value.trim(),
+          ),
+        )
+        .toList();
+
+    final testCaseList = _testCases
+        .asMap()
+        .entries
+        .where((e) => e.value.inputs.isNotEmpty || e.value.output.isNotEmpty)
+        .map(
+          (e) => AssignmentTestCase(
+            seq: e.key + 1,
+            inputValues: e.value.inputs.map((input) {
+              final t = input.trim();
+              if (t.toLowerCase() == 'true') return true;
+              if (t.toLowerCase() == 'false') return false;
+              final n = num.tryParse(t);
+              if (n != null) return n;
+              return t.replaceAll('\\n', '\n');
+            }).toList(),
+            outputText: e.value.output.replaceAll('\\n', '\n'),
+            visibility: e.value.visibility,
+          ),
+        )
+        .toList();
+
+    final codeTemplateList = _codeTemplates
+        .where((e) => e.language.isNotEmpty)
+        .map(
+          (e) => CodeTemplate(
+            language: e.language,
+            functionTemplate: e.codeController.text.trim(),
+          ),
+        )
+        .toList();
+
+    ref
+        .read(tasksManagementBlocProvider.notifier)
+        .add(
+          TasksManagementCreateAssignmentRequested(
+            courseSlug: widget.course.slug,
+            request: CreateAssignmentRequest(
+              weekNo: _weekNo,
+              orderInWeek: _orderInWeek,
+              startAt: _startAt!.toUtc().toIso8601String(),
+              endAt: _endAt!.toUtc().toIso8601String(),
+              metadata: AssignmentMetadata(
+                title: _title,
+                description: _description,
+                difficulty: _difficulty,
+                learningGoals: _learningGoals
+                    .where((e) => e.trim().isNotEmpty)
+                    .toList()
+                    .asMap()
+                    .entries
+                    .map(
+                      (e) => LearningGoal(
+                        sortOrder: e.key + 1,
+                        learningGoalText: e.value.trim(),
+                      ),
+                    )
+                    .toList(),
+                requirements: reqList,
+                testCases: testCaseList,
+                codeTemplates: codeTemplateList,
+                attributes: {},
+              ),
+            ),
+          ),
+        );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('과제 생성 요청을 보냈습니다.')));
+    setState(() => _showAddForm = false);
+  }
+}
+
+// ─── 과제 카드 ─────────────────────────────────────────────────────────────────
+class _AssignmentCard extends StatelessWidget {
+  final Assignment assignment;
+  final String courseSlug;
+  final WidgetRef ref;
+
+  const _AssignmentCard({
+    required this.assignment,
+    required this.courseSlug,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = _statusColor(assignment.status);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _D.sectionBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 제목 + 상태 배지
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${assignment.weekNo}주차 — ${assignment.metadata.title}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _D.textPrimary,
+                          letterSpacing: -0.31,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        assignment.status,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: statusColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '난이도: ${assignment.metadata.difficulty}  |  기한: ${assignment.startAt.split('T').first} ~ ${assignment.endAt.split('T').first}',
+                  style: const TextStyle(fontSize: 13, color: _D.textSub),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Row(
+            children: [
+              // 조회 버튼
+              _CardTextButton(
+                label: '조회',
+                color: _D.accentBlue,
+                onPressed: () => showAssignmentDetailsDialog(
+                  context,
+                  assignment,
+                  courseSlug,
+                ),
+              ),
+              const SizedBox(width: 4),
+              // 수정 버튼 (TODO: 새 UI)
+              _CardTextButton(
+                label: '수정',
+                color: _D.accentBlue,
+                onPressed: () =>
+                    showEditAssignmentDialog(context, assignment, courseSlug),
+              ),
+              const SizedBox(width: 4),
+              // 삭제 버튼
+              _CardTextButton(
+                label: '삭제',
+                color: Colors.red,
+                onPressed: () => _showDeleteDialog(context),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'PUBLISHED':
+        return const Color(0xFF7B1FA2);
+      case 'DRAFT':
+        return const Color(0xFF62748E);
+      default:
+        return const Color(0xFF62748E);
+    }
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          '과제 삭제',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        ),
+        content: const Text('이 과제와 관련 데이터를 모두 삭제합니다. 계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('취소', style: TextStyle(color: _D.textLight)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
+                    TasksManagementAssignmentDeletedRequested(
+                      courseSlug: courseSlug,
+                      assignmentId: assignment.id,
+                    ),
+                  );
+            },
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── 섹션 헤더 ─────────────────────────────────────────────────────────────────
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  const _SectionHeader({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: _D.accentBlue),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: _D.textPrimary,
+            letterSpacing: -0.89,
+          ),
+        ),
       ],
     );
   }
 }
 
+// ─── 섹션 컨테이너 ─────────────────────────────────────────────────────────────
+class _SectionContainer extends StatelessWidget {
+  final Widget child;
+  const _SectionContainer({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: const Color(0xFAF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _D.sectionBorder),
+      ),
+      child: child,
+    );
+  }
+}
+
+// ─── 아웃라인 버튼 ─────────────────────────────────────────────────────────────
+class _OutlineButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  const _OutlineButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 14, color: _D.accentBlue),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.black,
+        side: const BorderSide(color: _D.sectionBorder),
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+}
+
+class _SmallOutlineButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  const _SmallOutlineButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 12, color: _D.accentBlue),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.black,
+        side: const BorderSide(color: _D.sectionBorder),
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+}
+
+// ─── 카드 텍스트 버튼 ─────────────────────────────────────────────────────────
+class _CardTextButton extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+  const _CardTextButton({
+    required this.label,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── 날짜+시간 피커 ───────────────────────────────────────────────────────────
+class _DateTimePickerField extends StatefulWidget {
+  final String placeholder;
+  final ValueChanged<DateTime> onChanged;
+  const _DateTimePickerField({
+    required this.placeholder,
+    required this.onChanged,
+  });
+
+  @override
+  State<_DateTimePickerField> createState() => _DateTimePickerFieldState();
+}
+
+class _DateTimePickerFieldState extends State<_DateTimePickerField> {
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _ctrl,
+      readOnly: true,
+      onTap: () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2101),
+        );
+        if (date == null || !context.mounted) return;
+        final time = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (time == null || !context.mounted) return;
+        final dt = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          time.hour,
+          time.minute,
+        );
+        _ctrl.text =
+            '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+        widget.onChanged(dt);
+      },
+      decoration: _inputDeco(widget.placeholder).copyWith(
+        prefixIcon: const Icon(
+          Icons.calendar_month_outlined,
+          size: 16,
+          color: _D.accentBlue,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── 헬퍼 데이터 클래스 ────────────────────────────────────────────────────────
 class _TestCaseData {
   List<String> inputs;
   String output;
@@ -1135,7 +1384,7 @@ class _TestCaseData {
     List<String>? inputs,
     String? output,
     TestCaseVisibility? visibility,
-  }) : inputs = inputs ?? [],
+  }) : inputs = inputs ?? [''],
        output = output ?? '',
        visibility = visibility ?? TestCaseVisibility.public;
 }
@@ -1144,53 +1393,32 @@ class _CodeTemplateData {
   String language;
   late final CodeController codeController;
 
-  _CodeTemplateData({this.language = 'KOTLIN', String? codeTemplate}) {
+  _CodeTemplateData({String language = 'KOTLIN', String? codeTemplate})
+    : language = language {
     codeController = CodeController(
-      text: (codeTemplate ?? '').replaceAll('\\n', '\n'),
+      text: (codeTemplate ?? _defaultCode(language)).replaceAll('\\n', '\n'),
       language: _getLanguage(language),
     );
   }
 
-  void dispose() {
-    codeController.dispose();
-  }
-
-  void updateContent(String code) {
-    codeController.text = code.replaceAll('\\n', '\n');
-  }
-
-  void updateControllers() {
-    codeController.language = _getLanguage(language);
-  }
+  void dispose() => codeController.dispose();
 
   void updateLanguage(String lang) {
     language = lang;
     codeController.language = _getLanguage(lang);
-
-    // Automatically update to default template for the new language
-    final defaults = getDefaultTemplates(lang);
-    updateContent(defaults['code']!);
+    codeController.text = _defaultCode(lang);
   }
 
-  static Map<String, String> getDefaultTemplates(String lang) {
+  static String _defaultCode(String lang) {
     switch (lang.toUpperCase()) {
       case 'KOTLIN':
-        return {
-          'code':
-              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\nfun solution(): String {\n    var answer = \"\"\n    return answer\n}",
-        };
+        return '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\nfun solution(): String {\n    var answer = ""\n    return answer\n}';
       case 'DART':
-        return {
-          'code':
-              "/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = '';\n  return answer;\n}",
-        };
+        return '/*\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n*/\n\nString solution() {\n  String answer = \'\';\n  return answer;\n}';
       case 'PYTHON':
-        return {
-          'code':
-              "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer",
-        };
+        return "'''\n[문제]\n> 이해한 방식으로 문제를 다시 정의해요\n[해석]\n> 문제의 요구사항을 분석해요\n[풀이]\n> 적용할 풀이를 작성해요\n'''\n\ndef solution():\n    answer = ''\n    return answer";
       default:
-        return {'code': ''};
+        return '';
     }
   }
 
