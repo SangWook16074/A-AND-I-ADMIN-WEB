@@ -834,16 +834,19 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
   Widget _buildCodeEditor(_CodeTemplateData tmpl) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: _D.sectionBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF334155), width: 1.5),
+        border: Border.all(color: _D.sectionBorder, width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: const BoxDecoration(color: Color(0xFF1E293B)),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF1F5F9),
+              border: Border(bottom: BorderSide(color: _D.sectionBorder)),
+            ),
             child: Row(
               children: [
                 _dot(const Color(0xFFFF5F56)),
@@ -855,9 +858,10 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                 Text(
                   tmpl.language,
                   style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                    color: Color(0xFF64748B),
                     fontSize: 12,
                     fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -867,10 +871,14 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
             data: CodeThemeData(styles: atomOneLightTheme),
             child: CodeField(
               controller: tmpl.codeController,
-              textStyle: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontFamily: 'monospace',
+                color: _D.textPrimary,
+              ),
               maxLines: null,
               minLines: 8,
-              decoration: const BoxDecoration(color: Color(0xFF0F172A)),
+              decoration: const BoxDecoration(color: _D.sectionBg),
             ),
           ),
         ],
