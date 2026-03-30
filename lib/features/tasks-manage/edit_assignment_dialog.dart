@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import 'package:aandi_course_api/aandi_course_api.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:flutter_highlight/themes/atom-one-dark.dart';
+import 'package:flutter_highlight/themes/atom-one-light.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/kotlin.dart';
 import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/json.dart';
 
 import 'task_management.dart';
 
@@ -94,6 +95,11 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
   late List<_TestCaseData> _testCases;
   late List<_CodeTemplateData> _codeTemplates;
 
+  // JSON Mode 관련
+  bool _isJsonMode = false;
+  late CodeController _jsonController;
+  String? _jsonError;
+
   @override
   void initState() {
     super.initState();
@@ -137,6 +143,11 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
         )
         .toList();
     if (_codeTemplates.isEmpty) _codeTemplates.add(_CodeTemplateData());
+
+    _jsonController = CodeController(
+      text: '',
+      language: json,
+    );
   }
 
   @override
@@ -144,6 +155,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
     for (var t in _codeTemplates) {
       t.dispose();
     }
+    _jsonController.dispose();
     super.dispose();
   }
 
@@ -313,33 +325,82 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                             icon: Icons.science_outlined,
                             title: '테스트 예제',
                           ),
+                          const SizedBox(width: 16),
+                          Container(
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: _D.sectionBorder),
+                            ),
+                            padding: const EdgeInsets.all(2),
+                            child: Row(
+                              children: [
+                                _buildModeToggleBtn('폼 입력', !_isJsonMode, () {
+                                  if (_isJsonMode) {
+                                    if (_syncFromJson()) {
+                                      setState(() => _isJsonMode = false);
+                                    }
+                                  }
+                                }),
+                                _buildModeToggleBtn('JSON 입력', _isJsonMode, () {
+                                  if (!_isJsonMode) {
+                                    _syncToJson();
+                                    setState(() => _isJsonMode = true);
+                                  }
+                                }),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
                           Row(
                             children: [
-                              _OutlineButton(
-                                icon: Icons.content_paste_rounded,
-                                label: 'JSON 일괄 붙여넣기',
-                                onPressed: () =>
-                                    _showJsonPasteDialog(null, null),
-                              ),
-                              const SizedBox(width: 8),
-                              _OutlineButton(
-                                icon: Icons.add_rounded,
-                                label: '테스트케이스 추가',
-                                onPressed: () => setState(
-                                  () => _testCases.add(_TestCaseData()),
+                              if (_isJsonMode)
+                                _OutlineButton(
+                                  icon: Icons.format_align_left_rounded,
+                                  label: 'JSON 포맷팅',
+                                  onPressed: _formatJson,
+                                )
+                              else ...[
+                                _OutlineButton(
+                                  icon: Icons.add_rounded,
+                                  label: '테스트케이스 추가',
+                                  onPressed: () => setState(
+                                    () => _testCases.add(_TestCaseData()),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      ..._testCases.asMap().entries.map((entry) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildTestCaseCard(entry.key, entry.value),
-                        );
-                      }),
+                      if (_isJsonMode)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildJsonEditor(),
+                            if (_jsonError != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8, left: 4),
+                                child: Text(
+                                  _jsonError!,
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        )
+                      else
+                        ..._testCases.asMap().entries.map((entry) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _buildTestCaseCard(entry.key, entry.value),
+                          );
+                        }),
                       const SizedBox(height: 28),
 
                       // 5. 코드 템플릿
@@ -803,7 +864,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
             ),
           ),
           CodeTheme(
-            data: CodeThemeData(styles: atomOneDarkTheme),
+            data: CodeThemeData(styles: atomOneLightTheme),
             child: CodeField(
               controller: tmpl.codeController,
               textStyle: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
@@ -824,6 +885,15 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
   );
 
   void _submit() {
+    if (_isJsonMode) {
+      if (!_syncFromJson()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('JSON 문법 오류를 먼저 해결해 주세요.')),
+        );
+        return;
+      }
+    }
+
     if (!(_formKey.currentState?.validate() ?? false)) return;
     _formKey.currentState?.save();
 
@@ -904,109 +974,176 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
     Navigator.of(context).pop();
   }
 
-  void _showJsonPasteDialog(int? tcIndex, _TestCaseData? tc) {
-    final ctrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'JSON 일괄 붙여넣기',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-        ),
-        content: SizedBox(
-          width: 480,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '단일: {"inputValues": ["1", "2"], "outputText": "1"}\n여러개: [{"inputValues": ["1"], "outputText": "1"}, ...]',
-                style: TextStyle(fontSize: 12, color: _D.textLight),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: ctrl,
-                maxLines: 6,
-                decoration: _inputDeco('JSON을 붙여넣으세요', isTextarea: true),
-              ),
-            ],
+  // ── JSON 동기화 & UI ──────────────────────────────────────────────────────────
+
+  Widget _buildModeToggleBtn(String label, bool isActive, VoidCallback onTap) =>
+      InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isActive ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+              color: isActive ? _D.accentBlue : _D.textLight,
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('취소', style: TextStyle(color: _D.textLight)),
+      );
+
+  Widget _buildJsonEditor() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _jsonError != null ? Colors.redAccent : const Color(0xFFE2E8F0),
+          width: 1.5,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF1F5F9),
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+            ),
+            child: Row(
+              children: [
+                _dot(const Color(0xFFFF5F56)),
+                const SizedBox(width: 6),
+                _dot(const Color(0xFFFFBD2E)),
+                const SizedBox(width: 6),
+                _dot(const Color(0xFF27C93F)),
+                const SizedBox(width: 12),
+                const Text(
+                  'JSON Editor (Light)',
+                  style: TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: _D.textPrimary),
-            onPressed: () {
-              try {
-                final raw = ctrl.text.trim();
-                final decoded = jsonDecode(raw);
-
-                if (decoded is List) {
-                  setState(() {
-                    if (tc == null && _testCases.length == 1) {
-                      final first = _testCases[0];
-                      final isFirstEmpty = (first.inputs.isEmpty ||
-                              (first.inputs.length == 1 &&
-                                  first.inputs[0].trim().isEmpty)) &&
-                          first.output.trim().isEmpty;
-                      if (isFirstEmpty) _testCases.clear();
-                    }
-
-                    for (var item in decoded) {
-                      if (item is Map) {
-                        final newTc = _TestCaseData();
-                        final inputsRaw = item['inputValues'];
-                        if (inputsRaw is List) {
-                          newTc.inputs =
-                              inputsRaw.map((e) => e.toString()).toList();
-                        }
-                        final outputRaw = item['outputText'];
-                        if (outputRaw != null) {
-                          newTc.output = outputRaw.toString();
-                        }
-                        _testCases.add(newTc);
-                      }
-                    }
-                  });
-                } else if (decoded is Map) {
-                  setState(() {
-                    if (tc != null) {
-                      final inputsRaw = decoded['inputValues'];
-                      if (inputsRaw is List) {
-                        tc.inputs = inputsRaw.map((e) => e.toString()).toList();
-                      }
-                      final outputRaw = decoded['outputText'];
-                      if (outputRaw != null) tc.output = outputRaw.toString();
-                    } else {
-                      final newTc = _TestCaseData();
-                      final inputsRaw = decoded['inputValues'];
-                      if (inputsRaw is List) {
-                        newTc.inputs =
-                            inputsRaw.map((e) => e.toString()).toList();
-                      }
-                      final outputRaw = decoded['outputText'];
-                      if (outputRaw != null) {
-                        newTc.output = outputRaw.toString();
-                      }
-                      _testCases.add(newTc);
-                    }
-                  });
+          CodeTheme(
+            data: const CodeThemeData(styles: atomOneLightTheme),
+            child: CodeField(
+              controller: _jsonController,
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontFamily: 'monospace',
+                color: Color(0xFF0F172A),
+              ),
+              maxLines: null,
+              minLines: 12,
+              decoration: const BoxDecoration(color: Color(0xFFF8FAFC)),
+              onChanged: (v) {
+                // 실시간 문법 체크
+                try {
+                  jsonDecode(v);
+                  if (_jsonError != null) setState(() => _jsonError = null);
+                } catch (e) {
+                  // ignore
                 }
-                Navigator.of(ctx).pop();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('잘못된 JSON 형식입니다: $e')),
-                );
-              }
-            },
-            child: const Text('적용'),
+              },
+            ),
           ),
         ],
       ),
     );
+  }
+
+  void _syncToJson() {
+    final list = _testCases
+        .map((tc) => {
+              'inputValues': tc.inputs,
+              'outputText': tc.output,
+              'visibility':
+                  tc.visibility.toString().split('.').last.toUpperCase(),
+            })
+        .toList();
+    _jsonController.text = const JsonEncoder.withIndent('  ').convert(list);
+  }
+
+  bool _syncFromJson() {
+    try {
+      final raw = _jsonController.text.trim();
+      if (raw.isEmpty) {
+        setState(() {
+          _testCases = [_TestCaseData()];
+          _jsonError = null;
+        });
+        return true;
+      }
+      final decoded = jsonDecode(raw);
+      final List<_TestCaseData> newCases = [];
+      if (decoded is List) {
+        for (var item in decoded) {
+          if (item is Map) {
+            newCases.add(_parseTestCaseMap(item));
+          }
+        }
+      } else if (decoded is Map) {
+        newCases.add(_parseTestCaseMap(decoded));
+      }
+
+      setState(() {
+        _testCases = newCases.isEmpty ? [_TestCaseData()] : newCases;
+        _jsonError = null;
+      });
+      return true;
+    } catch (e) {
+      setState(() => _jsonError = 'JSON 문법이 올바르지 않습니다: $e');
+      return false;
+    }
+  }
+
+  _TestCaseData _parseTestCaseMap(Map item) {
+    final inputsRaw = item['inputValues'];
+    final inputs = inputsRaw is List
+        ? inputsRaw.map((e) => e.toString()).toList()
+        : [''];
+    final output = item['outputText']?.toString() ?? '';
+    final visStr = (item['visibility']?.toString() ?? 'PUBLIC').toUpperCase();
+    final visibility = TestCaseVisibility.values.firstWhere(
+      (v) => v.toString().split('.').last.toUpperCase() == visStr,
+      orElse: () => TestCaseVisibility.public,
+    );
+    return _TestCaseData(
+      inputs: inputs,
+      output: output,
+      visibility: visibility,
+    );
+  }
+
+  void _formatJson() {
+    try {
+      final decoded = jsonDecode(_jsonController.text);
+      _jsonController.text = const JsonEncoder.withIndent('  ').convert(decoded);
+      setState(() => _jsonError = null);
+    } catch (e) {
+      setState(() => _jsonError = '포맷팅 실패: JSON 문법을 확인해 주세요 ($e)');
+    }
   }
 }
 
