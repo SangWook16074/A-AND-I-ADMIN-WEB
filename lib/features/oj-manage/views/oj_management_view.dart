@@ -678,6 +678,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     final spans = <TextSpan>[];
 
     final combinedRegex = RegExp(
+      r'("""[\s\S]*?""")|' // Triple-quoted strings (Kotlin, etc.)
       r'(".*?")|'
       r"('.*?')|"
       r'(\/\/.*)|'
@@ -685,8 +686,9 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       r'([a-zA-Z_][a-zA-Z0-9_]*)|'
       r'(\d+(\.\d*)?)|'
       r'([{}()\[\]])|'
-      r'([+\-*/%=<>!&|^~,.:;])|'
-      r'(\s+)',
+      r'([+\-*/%=<>!&|^~,.:;$\\])|' // Updated to include $ and \
+      r'(\s+)|'
+      r'([\s\S])', // Catch-all for any other characters
     );
 
     final matches = combinedRegex.allMatches(code).toList();
@@ -695,15 +697,15 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       final match = matches[i];
       final text = match.group(0)!;
 
-      if (match.group(1) != null || match.group(2) != null) {
-        // Strings
+      if (match.group(1) != null || match.group(2) != null || match.group(3) != null) {
+        // Strings (Triple-quoted or standard)
         spans.add(
           TextSpan(
             text: text,
             style: const TextStyle(color: Color(0xFF86EFAC)),
           ),
         );
-      } else if (match.group(3) != null || match.group(4) != null) {
+      } else if (match.group(4) != null || match.group(5) != null) {
         // Comments
         spans.add(
           TextSpan(
@@ -714,9 +716,9 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           ),
         );
-      } else if (match.group(5) != null) {
+      } else if (match.group(6) != null) {
         // Words
-        final word = match.group(5)!;
+        final word = match.group(6)!;
         if (kwList.contains(word)) {
           spans.add(
             TextSpan(
@@ -744,7 +746,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           );
         }
-      } else if (match.group(6) != null) {
+      } else if (match.group(7) != null) {
         // Numbers
         spans.add(
           TextSpan(
@@ -752,7 +754,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             style: const TextStyle(color: Color(0xFFFDBA74)),
           ),
         );
-      } else if (match.group(8) != null) {
+      } else if (match.group(9) != null) {
         // Brackets
         spans.add(
           TextSpan(
@@ -760,16 +762,24 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             style: const TextStyle(color: Color(0xFFCBD5E1)),
           ),
         );
-      } else if (match.group(9) != null) {
-        // Operators
+      } else if (match.group(10) != null) {
+        // Operators (including $ and \)
         spans.add(
           TextSpan(
             text: text,
             style: const TextStyle(color: Color(0xFF94A3B8)),
           ),
         );
+      } else if (match.group(11) != null) {
+        // Whitespace
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
       } else {
-        // Whitespace etc
+        // Everything else (Group 12)
         spans.add(
           TextSpan(
             text: text,
@@ -906,8 +916,6 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       child: Text(
         text,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
         style: TextStyle(
           fontSize: isHeader ? 12 : 11,
           fontWeight: isHeader
