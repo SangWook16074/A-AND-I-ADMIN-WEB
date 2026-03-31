@@ -144,10 +144,7 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
         .toList();
     if (_codeTemplates.isEmpty) _codeTemplates.add(_CodeTemplateData());
 
-    _jsonController = CodeController(
-      text: '',
-      language: json,
-    );
+    _jsonController = CodeController(text: '', language: json);
   }
 
   @override
@@ -462,35 +459,35 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
   }
 
   Widget _buildWeekField() => TextFormField(
-        initialValue: _weekNo.toString(),
-        decoration: _inputDeco('예: 1'),
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onSaved: (v) => _weekNo = int.tryParse(v ?? '1') ?? 1,
-        validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
-      );
+    initialValue: _weekNo.toString(),
+    decoration: _inputDeco('예: 1'),
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    onSaved: (v) => _weekNo = int.tryParse(v ?? '1') ?? 1,
+    validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
+  );
 
   Widget _buildOrderField() => TextFormField(
-        initialValue: _orderInWeek.toString(),
-        decoration: _inputDeco('예: 1'),
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onSaved: (v) => _orderInWeek = int.tryParse(v ?? '1') ?? 1,
-        validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
-      );
+    initialValue: _orderInWeek.toString(),
+    decoration: _inputDeco('예: 1'),
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    onSaved: (v) => _orderInWeek = int.tryParse(v ?? '1') ?? 1,
+    validator: (v) => (v == null || v.trim().isEmpty) ? '필수' : null,
+  );
 
   Widget _buildDifficultyField() => DropdownButtonFormField<String>(
-        value: _difficulty,
-        decoration: _inputDeco(null),
-        items: const [
-          DropdownMenuItem(value: 'LOW', child: Text('LOW')),
-          DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM')),
-          DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
-          DropdownMenuItem(value: 'VERY_HIGH', child: Text('VERY_HIGH')),
-        ],
-        onChanged: (v) => setState(() => _difficulty = v ?? _difficulty),
-        onSaved: (v) => _difficulty = v ?? _difficulty,
-      );
+    initialValue: _difficulty,
+    decoration: _inputDeco(null),
+    items: const [
+      DropdownMenuItem(value: 'LOW', child: Text('LOW')),
+      DropdownMenuItem(value: 'MID', child: Text('MID')),
+      DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
+      DropdownMenuItem(value: 'VERY_HIGH', child: Text('VERY_HIGH')),
+    ],
+    onChanged: (v) => setState(() => _difficulty = v ?? _difficulty),
+    onSaved: (v) => _difficulty = v ?? _difficulty,
+  );
 
   Widget _buildLabeledField(String label, Widget field) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -688,7 +685,9 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            key: ValueKey('etc_${index}_in_${i}_${entry.value}'),
+                            key: ValueKey(
+                              'etc_${index}_in_${i}_${entry.value}',
+                            ),
                             initialValue: entry.value,
                             decoration: _inputDeco('입력값 ${i + 1}'),
                             onChanged: (v) => tc.inputs[i] = v,
@@ -951,7 +950,9 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
         )
         .toList();
 
-    ref.read(tasksManagementBlocProvider.notifier).add(
+    ref
+        .read(tasksManagementBlocProvider.notifier)
+        .add(
           TasksManagementUpdateAssignmentRequested(
             courseSlug: widget.courseSlug,
             assignmentId: widget.assignment.id,
@@ -969,7 +970,12 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
                     .toList()
                     .asMap()
                     .entries
-                    .map((e) => LearningGoal(sortOrder: e.key + 1, learningGoalText: e.value.trim()))
+                    .map(
+                      (e) => LearningGoal(
+                        sortOrder: e.key + 1,
+                        learningGoalText: e.value.trim(),
+                      ),
+                    )
                     .toList(),
                 requirements: reqList,
                 testCases: testCaseList,
@@ -1020,7 +1026,9 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _jsonError != null ? Colors.redAccent : const Color(0xFFE2E8F0),
+          color: _jsonError != null
+              ? Colors.redAccent
+              : const Color(0xFFE2E8F0),
           width: 1.5,
         ),
       ),
@@ -1083,12 +1091,17 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
 
   void _syncToJson() {
     final list = _testCases
-        .map((tc) => {
-              'inputValues': tc.inputs,
-              'outputText': tc.output,
-              'visibility':
-                  tc.visibility.toString().split('.').last.toUpperCase(),
-            })
+        .map(
+          (tc) => {
+            'inputValues': tc.inputs,
+            'outputText': tc.output,
+            'visibility': tc.visibility
+                .toString()
+                .split('.')
+                .last
+                .toUpperCase(),
+          },
+        )
         .toList();
     _jsonController.text = const JsonEncoder.withIndent('  ').convert(list);
   }
@@ -1147,7 +1160,9 @@ class _EditAssignmentDialogState extends ConsumerState<_EditAssignmentDialog> {
   void _formatJson() {
     try {
       final decoded = jsonDecode(_jsonController.text);
-      _jsonController.text = const JsonEncoder.withIndent('  ').convert(decoded);
+      _jsonController.text = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(decoded);
       setState(() => _jsonError = null);
     } catch (e) {
       setState(() => _jsonError = '포맷팅 실패: JSON 문법을 확인해 주세요 ($e)');

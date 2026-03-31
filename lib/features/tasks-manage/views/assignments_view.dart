@@ -100,12 +100,8 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   @override
   void initState() {
     super.initState();
-    _jsonController = CodeController(
-      text: '',
-      language: json,
-    );
+    _jsonController = CodeController(text: '', language: json);
   }
-
 
   @override
   void dispose() {
@@ -164,11 +160,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
     // 1. 주차별 그룹화
     final groupedMap = <int, List<Assignment>>{};
     for (var a in assignments) {
-      groupedMap.update(
-        a.weekNo,
-        (list) => list..add(a),
-        ifAbsent: () => [a],
-      );
+      groupedMap.update(a.weekNo, (list) => list..add(a), ifAbsent: () => [a]);
     }
 
     // 2. 주차 순 정렬
@@ -218,7 +210,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      '$week주차 (${week}주차 과제 구성)',
+                      '$week주차 ($week주차 과제 구성)',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -577,7 +569,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
     decoration: _inputDeco(null),
     items: const [
       DropdownMenuItem(value: 'LOW', child: Text('LOW')),
-      DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM')),
+      DropdownMenuItem(value: 'MID', child: Text('MID')),
       DropdownMenuItem(value: 'HIGH', child: Text('HIGH')),
       DropdownMenuItem(value: 'VERY_HIGH', child: Text('VERY_HIGH')),
     ],
@@ -1044,7 +1036,9 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _jsonError != null ? Colors.redAccent : const Color(0xFFE2E8F0),
+          color: _jsonError != null
+              ? Colors.redAccent
+              : const Color(0xFFE2E8F0),
           width: 1.5,
         ),
       ),
@@ -1106,12 +1100,17 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
 
   void _syncToJson() {
     final list = _testCases
-        .map((tc) => {
-              'inputValues': tc.inputs,
-              'outputText': tc.output,
-              'visibility':
-                  tc.visibility.toString().split('.').last.toUpperCase(),
-            })
+        .map(
+          (tc) => {
+            'inputValues': tc.inputs,
+            'outputText': tc.output,
+            'visibility': tc.visibility
+                .toString()
+                .split('.')
+                .last
+                .toUpperCase(),
+          },
+        )
         .toList();
     _jsonController.text = const JsonEncoder.withIndent('  ').convert(list);
   }
@@ -1172,7 +1171,9 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   void _formatJson() {
     try {
       final decoded = jsonDecode(_jsonController.text);
-      _jsonController.text = const JsonEncoder.withIndent('  ').convert(decoded);
+      _jsonController.text = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(decoded);
       setState(() => _jsonError = null);
     } catch (e) {
       setState(() => _jsonError = '포맷팅 실패: JSON 문법을 확인해 주세요 ($e)');
@@ -1180,11 +1181,10 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
   }
 
   Widget _dot(Color color) => Container(
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      );
-
+    width: 8,
+    height: 8,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
 
   // ── 과제 등록 ────────────────────────────────────────────────────────────────
   void _submit() {
