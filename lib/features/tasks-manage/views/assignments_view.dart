@@ -1219,12 +1219,7 @@ class _AssignmentsViewState extends ConsumerState<AssignmentsView> {
           (e) => AssignmentTestCase(
             seq: e.key + 1,
             inputValues: e.value.inputs.map((input) {
-              final t = input.trim();
-              if (t.toLowerCase() == 'true') return true;
-              if (t.toLowerCase() == 'false') return false;
-              final n = num.tryParse(t);
-              if (n != null) return n;
-              return t.replaceAll('\\n', '\n');
+              return input.replaceAll('\\n', '\n');
             }).toList(),
             outputText: e.value.output.replaceAll('\\n', '\n'),
             visibility: e.value.visibility,
