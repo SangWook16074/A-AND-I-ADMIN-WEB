@@ -1,0 +1,16 @@
+name: aandi_api_protocol
+description: Shared transport protocol helpers for AANDI API clients.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  crypto: ^3.0.6
+  dio: ^5.9.2
+  http: ^1.2.2
+
+dev_dependencies:
+  lints: ^6.0.0
+

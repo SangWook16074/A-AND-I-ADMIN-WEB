@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:aandi_course_api/aandi_course_api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/api_error_feedback.dart';
 import '../providers/tasks_management_providers.dart';
 import 'tasks_management_event.dart';
 import 'tasks_management_state.dart';
@@ -140,6 +143,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         courses: courses,
       );
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: TasksManagementStatus.failure,
         errorMessage: e.toString(),
@@ -172,6 +176,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       await _loadCourses();
       state = state.copyWith(isCreating: false);
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: TasksManagementStatus.failure,
         isCreating: false,
@@ -205,6 +210,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         );
       }
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       // Only record the error — don't flip the whole page to failure state.
       state = state.copyWith(
         isLoadingDetails: false,
@@ -226,6 +232,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       state = state.copyWith(isCreating: false);
       add(TasksManagementEnrollmentsRequested(courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       String errorMessage = '수강생 등록 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
         errorMessage =
@@ -254,6 +261,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       state = state.copyWith(isCreating: false);
       add(TasksManagementEnrollmentsRequested(courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       String errorMessage = '수강생 상태 변경 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
         errorMessage =
@@ -284,6 +292,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         isLoadingDetails: false,
       );
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         isLoadingDetails: false,
         errorMessage: e.toString(),
@@ -313,6 +322,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         );
       }
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       String errorMessage = '과제 상세 정보를 불러오는데 실패했습니다: $e';
       if (e is CourseApiException) {
         errorMessage =
@@ -340,6 +350,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       state = state.copyWith(isCreating: false);
       add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: TasksManagementStatus.failure,
         isCreating: false,
@@ -364,6 +375,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       state = state.copyWith(isCreating: false);
       add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       String errorMessage = '과제 수정 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
         errorMessage =
@@ -391,6 +403,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       state = state.copyWith(isCreating: false);
       add(TasksManagementAssignmentsRequested(courseSlug: courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       String errorMessage = '과제 삭제 중 오류가 발생했습니다: $e';
       if (e is CourseApiException) {
         errorMessage =
@@ -415,6 +428,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
           .toList();
       state = state.copyWith(isDeleting: false, courses: newCourses);
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(isDeleting: false, errorMessage: e.toString());
     }
   }
@@ -440,6 +454,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         selectedCourse: updated,
       );
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(isCreating: false, errorMessage: e.toString());
     }
   }
@@ -455,6 +470,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
           .execute(courseSlug: courseSlug, userId: userId);
       add(TasksManagementEnrollmentsRequested(courseSlug));
     } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         isLoadingDetails: false,
         errorMessage: '수강생 삭제 실패: $e',

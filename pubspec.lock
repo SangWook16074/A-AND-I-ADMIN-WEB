@@ -16,6 +16,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  aandi_api_protocol:
+    dependency: transitive
+    description:
+      path: "packages/api_protocol"
+      relative: true
+    source: path
+    version: "0.1.0"
   aandi_auth:
     dependency: "direct main"
     description:

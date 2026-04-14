@@ -79,9 +79,7 @@ class DashboardPage extends ConsumerWidget {
               ),
             ],
           ),
-          drawer: const Drawer(
-            child: DashboardSidebarView(),
-          ),
+          drawer: const Drawer(child: DashboardSidebarView()),
           body: body,
         );
       },

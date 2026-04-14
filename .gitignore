@@ -49,3 +49,5 @@ app.*.map.json
 # Env
 .env*
 .vscode/launch.json
+
+scripts/

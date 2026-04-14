@@ -165,7 +165,6 @@ List<dynamic> _inputValuesFromJson(dynamic json) {
   return <dynamic>[json.toString()];
 }
 
-
 @freezed
 abstract class CodeTemplate with _$CodeTemplate {
   const factory CodeTemplate({
@@ -252,4 +251,109 @@ abstract class UpdateEnrollmentStatusRequest
 
   factory UpdateEnrollmentStatusRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateEnrollmentStatusRequestFromJson(json);
+}
+
+class AssignmentSubmissionStatuses {
+  const AssignmentSubmissionStatuses({
+    required this.assignmentId,
+    required this.courseSlug,
+    required this.totalEnrolled,
+    required this.submittedCount,
+    required this.notSubmittedCount,
+    required this.items,
+  });
+
+  factory AssignmentSubmissionStatuses.fromJson(Map<String, dynamic> json) {
+    return AssignmentSubmissionStatuses(
+      assignmentId: (json['assignmentId'] ?? '').toString(),
+      courseSlug: (json['courseSlug'] ?? '').toString(),
+      totalEnrolled: _readNullableInt(json['totalEnrolled']) ?? 0,
+      submittedCount: _readNullableInt(json['submittedCount']) ?? 0,
+      notSubmittedCount: _readNullableInt(json['notSubmittedCount']) ?? 0,
+      items: (json['items'] as List<dynamic>? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(AssignmentSubmissionStatusItem.fromJson)
+          .toList(),
+    );
+  }
+
+  final String assignmentId;
+  final String courseSlug;
+  final int totalEnrolled;
+  final int submittedCount;
+  final int notSubmittedCount;
+  final List<AssignmentSubmissionStatusItem> items;
+}
+
+class AssignmentSubmissionStatusItem {
+  const AssignmentSubmissionStatusItem({
+    required this.userId,
+    this.publicCode,
+    this.username,
+    required this.enrollmentStatus,
+    required this.submitted,
+    this.score,
+    this.passedCases,
+    this.totalCases,
+    this.completedAt,
+  });
+
+  factory AssignmentSubmissionStatusItem.fromJson(Map<String, dynamic> json) {
+    return AssignmentSubmissionStatusItem(
+      userId: (json['userId'] ?? '').toString(),
+      publicCode: _readNullableString(json['publicCode']),
+      username: _readNullableString(json['username']),
+      enrollmentStatus:
+          _readNullableString(json['enrollmentStatus']) ?? 'ENABLED',
+      submitted: json['submitted'] == true,
+      score: _readNullableInt(json['score']),
+      passedCases: _readNullableInt(json['passedCases']),
+      totalCases: _readNullableInt(json['totalCases']),
+      completedAt: _readNullableDateTime(json['completedAt']),
+    );
+  }
+
+  final String userId;
+  final String? publicCode;
+  final String? username;
+  final String enrollmentStatus;
+  final bool submitted;
+  final int? score;
+  final int? passedCases;
+  final int? totalCases;
+  final DateTime? completedAt;
+}
+
+String? _readNullableString(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : text;
+}
+
+int? _readNullableInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  if (value is String) {
+    return int.tryParse(value);
+  }
+  return null;
+}
+
+DateTime? _readNullableDateTime(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is DateTime) {
+    return value;
+  }
+  if (value is String && value.trim().isNotEmpty) {
+    return DateTime.tryParse(value);
+  }
+  return null;
 }

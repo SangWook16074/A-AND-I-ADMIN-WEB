@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/api_error_feedback.dart';
 import '../../data/datasources/oj_management_api_client.dart';
 import '../../data/repositories/oj_management_repository_impl.dart';
 import '../../domain/repositories/oj_management_repository.dart';
@@ -62,6 +65,7 @@ class OjManagementBloc extends _$OjManagementBloc {
         submissions: submissions,
       );
     } on OjManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: OjManagementStatus.failure,
         errorMessage: e.message,
@@ -88,6 +92,7 @@ class OjManagementBloc extends _$OjManagementBloc {
         submissions: submissions,
       );
     } on OjManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: OjManagementStatus.failure,
         errorMessage: e.message,

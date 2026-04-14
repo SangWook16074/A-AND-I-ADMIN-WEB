@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:aandi_admin_api/aandi_admin_api.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/api_error_feedback.dart';
 import '../../data/datasources/users_management_api_client.dart';
 import '../../data/repositories/users_management_repository_impl.dart';
 import '../../domain/entities/admin_user.dart';
@@ -51,7 +54,7 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         :final role,
         :final cohort,
         :final cohortOrder,
-        :final userTrack
+        :final userTrack,
       ):
         await inviteMail(
           emails: emails,
@@ -65,7 +68,11 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         :final cohort,
         :final provisionType,
       ):
-        await createUser(role: role, cohort: cohort, provisionType: provisionType);
+        await createUser(
+          role: role,
+          cohort: cohort,
+          provisionType: provisionType,
+        );
       case UsersManagementDeleteRequested(:final userId):
         await deleteUser(userId: userId);
       case UsersManagementUpdateRequested(
@@ -101,11 +108,13 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         errorMessage: e.message,
@@ -138,22 +147,24 @@ class UsersManagementBloc extends _$UsersManagementBloc {
             cohortOrder: cohortOrder,
             userTrack: userTrack,
           );
-      
+
       // Reload users after successful invite
       await loadUsers();
-      
+
       state = state.copyWith(
         status: UsersManagementStatus.success,
         isCreating: false,
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         isCreating: false,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         isCreating: false,
@@ -176,11 +187,9 @@ class UsersManagementBloc extends _$UsersManagementBloc {
     state = state.copyWith(isCreating: true, clearError: true);
 
     try {
-      await ref.read(usersManagementRepositoryProvider).createUser(
-        role: role,
-        cohort: cohort,
-        provisionType: provisionType,
-      );
+      await ref
+          .read(usersManagementRepositoryProvider)
+          .createUser(role: role, cohort: cohort, provisionType: provisionType);
 
       // Reload users after successful creation
       await loadUsers();
@@ -191,12 +200,14 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         isCreating: false,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         isCreating: false,
@@ -228,12 +239,14 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearDeletingUserId: true,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearDeletingUserId: true,
@@ -295,12 +308,14 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearUpdatingUserId: true,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearUpdatingUserId: true,
@@ -316,7 +331,11 @@ class UsersManagementBloc extends _$UsersManagementBloc {
   }
 
   Future<void> resetPassword({required String userId}) async {
-    state = state.copyWith(resettingPasswordUserId: userId, clearError: true, clearTemporaryPassword: true);
+    state = state.copyWith(
+      resettingPasswordUserId: userId,
+      clearError: true,
+      clearTemporaryPassword: true,
+    );
 
     try {
       final pwd = await ref
@@ -329,12 +348,14 @@ class UsersManagementBloc extends _$UsersManagementBloc {
         clearError: true,
       );
     } on UsersManagementApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearResettingPasswordUserId: true,
         errorMessage: e.message,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         status: UsersManagementStatus.failure,
         clearResettingPasswordUserId: true,

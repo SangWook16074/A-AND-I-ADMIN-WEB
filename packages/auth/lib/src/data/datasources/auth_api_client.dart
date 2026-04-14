@@ -1,15 +1,17 @@
 import 'dart:convert';
 
+import 'package:aandi_api_protocol/aandi_api_protocol.dart';
 import 'package:http/http.dart' as http;
 
 import '../dtos/auth_dtos.dart';
 
 final class AuthApiException implements Exception {
-  AuthApiException(this.message, {this.statusCode, this.code});
+  AuthApiException(this.message, {this.statusCode, this.code, this.alert});
 
   final String message;
   final int? statusCode;
   final String? code;
+  final String? alert;
 
   @override
   String toString() =>
@@ -18,28 +20,27 @@ final class AuthApiException implements Exception {
 
 final class AuthApiClient {
   AuthApiClient({required this.baseUrl, http.Client? client})
-    : _client = client ?? http.Client();
+    : _client = wrapWithAandiProtocolClient(client ?? http.Client());
 
   final String baseUrl;
   final http.Client _client;
 
   Future<LoginResponseDto> login(LoginRequestDto request) async {
-    final payload = await _post('/v1/auth/login', body: request.toJson());
+    final payload = await _post('/v2/auth/login', body: request.toJson());
     return LoginResponseDto.fromJson(payload);
   }
 
   Future<RefreshResponseDto> refresh(RefreshRequestDto request) async {
-    final payload = await _post('/v1/auth/refresh', body: request.toJson());
+    final payload = await _post('/v2/auth/refresh', body: request.toJson());
     return RefreshResponseDto.fromJson(payload);
   }
 
-  Future<LogoutResponseDto> logout(LogoutRequestDto request) async {
-    final payload = await _post('/v1/auth/logout', body: request.toJson());
-    return LogoutResponseDto.fromJson(payload);
+  Future<void> logout(LogoutRequestDto request) async {
+    await _post('/v2/auth/logout', body: request.toJson());
   }
 
   Future<MeResponseDto> me({required String accessToken}) async {
-    final payload = await _get('/v1/me', accessToken: accessToken);
+    final payload = await _get('/v2/me', accessToken: accessToken);
     return MeResponseDto.fromJson(payload);
   }
 
@@ -87,10 +88,14 @@ final class AuthApiClient {
     if (response.statusCode < 200 ||
         response.statusCode >= 300 ||
         !envelope.success) {
+      final error = decoded['error'];
       throw AuthApiException(
         envelope.error?.message ?? 'Request failed',
         statusCode: response.statusCode,
         code: envelope.error?.code,
+        alert: error is Map<String, dynamic>
+            ? error['alert']?.toString()
+            : null,
       );
     }
 
