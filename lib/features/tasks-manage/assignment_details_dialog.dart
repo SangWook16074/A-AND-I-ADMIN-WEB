@@ -67,7 +67,10 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 1. 기본 정보
-                    _SectionHeader(icon: Icons.info_outline_rounded, title: '기본 정보'),
+                    _SectionHeader(
+                      icon: Icons.info_outline_rounded,
+                      title: '기본 정보',
+                    ),
                     const SizedBox(height: 16),
                     _SectionContainer(
                       child: Column(
@@ -75,23 +78,57 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              _InfoItem(label: '주차 / 순서', value: '${assignment.weekNo}주차 / ${assignment.orderInWeek}'),
+                              _InfoItem(
+                                label: '주차 / 순서',
+                                value:
+                                    '${assignment.weekNo}주차 / ${assignment.orderInWeek}',
+                              ),
                               const SizedBox(width: 48),
-                              _InfoItem(label: '난이도', value: assignment.metadata.difficulty),
+                              _InfoItem(
+                                label: '난이도',
+                                value: assignment.metadata.difficulty,
+                              ),
                               const SizedBox(width: 48),
                               _InfoItem(label: '상태', value: assignment.status),
                             ],
                           ),
                           const SizedBox(height: 24),
-                          const Text('과제명', style: TextStyle(fontSize: 13, color: _D.textLight, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 4),
-                          Text(assignment.metadata.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _D.textPrimary)),
-                          const SizedBox(height: 16),
-                          const Text('설명', style: TextStyle(fontSize: 13, color: _D.textLight, fontWeight: FontWeight.w600)),
+                          const Text(
+                            '과제명',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _D.textLight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
-                            assignment.metadata.description?.isNotEmpty == true ? assignment.metadata.description! : '등록된 설명이 없습니다.',
-                            style: const TextStyle(fontSize: 15, color: _D.textDesc, height: 1.6),
+                            assignment.metadata.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: _D.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            '설명',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _D.textLight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            assignment.metadata.description?.isNotEmpty == true
+                                ? assignment.metadata.description!
+                                : '등록된 설명이 없습니다.',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: _D.textDesc,
+                              height: 1.6,
+                            ),
                           ),
                         ],
                       ),
@@ -99,21 +136,33 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                     const SizedBox(height: 32),
 
                     // 2. 일정 설정
-                    _SectionHeader(icon: Icons.calendar_month_outlined, title: '일정 설정'),
+                    _SectionHeader(
+                      icon: Icons.calendar_month_outlined,
+                      title: '일정 설정',
+                    ),
                     const SizedBox(height: 16),
                     _SectionContainer(
                       child: Row(
                         children: [
-                          _InfoItem(label: '시작 일시', value: _pruneOffset(assignment.startAt)),
+                          _InfoItem(
+                            label: '시작 일시',
+                            value: _pruneOffset(assignment.startAt),
+                          ),
                           const SizedBox(width: 48),
-                          _InfoItem(label: '종료 일시', value: _pruneOffset(assignment.endAt)),
+                          _InfoItem(
+                            label: '종료 일시',
+                            value: _pruneOffset(assignment.endAt),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 32),
 
                     // 3. 목표 및 요구사항
-                    _SectionHeader(icon: Icons.checklist_rounded, title: '상세 목표 및 요구사항'),
+                    _SectionHeader(
+                      icon: Icons.checklist_rounded,
+                      title: '상세 목표 및 요구사항',
+                    ),
                     const SizedBox(height: 16),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,14 +170,18 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                         Expanded(
                           child: _DetailListCard(
                             title: '학습 목표',
-                            items: assignment.metadata.learningGoals.map((e) => e.learningGoalText).toList(),
+                            items: assignment.metadata.learningGoals
+                                .map((e) => e.learningGoalText)
+                                .toList(),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: _DetailListCard(
                             title: '요구사항',
-                            items: assignment.metadata.requirements.map((e) => e.requirementText).toList(),
+                            items: assignment.metadata.requirements
+                                .map((e) => e.requirementText)
+                                .toList(),
                           ),
                         ),
                       ],
@@ -136,15 +189,23 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                     const SizedBox(height: 32),
 
                     // 4. 테스트 케이스
-                    _SectionHeader(icon: Icons.science_outlined, title: '테스트 케이스'),
+                    _SectionHeader(
+                      icon: Icons.science_outlined,
+                      title: '테스트 케이스',
+                    ),
                     const SizedBox(height: 16),
                     if (assignment.metadata.testCases.isEmpty)
                       const Text('등록된 테스트 케이스가 없습니다.')
                     else
-                      ...assignment.metadata.testCases.asMap().entries.map((e) => Padding(
+                      ...assignment.metadata.testCases.asMap().entries.map(
+                        (e) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: _TestCaseViewCard(index: e.key + 1, tc: e.value),
-                        )),
+                          child: _TestCaseViewCard(
+                            index: e.key + 1,
+                            tc: e.value,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 32),
 
                     // 5. 코드 템플릿
@@ -153,10 +214,12 @@ class _AssignmentDetailsDialog extends ConsumerWidget {
                     if (assignment.metadata.codeTemplates.isEmpty)
                       const Text('등록된 코드 템플릿이 없습니다.')
                     else
-                      ...assignment.metadata.codeTemplates.map((e) => Padding(
+                      ...assignment.metadata.codeTemplates.map(
+                        (e) => Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: _CodeTemplateViewCard(tmpl: e),
-                        )),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -187,8 +250,18 @@ class _DialogHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _D.textPrimary)),
-          IconButton(icon: const Icon(Icons.close_rounded, color: _D.accentBlue), onPressed: onClose),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: _D.textPrimary,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, color: _D.accentBlue),
+            onPressed: onClose,
+          ),
         ],
       ),
     );
@@ -206,7 +279,15 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Icon(icon, size: 20, color: _D.accentBlue),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: _D.textPrimary, letterSpacing: -0.4)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: _D.textPrimary,
+            letterSpacing: -0.4,
+          ),
+        ),
       ],
     );
   }
@@ -226,7 +307,11 @@ class _SectionContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: _D.sectionBorder),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: child,
@@ -244,9 +329,23 @@ class _InfoItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: _D.textLight, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: _D.textLight,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 6),
-        Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _D.textPrimary)),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: _D.textPrimary,
+          ),
+        ),
       ],
     );
   }
@@ -276,27 +375,50 @@ class _DetailListCard extends StatelessWidget {
               borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
               border: Border(bottom: BorderSide(color: _D.sectionBorder)),
             ),
-            child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: items.isEmpty
-                ? const Text('등록된 항목이 없습니다.', style: TextStyle(color: _D.textLight, fontSize: 13))
+                ? const Text(
+                    '등록된 항목이 없습니다.',
+                    style: TextStyle(color: _D.textLight, fontSize: 13),
+                  )
                 : Column(
-                    children: items.map((e) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 6),
-                                child: Icon(Icons.circle, size: 5, color: _D.accentBlue),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(e, style: const TextStyle(fontSize: 14, color: _D.textDesc, height: 1.5))),
-                            ],
+                    children: items
+                        .map(
+                          (e) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 6),
+                                  child: Icon(
+                                    Icons.circle,
+                                    size: 5,
+                                    color: _D.accentBlue,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    e,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: _D.textDesc,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        )).toList(),
+                        )
+                        .toList(),
                   ),
           ),
         ],
@@ -332,8 +454,16 @@ class _TestCaseViewCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('테스트케이스 #$index', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                _MetadataBadge(label: tc.visibility.toString().split('.').last.toUpperCase()),
+                Text(
+                  '테스트케이스 #$index',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                _MetadataBadge(
+                  label: tc.visibility.toString().split('.').last.toUpperCase(),
+                ),
               ],
             ),
           ),
@@ -342,7 +472,14 @@ class _TestCaseViewCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('입력', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _D.textLight)),
+                const Text(
+                  '입력',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _D.textLight,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Container(
                   width: double.infinity,
@@ -353,17 +490,36 @@ class _TestCaseViewCard extends StatelessWidget {
                   ),
                   child: Text(
                     tc.inputValues.map((v) => v.toString()).join(' / '),
-                    style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text('기대 출력', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _D.textLight)),
+                const Text(
+                  '기대 출력',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _D.textLight,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
-                  child: Text(tc.outputText ?? '', style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    tc.outputText ?? '',
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -420,9 +576,19 @@ class _CodeTemplateViewCardState extends State<_CodeTemplateViewCard> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.terminal_rounded, size: 16, color: _D.accentBlue),
+                const Icon(
+                  Icons.terminal_rounded,
+                  size: 16,
+                  color: _D.accentBlue,
+                ),
                 const SizedBox(width: 8),
-                Text('작성 템플릿: ${widget.tmpl.language}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                Text(
+                  '작성 템플릿: ${widget.tmpl.language}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
               ],
             ),
           ),

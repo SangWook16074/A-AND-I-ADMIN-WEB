@@ -5,6 +5,7 @@ import 'package:aandi_course_api/aandi_course_api.dart';
 import 'task_management.dart';
 import 'views/enrollments_view.dart';
 import 'views/assignments_view.dart';
+import 'views/submission_statuses_view.dart';
 
 // ─── 디자인 토큰 ────────────────────────────────────────────────────────────────
 class _D {
@@ -57,7 +58,7 @@ class _CourseDetailsDialogState extends ConsumerState<_CourseDetailsDialog>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
   }
 
   @override
@@ -128,6 +129,14 @@ class _CourseDetailsDialogState extends ConsumerState<_CourseDetailsDialog>
                     course: widget.course,
                     isLoading: state.isLoadingDetails,
                     assignments: state.selectedCourseAssignments,
+                  ),
+                  SubmissionStatusesView(
+                    course: widget.course,
+                    isLoadingAssignments: state.isLoadingDetails,
+                    assignments: state.selectedCourseAssignments,
+                    statuses: state.selectedAssignmentSubmissionStatuses,
+                    isLoadingStatuses: state.isLoadingSubmissionStatuses,
+                    errorMessage: state.errorMessage,
                   ),
                 ],
               ),
@@ -525,6 +534,7 @@ class _DialogHeader extends StatelessWidget {
             tabs: const [
               Tab(text: '수강생 목록'),
               Tab(text: '과제 관리'),
+              Tab(text: '제출 현황'),
             ],
           ),
         ],

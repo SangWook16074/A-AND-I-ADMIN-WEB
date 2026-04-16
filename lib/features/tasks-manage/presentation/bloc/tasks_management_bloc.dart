@@ -73,6 +73,13 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       );
     });
 
+    on<TasksManagementAssignmentSubmissionStatusesRequested>((event) async {
+      await _loadAssignmentSubmissionStatuses(
+        courseSlug: event.courseSlug,
+        assignmentId: event.assignmentId,
+      );
+    });
+
     on<TasksManagementAddEnrollmentRequested>((event) async {
       await _addEnrollment(
         courseSlug: event.courseSlug,
@@ -190,6 +197,7 @@ class TasksManagementBloc extends _$TasksManagementBloc {
       selectedCourse: course,
       selectedCourseEnrollments: null,
       selectedCourseAssignments: null,
+      clearAssignmentSubmissionStatuses: true,
       clearError: true,
     );
     add(TasksManagementEnrollmentsRequested(course.slug));
@@ -332,6 +340,35 @@ class TasksManagementBloc extends _$TasksManagementBloc {
         status: TasksManagementStatus.failure,
         isLoadingDetails: false,
         errorMessage: errorMessage,
+      );
+    }
+  }
+
+  Future<void> _loadAssignmentSubmissionStatuses({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    state = state.copyWith(
+      isLoadingSubmissionStatuses: true,
+      clearAssignmentSubmissionStatuses: true,
+      clearError: true,
+    );
+    try {
+      final statuses = await ref.read(
+        getAssignmentSubmissionStatusesUseCaseProvider,
+      )(courseSlug: courseSlug, assignmentId: assignmentId);
+
+      if (state.selectedCourse?.slug == courseSlug) {
+        state = state.copyWith(
+          selectedAssignmentSubmissionStatuses: statuses,
+          isLoadingSubmissionStatuses: false,
+        );
+      }
+    } catch (e) {
+      unawaited(showApiAlertIfPresent(e));
+      state = state.copyWith(
+        isLoadingSubmissionStatuses: false,
+        errorMessage: e.toString(),
       );
     }
   }

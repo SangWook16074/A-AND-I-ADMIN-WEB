@@ -6,7 +6,7 @@ part of 'login_bloc.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loginBlocHash() => r'5fcb98570266f4496854d16582b115876f990092';
+String _$loginBlocHash() => r'3d378988a51376dc14685982a1663585eb62acc5';
 
 /// See also [LoginBloc].
 @ProviderFor(LoginBloc)

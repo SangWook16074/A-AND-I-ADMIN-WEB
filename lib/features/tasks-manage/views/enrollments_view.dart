@@ -18,24 +18,24 @@ class _D {
 }
 
 InputDecoration _inputDeco(String? hint) => InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: _D.textLight, fontSize: 14),
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: _D.inputBorder),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: _D.inputBorder),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: _D.accentBlue, width: 1.5),
-      ),
-    );
+  hintText: hint,
+  hintStyle: const TextStyle(color: _D.textLight, fontSize: 14),
+  filled: true,
+  fillColor: Colors.white,
+  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10),
+    borderSide: const BorderSide(color: _D.inputBorder),
+  ),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10),
+    borderSide: const BorderSide(color: _D.inputBorder),
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10),
+    borderSide: const BorderSide(color: _D.accentBlue, width: 1.5),
+  ),
+);
 
 // ─── 메인 위젯 ──────────────────────────────────────────────────────────────────
 class EnrollmentsView extends ConsumerStatefulWidget {
@@ -86,7 +86,9 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
       final request = AddEnrollmentRequest(
         publicCode: searchedUser?.publicCode ?? _publicCode,
       );
-      ref.read(tasksManagementBlocProvider.notifier).add(
+      ref
+          .read(tasksManagementBlocProvider.notifier)
+          .add(
             TasksManagementAddEnrollmentRequested(
               courseSlug: widget.courseSlug,
               request: request,
@@ -129,20 +131,22 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
           else
             Column(
               children: widget.enrollments!
-                  .map((e) => _EnrollmentCard(
-                        enrollment: e,
-                        isUpdating: _isUpdatingEnrollmentStatus,
-                        onStatusAction: (status) {
-                          if (status == EnrollmentActionStatus.deleted) {
-                            _showDeleteEnrollmentDialog(e);
-                          } else {
-                            _showEnrollmentStatusDialog(
-                              enrollment: e,
-                              status: status,
-                            );
-                          }
-                        },
-                      ))
+                  .map(
+                    (e) => _EnrollmentCard(
+                      enrollment: e,
+                      isUpdating: _isUpdatingEnrollmentStatus,
+                      onStatusAction: (status) {
+                        if (status == EnrollmentActionStatus.deleted) {
+                          _showDeleteEnrollmentDialog(e);
+                        } else {
+                          _showEnrollmentStatusDialog(
+                            enrollment: e,
+                            status: status,
+                          );
+                        }
+                      },
+                    ),
+                  )
                   .toList(),
             ),
 
@@ -194,12 +198,14 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
                               decoration: _inputDeco('유저 코드 입력').copyWith(
                                 suffixIcon: InkWell(
                                   onTap: () {
-                                    final query =
-                                        _userLookupController.text.trim();
+                                    final query = _userLookupController.text
+                                        .trim();
                                     if (query.isNotEmpty) {
                                       ref
-                                          .read(tasksManagementBlocProvider
-                                              .notifier)
+                                          .read(
+                                            tasksManagementBlocProvider
+                                                .notifier,
+                                          )
                                           .add(
                                             TasksManagementUserSearchRequested(
                                               query: query,
@@ -290,14 +296,20 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
       return Text(
         '존재하는 사용자: ${state.searchedUser!.nickname ?? state.searchedUser!.id} (${state.searchedUser!.username})',
         style: const TextStyle(
-            color: _D.accentBlue, fontSize: 12, fontWeight: FontWeight.w600),
+          color: _D.accentBlue,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       );
     }
     if (state.userNotFound) {
       return const Text(
         '사용자를 찾을 수 없습니다.',
         style: TextStyle(
-            color: Colors.red, fontSize: 12, fontWeight: FontWeight.w600),
+          color: Colors.red,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       );
     }
     return const SizedBox.shrink();
@@ -332,11 +344,13 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
-                  Text('변경 상태: ${switch (status) {
-                    EnrollmentActionStatus.enabled => 'ENABLED',
-                    EnrollmentActionStatus.banned => 'BANNED',
-                    EnrollmentActionStatus.deleted => 'DELETED',
-                  }}'),
+                  Text(
+                    '변경 상태: ${switch (status) {
+                      EnrollmentActionStatus.enabled => 'ENABLED',
+                      EnrollmentActionStatus.banned => 'BANNED',
+                      EnrollmentActionStatus.deleted => 'DELETED',
+                    }}',
+                  ),
                   if (shouldRequireBanReason) ...[
                     const SizedBox(height: 16),
                     TextFormField(
@@ -364,10 +378,7 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(
-                '취소',
-                style: TextStyle(color: _D.textLight),
-              ),
+              child: const Text('취소', style: TextStyle(color: _D.textLight)),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: _D.textPrimary),
@@ -381,20 +392,22 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
                 final targetStatus = switch (status) {
                   EnrollmentActionStatus.enabled => EnrollmentStatus.enabled,
                   EnrollmentActionStatus.banned => EnrollmentStatus.banned,
-                  EnrollmentActionStatus.deleted =>
-                    throw UnimplementedError('Delete is separate'),
+                  EnrollmentActionStatus.deleted => throw UnimplementedError(
+                    'Delete is separate',
+                  ),
                 };
 
-                ref.read(tasksManagementBlocProvider.notifier).add(
+                ref
+                    .read(tasksManagementBlocProvider.notifier)
+                    .add(
                       TasksManagementUpdateEnrollmentStatusRequested(
                         courseSlug: widget.courseSlug,
                         userId: enrollment.userId,
                         request: UpdateEnrollmentStatusRequest(
                           status: targetStatus,
-                          banReason:
-                              targetStatus == EnrollmentStatus.banned
-                                  ? banReason
-                                  : null,
+                          banReason: targetStatus == EnrollmentStatus.banned
+                              ? banReason
+                              : null,
                         ),
                       ),
                     );
@@ -432,7 +445,9 @@ class EnrollmentsViewState extends ConsumerState<EnrollmentsView> {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(dialogContext);
-              ref.read(tasksManagementBlocProvider.notifier).add(
+              ref
+                  .read(tasksManagementBlocProvider.notifier)
+                  .add(
                     TasksManagementDeleteEnrollmentRequested(
                       courseSlug: widget.courseSlug,
                       userId: enrollment.userId,
@@ -493,8 +508,8 @@ class _EnrollmentCard extends StatelessWidget {
                 (enrollment.username?.isNotEmpty ?? false)
                     ? enrollment.username!.substring(0, 1).toUpperCase()
                     : enrollment.userId.isNotEmpty
-                        ? enrollment.userId.substring(0, 1).toUpperCase()
-                        : '?',
+                    ? enrollment.userId.substring(0, 1).toUpperCase()
+                    : '?',
                 style: TextStyle(
                   color: statusColor,
                   fontWeight: FontWeight.w800,
@@ -549,7 +564,9 @@ class _EnrollmentCard extends StatelessWidget {
                     // 상태 배지
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4),
@@ -567,7 +584,10 @@ class _EnrollmentCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         '등록: ${_formatDateTime(enrollment.joinedAt!)}',
-                        style: const TextStyle(fontSize: 12, color: _D.textLight),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: _D.textLight,
+                        ),
                       ),
                     ],
                   ],

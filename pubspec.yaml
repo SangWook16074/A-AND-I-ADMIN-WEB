@@ -71,6 +71,7 @@ dev_dependencies:
   riverpod_lint: ^2.6.3
   custom_lint: ^0.7.5
   flutterfire_cli: ^1.2.0
+  melos: ^6.3.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -43,7 +43,7 @@ final ojManagementRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef OjManagementRepositoryRef = ProviderRef<OjManagementRepository>;
-String _$ojManagementBlocHash() => r'b7430d696a414b84b16ffa318835db8db31d4a9e';
+String _$ojManagementBlocHash() => r'173acd50c6ce62e0cbb8e672e7ed4e7c1191e09a';
 
 /// See also [OjManagementBloc].
 @ProviderFor(OjManagementBloc)

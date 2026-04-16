@@ -170,7 +170,11 @@ class TaskManagementView extends ConsumerWidget {
                                       ),
                                     ),
                                     const SizedBox(width: 12),
-                                    const Icon(Icons.link_rounded, size: 14, color: Color(0xFF8A8A8A)),
+                                    const Icon(
+                                      Icons.link_rounded,
+                                      size: 14,
+                                      color: Color(0xFF8A8A8A),
+                                    ),
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
@@ -188,14 +192,20 @@ class TaskManagementView extends ConsumerWidget {
                                 Text(
                                   '생성: ${course.createdAt?.toLocal().toString().split('.').first ?? '-'}  |  '
                                   '수정: ${course.updatedAt?.toLocal().toString().split('.').first ?? '-'}',
-                                  style: const TextStyle(fontSize: 11, color: Color(0xFFB0B0B0)),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFB0B0B0),
+                                  ),
                                 ),
                                 if (course.metadata.attributes.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4),
                                     child: Text(
                                       '속성: ${course.metadata.attributes}',
-                                      style: const TextStyle(fontSize: 11, color: Color(0xFF8A8A8A)),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF8A8A8A),
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),

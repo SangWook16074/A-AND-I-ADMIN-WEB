@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'auth_dtos.freezed.dart';
 part 'auth_dtos.g.dart';
 
+/// 서버와 주고받는 권한 enum DTO.
 enum AuthRoleDto {
   @JsonValue('USER')
   user,
@@ -12,14 +13,17 @@ enum AuthRoleDto {
   admin,
 }
 
+/// API 오류 페이로드 DTO.
 @freezed
 abstract class ApiErrorDto with _$ApiErrorDto {
   const factory ApiErrorDto({String? code, String? message}) = _ApiErrorDto;
 
+  /// JSON 역직렬화.
   factory ApiErrorDto.fromJson(Map<String, dynamic> json) =>
       _$ApiErrorDtoFromJson(json);
 }
 
+/// 로그인 요청 DTO.
 @freezed
 abstract class LoginRequestDto with _$LoginRequestDto {
   const factory LoginRequestDto({
@@ -27,28 +31,34 @@ abstract class LoginRequestDto with _$LoginRequestDto {
     required String password,
   }) = _LoginRequestDto;
 
+  /// JSON 역직렬화.
   factory LoginRequestDto.fromJson(Map<String, dynamic> json) =>
       _$LoginRequestDtoFromJson(json);
 }
 
+/// 토큰 갱신 요청 DTO.
 @freezed
 abstract class RefreshRequestDto with _$RefreshRequestDto {
   const factory RefreshRequestDto({required String refreshToken}) =
       _RefreshRequestDto;
 
+  /// JSON 역직렬화.
   factory RefreshRequestDto.fromJson(Map<String, dynamic> json) =>
       _$RefreshRequestDtoFromJson(json);
 }
 
+/// 로그아웃 요청 DTO.
 @freezed
 abstract class LogoutRequestDto with _$LogoutRequestDto {
   const factory LogoutRequestDto({required String refreshToken}) =
       _LogoutRequestDto;
 
+  /// JSON 역직렬화.
   factory LogoutRequestDto.fromJson(Map<String, dynamic> json) =>
       _$LogoutRequestDtoFromJson(json);
 }
 
+/// 로그인 응답에 포함되는 사용자 정보 DTO.
 @freezed
 abstract class LoginUserDto with _$LoginUserDto {
   const factory LoginUserDto({
@@ -57,10 +67,12 @@ abstract class LoginUserDto with _$LoginUserDto {
     required AuthRoleDto role,
   }) = _LoginUserDto;
 
+  /// JSON 역직렬화.
   factory LoginUserDto.fromJson(Map<String, dynamic> json) =>
       _$LoginUserDtoFromJson(json);
 }
 
+/// 로그인 응답 DTO.
 @freezed
 abstract class LoginResponseDto with _$LoginResponseDto {
   const factory LoginResponseDto({
@@ -94,6 +106,7 @@ abstract class LogoutResponseDto with _$LogoutResponseDto {
       _$LogoutResponseDtoFromJson(json);
 }
 
+/// 현재 로그인한 사용자 정보 응답 DTO.
 @freezed
 abstract class MeResponseDto with _$MeResponseDto {
   const factory MeResponseDto({
