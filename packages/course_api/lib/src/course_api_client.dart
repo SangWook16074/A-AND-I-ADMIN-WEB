@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'package:aandi_api_protocol/aandi_api_protocol.dart';
 import 'package:dio/dio.dart';
 import 'course_models.dart';
 
 import 'course_api_exceptions.dart';
 
 class CourseApiClient {
-  CourseApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
+  CourseApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio() {
+    ensureAandiProtocolInterceptor(this.dio);
+  }
 
-  static const _coursesPath = '/v1/admin/courses';
+  static const _coursesPath = '/v2/admin/courses';
 
   final String baseUrl;
   final Dio dio;
@@ -44,6 +47,7 @@ class CourseApiClient {
           'title': request.title,
           'description': request.description,
           'phase': request.phase,
+          'attributes': <String, dynamic>{},
         },
       },
     );
@@ -145,7 +149,24 @@ class CourseApiClient {
     return Assignment.fromJson(mapData);
   }
 
+  Future<AssignmentSubmissionStatuses> getAssignmentSubmissionStatuses({
+    required String accessToken,
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final response = await _requestJson(
+      method: 'GET',
+      accessToken: accessToken,
+      path:
+          '$_coursesPath/$courseSlug/assignments/$assignmentId/submission-statuses',
+    );
 
+    final mapData = _readMapData(
+      response.body,
+      statusCode: response.statusCode,
+    );
+    return AssignmentSubmissionStatuses.fromJson(mapData);
+  }
 
   Future<List<Assignment>> getAssignments({
     required String accessToken,
@@ -402,6 +423,14 @@ class CourseApiClient {
     final code = error is Map<String, dynamic>
         ? error['code']?.toString()
         : null;
-    throw CourseApiException(message, statusCode: statusCode, code: code);
+    final alert = error is Map<String, dynamic>
+        ? error['alert']?.toString()
+        : null;
+    throw CourseApiException(
+      message,
+      statusCode: statusCode,
+      code: code,
+      alert: alert,
+    );
   }
 }

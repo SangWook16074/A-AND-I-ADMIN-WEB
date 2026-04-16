@@ -12,6 +12,6 @@ class SubmissionTestCase {
   final String status;
   final double timeMs;
   final double memoryMb;
-  final String? output;
+  final dynamic output;
   final String? error;
 }

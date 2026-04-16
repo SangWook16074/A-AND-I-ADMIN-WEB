@@ -31,7 +31,9 @@ class OjManagementRepositoryImpl implements OjManagementRepository {
       testCases: dto.testCases.map((tc) => TestCase(
         caseId: tc.caseId,
         args: tc.args,
+        argTypes: tc.argTypes,
         expectedOutput: tc.expectedOutput,
+        expectedOutputType: tc.expectedOutputType,
       )).toList(),
     )).toList();
   }

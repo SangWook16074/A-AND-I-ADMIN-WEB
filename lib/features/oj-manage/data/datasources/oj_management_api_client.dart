@@ -2,10 +2,16 @@ import 'package:aandi_oj_api/aandi_oj_api.dart' as oj_api;
 import 'package:dio/dio.dart';
 
 class OjManagementApiException implements Exception {
-  OjManagementApiException(this.message, {this.statusCode, this.code});
+  OjManagementApiException(
+    this.message, {
+    this.statusCode,
+    this.code,
+    this.alert,
+  });
   final String message;
   final int? statusCode;
   final String? code;
+  final String? alert;
 
   @override
   String toString() => message;
@@ -18,7 +24,9 @@ class OjManagementApiClient {
   final String baseUrl;
   final oj_api.OjApiClient apiClient;
 
-  Future<List<oj_api.ProblemTestCases>> getTestCases({required String accessToken}) async {
+  Future<List<oj_api.ProblemTestCases>> getTestCases({
+    required String accessToken,
+  }) async {
     try {
       return await apiClient.getTestCases(accessToken: accessToken);
     } catch (e) {
@@ -27,6 +35,7 @@ class OjManagementApiClient {
           e.message,
           statusCode: e.statusCode,
           code: e.code,
+          alert: e.alert,
         );
       }
       if (e is DioException) {
@@ -39,7 +48,9 @@ class OjManagementApiClient {
     }
   }
 
-  Future<List<oj_api.Submission>> getSubmissions({required String accessToken}) async {
+  Future<List<oj_api.Submission>> getSubmissions({
+    required String accessToken,
+  }) async {
     try {
       return await apiClient.getSubmissions(accessToken: accessToken);
     } catch (e) {
@@ -48,6 +59,7 @@ class OjManagementApiClient {
           e.message,
           statusCode: e.statusCode,
           code: e.code,
+          alert: e.alert,
         );
       }
       if (e is DioException) {

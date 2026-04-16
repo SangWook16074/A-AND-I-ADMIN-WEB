@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:aandi_api_protocol/aandi_api_protocol.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 
 import 'admin_api_exception.dart';
 import 'admin_user_provision_type.dart';
@@ -9,12 +11,17 @@ import 'admin_user_summary.dart';
 import 'create_admin_user_response.dart';
 
 class AdminApiClient {
-  AdminApiClient({required this.baseUrl, Dio? dio}) : dio = dio ?? Dio();
+  AdminApiClient({required this.baseUrl, Dio? dio, http.Client? httpClient})
+    : dio = dio ?? Dio(),
+      _httpClient = wrapWithAandiProtocolClient(httpClient ?? http.Client()) {
+    ensureAandiProtocolInterceptor(this.dio);
+  }
 
-  static const _usersPath = '/v1/admin/users';
+  static const _usersPath = '/v2/admin/users';
 
   final String baseUrl;
   final Dio dio;
+  final http.Client _httpClient;
 
   Future<List<AdminUserSummary>> getUsers({required String accessToken}) async {
     final response = await _requestJson(
@@ -50,7 +57,7 @@ class AdminApiClient {
     final response = await _requestJson(
       method: 'GET',
       accessToken: accessToken,
-      path: '/v1/users/lookup',
+      path: '/v2/users/lookup',
       queryParameters: {'code': code},
     );
 
@@ -68,7 +75,7 @@ class AdminApiClient {
     final response = await _requestJson(
       method: 'POST',
       accessToken: accessToken,
-      path: '/v1/admin/users',
+      path: '/v2/admin/users',
       data: {
         'role': role.toApi(),
         'provisionType': provisionType.toApi(),
@@ -88,8 +95,7 @@ class AdminApiClient {
     await _requestJson(
       method: 'DELETE',
       accessToken: accessToken,
-      data: {'userId': userId},
-      allowEmptySuccessBody: true,
+      path: '$_usersPath/$userId',
     );
   }
 
@@ -97,17 +103,35 @@ class AdminApiClient {
     required String accessToken,
     required String userId,
   }) async {
-    final response = await _requestJson(
-      method: 'POST',
-      accessToken: accessToken,
-      pathSuffix: '/$userId/reset-password',
-      data: const <String, dynamic>{},
+    final uri = Uri.parse('$baseUrl$_usersPath/$userId/password/reset');
+    final httpResponse = await _httpClient.post(
+      uri,
+      headers: _headers(
+        accessToken: accessToken,
+        includeContentType: true,
+      ).cast<String, String>(),
+      body: jsonEncode({}),
     );
-    final data = _readMapData(response.body, statusCode: response.statusCode);
+    final decoded = _decodeResponseMap(
+      httpResponse.body,
+      statusCode: httpResponse.statusCode,
+      allowEmptySuccessBody: false,
+    );
+    if (decoded == null) {
+      throw AdminApiException(
+        'Response data is missing',
+        statusCode: httpResponse.statusCode,
+      );
+    }
+    _throwIfRequestFailed(
+      statusCode: httpResponse.statusCode,
+      decoded: decoded,
+    );
+    final data = _readMapData(decoded, statusCode: httpResponse.statusCode);
     if (data['temporaryPassword'] is! String) {
       throw AdminApiException(
         'Missing temporaryPassword in response',
-        statusCode: response.statusCode,
+        statusCode: httpResponse.statusCode,
       );
     }
     return data['temporaryPassword'] as String;
@@ -124,14 +148,13 @@ class AdminApiClient {
     await _requestJson(
       method: 'PATCH',
       accessToken: accessToken,
+      path: '$_usersPath/$userId',
       data: {
-        'userId': userId,
         'role': role.toApi(),
         'userTrack': userTrack,
         'cohort': cohort,
         'nickname': nickname,
       },
-      allowEmptySuccessBody: true,
     );
   }
 
@@ -146,7 +169,7 @@ class AdminApiClient {
     await _requestJson(
       method: 'POST',
       accessToken: accessToken,
-      path: '/v1/admin/invite-mail',
+      path: '/v2/admin/invite-mail',
       data: {
         'emails': emails,
         'role': role.toApi(),
@@ -178,6 +201,7 @@ class AdminApiClient {
           accessToken: accessToken,
           includeContentType: data != null,
         ),
+        contentType: data != null ? Headers.jsonContentType : null,
         responseType: ResponseType.plain,
         validateStatus: (_) => true,
       ),
@@ -197,7 +221,7 @@ class AdminApiClient {
     return (statusCode: statusCode, body: decoded);
   }
 
-  Map<String, String> _headers({
+  Map<String, dynamic> _headers({
     required String accessToken,
     required bool includeContentType,
   }) {
@@ -301,6 +325,14 @@ class AdminApiClient {
     final code = error is Map<String, dynamic>
         ? error['code']?.toString()
         : null;
-    throw AdminApiException(message, statusCode: statusCode, code: code);
+    final alert = error is Map<String, dynamic>
+        ? error['alert']?.toString()
+        : null;
+    throw AdminApiException(
+      message,
+      statusCode: statusCode,
+      code: code,
+      alert: alert,
+    );
   }
 }

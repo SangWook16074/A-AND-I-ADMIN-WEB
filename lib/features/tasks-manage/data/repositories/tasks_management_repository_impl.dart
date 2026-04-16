@@ -151,6 +151,19 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
   }
 
   @override
+  Future<AssignmentSubmissionStatuses> getAssignmentSubmissionStatuses({
+    required String courseSlug,
+    required String assignmentId,
+  }) async {
+    final token = await _getAccessToken();
+    return _apiClient.getAssignmentSubmissionStatuses(
+      accessToken: token,
+      courseSlug: courseSlug,
+      assignmentId: assignmentId,
+    );
+  }
+
+  @override
   Future<Assignment> createAssignment({
     required String courseSlug,
     required CreateAssignmentRequest request,
@@ -175,9 +188,6 @@ class TasksManagementRepositoryImpl implements TasksManagementRepository {
       assignmentId: assignmentId,
     );
   }
-
-
-
 
   @override
   Future<Assignment> updateAssignment({

@@ -95,8 +95,6 @@ abstract class AssignmentMetadata with _$AssignmentMetadata {
     @Default([]) List<LearningGoal> learningGoals,
     @Default([]) List<AssignmentRequirement> requirements,
     @Default([]) List<AssignmentTestCase> testCases,
-    ProblemDetail? problemDetail,
-    SubmissionGuide? submissionGuide,
     @Default([]) List<CodeTemplate> codeTemplates,
     @Default({}) Map<String, dynamic> attributes,
   }) = _AssignmentMetadata;
@@ -127,61 +125,54 @@ abstract class AssignmentRequirement with _$AssignmentRequirement {
       _$AssignmentRequirementFromJson(json);
 }
 
+enum TestCaseVisibility {
+  @JsonValue('PUBLIC')
+  public,
+  @JsonValue('HIDDEN')
+  hidden,
+  @JsonValue('EXCLUDED')
+  excluded,
+}
+
 @freezed
 abstract class AssignmentTestCase with _$AssignmentTestCase {
   const factory AssignmentTestCase({
     required int seq,
-    @Default([]) List<String> inputValues,
+    @JsonKey(name: 'inputValues', fromJson: _inputValuesFromJson)
+    @Default([])
+    List<dynamic> inputValues,
     String? outputText,
-    @Default('PUBLIC') String visibility,
+    @Default(TestCaseVisibility.public) TestCaseVisibility visibility,
   }) = _AssignmentTestCase;
 
   factory AssignmentTestCase.fromJson(Map<String, dynamic> json) =>
       _$AssignmentTestCaseFromJson(json);
 }
 
-@freezed
-abstract class ProblemDetail with _$ProblemDetail {
-  const factory ProblemDetail({
-    String? inputDescription,
-    String? outputDescription,
-    ProblemClassification? classification,
-  }) = _ProblemDetail;
-
-  factory ProblemDetail.fromJson(Map<String, dynamic> json) =>
-      _$ProblemDetailFromJson(json);
-}
-
-@freezed
-abstract class ProblemClassification with _$ProblemClassification {
-  const factory ProblemClassification({
-    String? algorithmStep,
-    int? difficultyStep,
-  }) = _ProblemClassification;
-
-  factory ProblemClassification.fromJson(Map<String, dynamic> json) =>
-      _$ProblemClassificationFromJson(json);
-}
-
-@freezed
-abstract class SubmissionGuide with _$SubmissionGuide {
-  const factory SubmissionGuide({
-    String? title,
-    String? description,
-    @Default([]) List<String> commentSections,
-  }) = _SubmissionGuide;
-
-  factory SubmissionGuide.fromJson(Map<String, dynamic> json) =>
-      _$SubmissionGuideFromJson(json);
+List<dynamic> _inputValuesFromJson(dynamic json) {
+  if (json == null) return const <dynamic>[];
+  if (json is List) {
+    try {
+      return List<dynamic>.from(json);
+    } catch (_) {
+      return const <dynamic>[];
+    }
+  }
+  if (json is String) {
+    if (json.trim().isEmpty) return const <dynamic>[];
+    return <dynamic>[json];
+  }
+  return <dynamic>[json.toString()];
 }
 
 @freezed
 abstract class CodeTemplate with _$CodeTemplate {
   const factory CodeTemplate({
     required String language,
+    String? codeTemplate,
+    String? runnableTemplate,
     String? commentTemplate,
     String? functionTemplate,
-    String? runnableTemplate,
   }) = _CodeTemplate;
 
   factory CodeTemplate.fromJson(Map<String, dynamic> json) =>
@@ -260,4 +251,109 @@ abstract class UpdateEnrollmentStatusRequest
 
   factory UpdateEnrollmentStatusRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateEnrollmentStatusRequestFromJson(json);
+}
+
+class AssignmentSubmissionStatuses {
+  const AssignmentSubmissionStatuses({
+    required this.assignmentId,
+    required this.courseSlug,
+    required this.totalEnrolled,
+    required this.submittedCount,
+    required this.notSubmittedCount,
+    required this.items,
+  });
+
+  factory AssignmentSubmissionStatuses.fromJson(Map<String, dynamic> json) {
+    return AssignmentSubmissionStatuses(
+      assignmentId: (json['assignmentId'] ?? '').toString(),
+      courseSlug: (json['courseSlug'] ?? '').toString(),
+      totalEnrolled: _readNullableInt(json['totalEnrolled']) ?? 0,
+      submittedCount: _readNullableInt(json['submittedCount']) ?? 0,
+      notSubmittedCount: _readNullableInt(json['notSubmittedCount']) ?? 0,
+      items: (json['items'] as List<dynamic>? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(AssignmentSubmissionStatusItem.fromJson)
+          .toList(),
+    );
+  }
+
+  final String assignmentId;
+  final String courseSlug;
+  final int totalEnrolled;
+  final int submittedCount;
+  final int notSubmittedCount;
+  final List<AssignmentSubmissionStatusItem> items;
+}
+
+class AssignmentSubmissionStatusItem {
+  const AssignmentSubmissionStatusItem({
+    required this.userId,
+    this.publicCode,
+    this.username,
+    required this.enrollmentStatus,
+    required this.submitted,
+    this.score,
+    this.passedCases,
+    this.totalCases,
+    this.completedAt,
+  });
+
+  factory AssignmentSubmissionStatusItem.fromJson(Map<String, dynamic> json) {
+    return AssignmentSubmissionStatusItem(
+      userId: (json['userId'] ?? '').toString(),
+      publicCode: _readNullableString(json['publicCode']),
+      username: _readNullableString(json['username']),
+      enrollmentStatus:
+          _readNullableString(json['enrollmentStatus']) ?? 'ENABLED',
+      submitted: json['submitted'] == true,
+      score: _readNullableInt(json['score']),
+      passedCases: _readNullableInt(json['passedCases']),
+      totalCases: _readNullableInt(json['totalCases']),
+      completedAt: _readNullableDateTime(json['completedAt']),
+    );
+  }
+
+  final String userId;
+  final String? publicCode;
+  final String? username;
+  final String enrollmentStatus;
+  final bool submitted;
+  final int? score;
+  final int? passedCases;
+  final int? totalCases;
+  final DateTime? completedAt;
+}
+
+String? _readNullableString(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  final text = value.toString();
+  return text.isEmpty ? null : text;
+}
+
+int? _readNullableInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  if (value is String) {
+    return int.tryParse(value);
+  }
+  return null;
+}
+
+DateTime? _readNullableDateTime(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is DateTime) {
+    return value;
+  }
+  if (value is String && value.trim().isNotEmpty) {
+    return DateTime.tryParse(value);
+  }
+  return null;
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'course_details_bottom_sheet.dart';
+import 'course_details_dialog.dart';
 import 'task_management.dart';
 
 class TaskManagementView extends ConsumerWidget {
@@ -108,19 +107,118 @@ class TaskManagementView extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                             side: const BorderSide(color: Color(0xFFEAEAEA)),
                           ),
-                          title: Text(
-                            course.metadata.title,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          title: Row(
+                            children: [
+                              Flexible(
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: [
+                                    Text(
+                                      course.metadata.title,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    _MetadataChip(
+                                      label: course.metadata.phase,
+                                      color: Colors.blue[700]!,
+                                      backgroundColor: Colors.blue[50]!,
+                                    ),
+                                    _MetadataChip(
+                                      label: course.targetTrack,
+                                      color: Colors.orange[700]!,
+                                      backgroundColor: Colors.orange[50]!,
+                                    ),
+                                    _MetadataChip(
+                                      label: course.status,
+                                      color: Colors.purple[700]!,
+                                      backgroundColor: Colors.purple[50]!,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          subtitle: Text(
-                            course.metadata.description ?? '설명 없음',
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  course.metadata.description ?? '설명 없음',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF666666),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.calendar_month_rounded,
+                                      size: 14,
+                                      color: Color(0xFF8A8A8A),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${course.startDate ?? '미정'} ~ ${course.endDate ?? '미정'}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF8A8A8A),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Icon(
+                                      Icons.link_rounded,
+                                      size: 14,
+                                      color: Color(0xFF8A8A8A),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        course.slug,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF8A8A8A),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '생성: ${course.createdAt?.toLocal().toString().split('.').first ?? '-'}  |  '
+                                  '수정: ${course.updatedAt?.toLocal().toString().split('.').first ?? '-'}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFB0B0B0),
+                                  ),
+                                ),
+                                if (course.metadata.attributes.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      '속성: ${course.metadata.attributes}',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF8A8A8A),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                           trailing: const Icon(Icons.chevron_right_rounded),
                           onTap: () {
                             ref
                                 .read(tasksManagementBlocProvider.notifier)
                                 .add(TasksManagementCourseSelected(course));
-                            showCourseDetailsBottomSheet(context, course);
+                            showCourseDetailsDialog(context, course);
                           },
                         );
                       },
@@ -346,6 +444,38 @@ void _showCreateCourseDialog(BuildContext context, WidgetRef ref) {
       );
     },
   );
+}
+
+class _MetadataChip extends StatelessWidget {
+  const _MetadataChip({
+    required this.label,
+    required this.color,
+    required this.backgroundColor,
+  });
+
+  final String label;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: color,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
 }
 
 String _startDateStr = '';

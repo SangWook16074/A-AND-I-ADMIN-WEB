@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 
+import '../../../../app/api_error_feedback.dart';
 import 'login_event.dart';
 import 'login_state.dart';
 
@@ -67,6 +70,7 @@ class LoginBloc extends _$LoginBloc {
         clearError: true,
       );
     } on AuthApiException catch (e) {
+      unawaited(showApiAlertIfPresent(e));
       state = state.copyWith(
         submissionStatus: LoginSubmissionStatus.failure,
         errorMessage: e.message,

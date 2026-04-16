@@ -678,6 +678,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     final spans = <TextSpan>[];
 
     final combinedRegex = RegExp(
+      r'("""[\s\S]*?""")|' // Triple-quoted strings (Kotlin, etc.)
       r'(".*?")|'
       r"('.*?')|"
       r'(\/\/.*)|'
@@ -685,8 +686,9 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       r'([a-zA-Z_][a-zA-Z0-9_]*)|'
       r'(\d+(\.\d*)?)|'
       r'([{}()\[\]])|'
-      r'([+\-*/%=<>!&|^~,.:;])|'
-      r'(\s+)',
+      r'([+\-*/%=<>!&|^~,.:;$\\])|' // Updated to include $ and \
+      r'(\s+)|'
+      r'([\s\S])', // Catch-all for any other characters
     );
 
     final matches = combinedRegex.allMatches(code).toList();
@@ -695,15 +697,15 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       final match = matches[i];
       final text = match.group(0)!;
 
-      if (match.group(1) != null || match.group(2) != null) {
-        // Strings
+      if (match.group(1) != null || match.group(2) != null || match.group(3) != null) {
+        // Strings (Triple-quoted or standard)
         spans.add(
           TextSpan(
             text: text,
             style: const TextStyle(color: Color(0xFF86EFAC)),
           ),
         );
-      } else if (match.group(3) != null || match.group(4) != null) {
+      } else if (match.group(4) != null || match.group(5) != null) {
         // Comments
         spans.add(
           TextSpan(
@@ -714,9 +716,9 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           ),
         );
-      } else if (match.group(5) != null) {
+      } else if (match.group(6) != null) {
         // Words
-        final word = match.group(5)!;
+        final word = match.group(6)!;
         if (kwList.contains(word)) {
           spans.add(
             TextSpan(
@@ -744,7 +746,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           );
         }
-      } else if (match.group(6) != null) {
+      } else if (match.group(7) != null) {
         // Numbers
         spans.add(
           TextSpan(
@@ -752,7 +754,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             style: const TextStyle(color: Color(0xFFFDBA74)),
           ),
         );
-      } else if (match.group(8) != null) {
+      } else if (match.group(9) != null) {
         // Brackets
         spans.add(
           TextSpan(
@@ -760,16 +762,24 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             style: const TextStyle(color: Color(0xFFCBD5E1)),
           ),
         );
-      } else if (match.group(9) != null) {
-        // Operators
+      } else if (match.group(10) != null) {
+        // Operators (including $ and \)
         spans.add(
           TextSpan(
             text: text,
             style: const TextStyle(color: Color(0xFF94A3B8)),
           ),
         );
+      } else if (match.group(11) != null) {
+        // Whitespace
+        spans.add(
+          TextSpan(
+            text: text,
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
       } else {
-        // Whitespace etc
+        // Everything else (Group 12)
         spans.add(
           TextSpan(
             text: text,
@@ -870,7 +880,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
                 _buildTableCell(
                   (tc.error != null && tc.error!.isNotEmpty)
                       ? tc.error!
-                      : (tc.output ?? '-'),
+                      : (tc.output?.toString() ?? '-'),
                   isMonospace: true,
                   textColor: tc.error != null ? Colors.redAccent : null,
                 ),
@@ -906,8 +916,6 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       child: Text(
         text,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
         style: TextStyle(
           fontSize: isHeader ? 12 : 11,
           fontWeight: isHeader
@@ -923,6 +931,13 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
   }
 
   Widget _buildTestCaseItem(TestCase tc) {
+    final List<String> argDisplays = [];
+    for (int i = 0; i < tc.args.length; i++) {
+      final type = i < tc.argTypes.length ? tc.argTypes[i] : 'UNKNOWN';
+      argDisplays.add('${tc.args[i]} ($type)');
+    }
+    final String argsText = '[${argDisplays.join(', ')}]';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -951,7 +966,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
                   Clipboard.setData(
                     ClipboardData(
                       text:
-                          'Args: ${tc.args.join(', ')}\nOutput: ${tc.expectedOutput}',
+                          'Args: $argsText\nOutput: ${tc.expectedOutput} (${tc.expectedOutputType})',
                     ),
                   );
                   ScaffoldMessenger.of(
@@ -973,11 +988,11 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
             ),
           ),
           const SizedBox(height: 4),
-          _buildCodeBlock(tc.args.toString()),
+          _buildCodeBlock(argsText),
           const SizedBox(height: 12),
-          const Text(
-            'Expected Output:',
-            style: TextStyle(
+          Text(
+            'Expected Output (${tc.expectedOutputType}):',
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: Color(0xFF6B7280),
@@ -990,7 +1005,8 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
     );
   }
 
-  Widget _buildCodeBlock(String code) {
+  Widget _buildCodeBlock(dynamic code) {
+    final String displayCode = code.toString();
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -999,7 +1015,7 @@ class _OJManagementViewState extends ConsumerState<OJManagementView>
         borderRadius: BorderRadius.circular(6),
       ),
       child: SelectableText(
-        code,
+        displayCode,
         style: const TextStyle(
           color: Colors.greenAccent,
           fontFamily: 'monospace',

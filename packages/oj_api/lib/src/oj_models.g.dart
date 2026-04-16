@@ -9,13 +9,19 @@ part of 'oj_models.dart';
 _TestCase _$TestCaseFromJson(Map<String, dynamic> json) => _TestCase(
   caseId: (json['caseId'] as num).toInt(),
   args: json['args'] as List<dynamic>,
-  expectedOutput: json['expectedOutput'] as String,
+  argTypes: (json['argTypes'] as List<dynamic>)
+      .map((e) => e as String)
+      .toList(),
+  expectedOutput: json['expectedOutput'],
+  expectedOutputType: json['expectedOutputType'] as String,
 );
 
 Map<String, dynamic> _$TestCaseToJson(_TestCase instance) => <String, dynamic>{
   'caseId': instance.caseId,
   'args': instance.args,
+  'argTypes': instance.argTypes,
   'expectedOutput': instance.expectedOutput,
+  'expectedOutputType': instance.expectedOutputType,
 };
 
 _ProblemTestCases _$ProblemTestCasesFromJson(Map<String, dynamic> json) =>
@@ -40,7 +46,7 @@ _SubmissionTestCase _$SubmissionTestCaseFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String,
       timeMs: (json['timeMs'] as num).toDouble(),
       memoryMb: (json['memoryMb'] as num).toDouble(),
-      output: json['output'] as String?,
+      output: json['output'],
       error: json['error'] as String?,
     );
 

@@ -5,11 +5,17 @@ import 'package:dio/dio.dart';
 import '../dtos/admin_user_dto.dart';
 
 class UsersManagementApiException implements Exception {
-  UsersManagementApiException(this.message, {this.statusCode, this.code});
+  UsersManagementApiException(
+    this.message, {
+    this.statusCode,
+    this.code,
+    this.alert,
+  });
 
   final String message;
   final int? statusCode;
   final String? code;
+  final String? alert;
 
   @override
   String toString() {
@@ -50,6 +56,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -82,6 +89,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -114,6 +122,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -148,6 +157,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -163,6 +173,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -189,6 +200,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -207,6 +219,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }
@@ -233,6 +246,7 @@ class UsersManagementApiClient {
         e.message,
         statusCode: e.statusCode,
         code: e.code,
+        alert: e.alert,
       );
     }
   }

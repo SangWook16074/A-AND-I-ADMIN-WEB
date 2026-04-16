@@ -49,6 +49,10 @@ dependencies:
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   dio: ^5.9.2
+  code_text_field: ^1.1.0
+  flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
+  flutter_code_editor: ^0.3.5
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +71,7 @@ dev_dependencies:
   riverpod_lint: ^2.6.3
   custom_lint: ^0.7.5
   flutterfire_cli: ^1.2.0
+  melos: ^6.3.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

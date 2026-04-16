@@ -8,7 +8,9 @@ abstract class TestCase with _$TestCase {
   const factory TestCase({
     required int caseId,
     required List<dynamic> args,
-    required String expectedOutput,
+    required List<String> argTypes,
+    required dynamic expectedOutput,
+    required String expectedOutputType,
   }) = _TestCase;
 
   factory TestCase.fromJson(Map<String, dynamic> json) => _$TestCaseFromJson(json);
@@ -32,7 +34,7 @@ abstract class SubmissionTestCase with _$SubmissionTestCase {
     required String status,
     required double timeMs,
     required double memoryMb,
-    required String? output,
+    required dynamic output,
     required String? error,
   }) = _SubmissionTestCase;
 

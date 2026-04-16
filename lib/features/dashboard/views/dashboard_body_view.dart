@@ -21,15 +21,15 @@ class DashboardBodyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (selectedTab) {
       DashboardNavTab.usersManage => UsersManagementView(
-        showLogoutButton: !isDesktop,
+        showLogoutButton: false,
         onLogout: onLogout,
       ),
       DashboardNavTab.tasksManage => TaskManagementView(
-        showLogoutButton: !isDesktop,
+        showLogoutButton: false,
         onLogout: onLogout,
       ),
       DashboardNavTab.ojManage => OJManagementView(
-        showLogoutButton: !isDesktop,
+        showLogoutButton: false,
         onLogout: onLogout,
       ),
     };

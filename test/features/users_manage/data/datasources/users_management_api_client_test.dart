@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('UsersManagementApiClient.createUser', () {
-    test('sends POST /v1/admin/users with expected payload', () async {
+    test('sends POST /v2/admin/users with expected payload', () async {
       late RequestOptions captured;
       late String capturedBody;
       final apiClient = UsersManagementApiClient(
@@ -32,11 +32,15 @@ void main() {
       );
 
       expect(captured.method, 'POST');
-      expect(captured.uri.toString(), 'https://api.example.com/v1/admin/user');
+      expect(captured.uri.toString(), 'https://api.example.com/v2/admin/users');
       expect(
-        _headerValue(captured.headers, 'authorization'),
+        _headerValue(captured.headers, 'authenticate'),
         'Bearer access-token',
       );
+      expect(_headerValue(captured.headers, 'authorization'), isNull);
+      expect(_headerValue(captured.headers, 'deviceOS'), 'web');
+      expect(_headerValue(captured.headers, 'timestamp'), isNotEmpty);
+      expect(_headerValue(captured.headers, 'salt'), isNull);
       expect(
         _headerValue(captured.headers, 'content-type'),
         'application/json',
@@ -51,7 +55,7 @@ void main() {
   });
 
   group('UsersManagementApiClient.deleteUser', () {
-    test('sends DELETE /v1/admin/users with userId in body', () async {
+    test('sends DELETE /v2/admin/users/{id} without body', () async {
       late RequestOptions captured;
       late String capturedBody;
       final apiClient = UsersManagementApiClient(
@@ -66,23 +70,25 @@ void main() {
       await apiClient.deleteUser(accessToken: 'access-token', userId: 'u-1');
 
       expect(captured.method, 'DELETE');
-      expect(captured.uri.toString(), 'https://api.example.com/v1/admin/users');
       expect(
-        _headerValue(captured.headers, 'authorization'),
+        captured.uri.toString(),
+        'https://api.example.com/v2/admin/users/u-1',
+      );
+      expect(
+        _headerValue(captured.headers, 'authenticate'),
         'Bearer access-token',
       );
-      expect(
-        _headerValue(captured.headers, 'content-type'),
-        'application/json',
-      );
-
-      final body = jsonDecode(capturedBody) as Map<String, dynamic>;
-      expect(body['userId'], 'u-1');
+      expect(_headerValue(captured.headers, 'authorization'), isNull);
+      expect(_headerValue(captured.headers, 'deviceOS'), 'web');
+      expect(_headerValue(captured.headers, 'timestamp'), isNotEmpty);
+      expect(_headerValue(captured.headers, 'salt'), isNull);
+      expect(_headerValue(captured.headers, 'content-type'), isNull);
+      expect(capturedBody, isEmpty);
     });
   });
 
   group('UsersManagementApiClient.updateUser', () {
-    test('sends PATCH /v1/admin/users with expected payload', () async {
+    test('sends PATCH /v2/admin/users/{id} with expected payload', () async {
       late RequestOptions captured;
       late String capturedBody;
       final apiClient = UsersManagementApiClient(
@@ -104,18 +110,24 @@ void main() {
       );
 
       expect(captured.method, 'PATCH');
-      expect(captured.uri.toString(), 'https://api.example.com/v1/admin/users');
       expect(
-        _headerValue(captured.headers, 'authorization'),
+        captured.uri.toString(),
+        'https://api.example.com/v2/admin/users/u-1',
+      );
+      expect(
+        _headerValue(captured.headers, 'authenticate'),
         'Bearer access-token',
       );
+      expect(_headerValue(captured.headers, 'authorization'), isNull);
+      expect(_headerValue(captured.headers, 'deviceOS'), 'web');
+      expect(_headerValue(captured.headers, 'timestamp'), isNotEmpty);
+      expect(_headerValue(captured.headers, 'salt'), isNull);
       expect(
         _headerValue(captured.headers, 'content-type'),
         'application/json',
       );
 
       final body = jsonDecode(capturedBody) as Map<String, dynamic>;
-      expect(body['userId'], 'u-1');
       expect(body['role'], 'ORGANIZER');
       expect(body['userTrack'], 'SP');
       expect(body['cohort'], 9);

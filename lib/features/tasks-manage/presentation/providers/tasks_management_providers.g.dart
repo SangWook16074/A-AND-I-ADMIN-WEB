@@ -209,6 +209,26 @@ final getAssignmentDetailsUseCaseProvider =
 // ignore: unused_element
 typedef GetAssignmentDetailsUseCaseRef =
     ProviderRef<GetAssignmentDetailsUseCase>;
+String _$getAssignmentSubmissionStatusesUseCaseHash() =>
+    r'61f4638fe5d153463e56f97ceaf1200cc39e6fd9';
+
+/// See also [getAssignmentSubmissionStatusesUseCase].
+@ProviderFor(getAssignmentSubmissionStatusesUseCase)
+final getAssignmentSubmissionStatusesUseCaseProvider =
+    Provider<GetAssignmentSubmissionStatusesUseCase>.internal(
+      getAssignmentSubmissionStatusesUseCase,
+      name: r'getAssignmentSubmissionStatusesUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$getAssignmentSubmissionStatusesUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetAssignmentSubmissionStatusesUseCaseRef =
+    ProviderRef<GetAssignmentSubmissionStatusesUseCase>;
 String _$deleteAssignmentUseCaseHash() =>
     r'b52e55e22918c0e56e7852d276e52e4944801aba';
 

@@ -40,6 +40,32 @@ flutter run -d chrome --web-browser-flag "--disable-web-security" --dart-define=
 flutter run -d chrome --dart-define=API_URL=https://api.aandiclub.com
 ```
 
+## 2-1. Monorepo 관리 (melos)
+
+이 저장소는 `packages/*` 아래 로컬 패키지를 함께 관리하는 monorepo 구조입니다.
+
+설치:
+
+```bash
+dart pub get
+dart run melos --help
+```
+
+주요 명령:
+
+```bash
+dart run melos run pub:get
+dart run melos run analyze
+dart run melos run format
+dart run melos run test
+dart run melos run build
+```
+
+참고:
+
+- `melos`는 `packages/*` 워크스페이스 관리용입니다.
+- 루트 앱 실행/테스트는 기존처럼 `flutter run`, `flutter test`를 사용합니다.
+
 ## 3. URL에서 `#` 제거 (Hash URL 비활성화)
 
 이 프로젝트는 `Path URL strategy`를 사용합니다.
@@ -76,8 +102,11 @@ flutter run -d chrome --dart-define=API_URL=https://api.aandiclub.com
 │     ├─ users-manage/     # 사용자 관리
 │     └─ my-info/          # 내 정보 화면
 ├─ packages/
+│  ├─ api_protocol/        # 공통 통신 규약 패키지 (aandi_api_protocol)
 │  ├─ auth/                # 공통 인증 패키지 (aandi_auth)
-│  └─ admin_api/           # 관리자 API 패키지 (aandi_admin_api)
+│  ├─ admin_api/           # 관리자 API 패키지 (aandi_admin_api)
+│  ├─ course_api/          # 코스 API 패키지 (aandi_course_api)
+│  └─ oj_api/              # OJ API 패키지 (aandi_oj_api)
 ├─ test/
 ├─ firebase.json
 └─ .github/workflows/firebase-hosting-deploy.yml
@@ -92,8 +121,21 @@ flutter run -d chrome --dart-define=API_URL=https://api.aandiclub.com
 
 ### `packages/admin_api` (`aandi_admin_api`)
 
-- `/v1/admin/*` 전용 API 클라이언트
+- `/v2/admin/*` 사용자 관리 API 클라이언트
 - 관리자 기능 스펙 분리
+
+### `packages/course_api` (`aandi_course_api`)
+
+- `/v2/admin/courses/*` 코스/수강/과제 API 클라이언트
+
+### `packages/oj_api` (`aandi_oj_api`)
+
+- `/v2/admin/testcases`, `/v2/admin/submissions` API 클라이언트
+
+### `packages/api_protocol` (`aandi_api_protocol`)
+
+- A&I 공통 헤더 규약 처리
+- `Authenticate`, `deviceOS`, `timestamp` 주입
 
 원칙:
 

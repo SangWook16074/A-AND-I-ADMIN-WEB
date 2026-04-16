@@ -51,6 +51,11 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String assignmentId,
   }) = TasksManagementAssignmentDetailsRequested;
 
+  const factory TasksManagementEvent.assignmentSubmissionStatusesRequested({
+    required String courseSlug,
+    required String assignmentId,
+  }) = TasksManagementAssignmentSubmissionStatusesRequested;
+
   const factory TasksManagementEvent.assignmentDeletedRequested({
     required String courseSlug,
     required String assignmentId,
@@ -81,5 +86,6 @@ sealed class TasksManagementEvent with _$TasksManagementEvent {
     required String query,
   }) = TasksManagementUserSearchRequested;
 
-  const factory TasksManagementEvent.clearUserSearch() = TasksManagementClearUserSearch;
+  const factory TasksManagementEvent.clearUserSearch() =
+      TasksManagementClearUserSearch;
 }

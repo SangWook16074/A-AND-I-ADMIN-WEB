@@ -4,7 +4,8 @@ import 'dart:typed_data';
 import 'package:aandi_admin_api/aandi_admin_api.dart';
 import 'package:aandi_auth/aandi_auth.dart';
 import 'package:dio/dio.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   const baseUrl = 'https://api.example.com';
@@ -16,12 +17,16 @@ void main() {
         baseUrl: baseUrl,
         handler: (options, _) async {
           expect(options.method, 'GET');
-          expect(options.uri, Uri.parse('$baseUrl/v1/admin/users'));
+          expect(options.uri, Uri.parse('$baseUrl/v2/admin/users'));
           expect(
-            _headerValue(options.headers, 'authorization'),
+            _headerValue(options.headers, 'authenticate'),
             'Bearer $accessToken',
           );
+          expect(_headerValue(options.headers, 'authorization'), isNull);
           expect(_headerValue(options.headers, 'accept'), 'application/json');
+          expect(_headerValue(options.headers, 'deviceOS'), 'web');
+          expect(_headerValue(options.headers, 'timestamp'), isNotEmpty);
+          expect(_headerValue(options.headers, 'salt'), isNull);
 
           return _jsonResponse({
             'success': true,
@@ -115,16 +120,20 @@ void main() {
         baseUrl: baseUrl,
         handler: (options, requestBody) async {
           expect(options.method, 'POST');
-          expect(options.uri, Uri.parse('$baseUrl/v1/admin/users'));
+          expect(options.uri, Uri.parse('$baseUrl/v2/admin/users'));
           expect(
-            _headerValue(options.headers, 'authorization'),
+            _headerValue(options.headers, 'authenticate'),
             'Bearer $accessToken',
           );
+          expect(_headerValue(options.headers, 'authorization'), isNull);
           expect(_headerValue(options.headers, 'accept'), 'application/json');
           expect(
             _headerValue(options.headers, 'content-type'),
             'application/json',
           );
+          expect(_headerValue(options.headers, 'deviceOS'), 'web');
+          expect(_headerValue(options.headers, 'timestamp'), isNotEmpty);
+          expect(_headerValue(options.headers, 'salt'), isNull);
           expect(jsonDecode(requestBody), {
             'role': 'ORGANIZER',
             'provisionType': 'PASSWORD',
@@ -203,13 +212,16 @@ void main() {
         baseUrl: baseUrl,
         handler: (options, requestBody) async {
           expect(options.method, 'DELETE');
-          expect(options.uri, Uri.parse('$baseUrl/v1/admin/users'));
-          expect(
-            _headerValue(options.headers, 'content-type'),
-            'application/json',
-          );
-          expect(jsonDecode(requestBody), {'userId': 'user-1'});
-          return ResponseBody.fromString('', 204);
+          expect(options.uri, Uri.parse('$baseUrl/v2/admin/users/user-1'));
+          expect(_headerValue(options.headers, 'content-type'), isNull);
+          expect(_headerValue(options.headers, 'deviceOS'), 'web');
+          expect(_headerValue(options.headers, 'timestamp'), isNotEmpty);
+          expect(_headerValue(options.headers, 'salt'), isNull);
+          expect(requestBody, isEmpty);
+          return _jsonResponse({
+            'success': true,
+            'data': {'userId': 'user-1', 'deleted': true},
+          }, 200);
         },
       );
 
@@ -260,15 +272,29 @@ void main() {
           baseUrl: baseUrl,
           handler: (options, requestBody) async {
             expect(options.method, 'PATCH');
-            expect(options.uri, Uri.parse('$baseUrl/v1/admin/users'));
+            expect(options.uri, Uri.parse('$baseUrl/v2/admin/users/user-2'));
+            expect(_headerValue(options.headers, 'deviceOS'), 'web');
+            expect(_headerValue(options.headers, 'timestamp'), isNotEmpty);
+            expect(_headerValue(options.headers, 'salt'), isNull);
             expect(jsonDecode(requestBody), {
-              'userId': 'user-2',
               'role': 'ADMIN',
               'userTrack': 'AI',
               'cohort': 7,
               'nickname': 'Renamed',
             });
-            return ResponseBody.fromString('', 200);
+            return _jsonResponse({
+              'success': true,
+              'data': {
+                'id': 'user-2',
+                'username': 'admin',
+                'role': 'ADMIN',
+                'userTrack': 'AI',
+                'cohort': 7,
+                'cohortOrder': 1,
+                'publicCode': 'A001',
+                'nickname': 'Renamed',
+              },
+            }, 200);
           },
         );
 
@@ -312,6 +338,46 @@ void main() {
         ),
       );
     });
+  });
+
+  group('AdminApiClient.resetPassword', () {
+    test(
+      'sends bodyless POST without content-type and reads temporaryPassword',
+      () async {
+        final client = AdminApiClient(
+          baseUrl: baseUrl,
+          dio: Dio(),
+          httpClient: _MockHttpClient((request) async {
+            expect(request.method, 'POST');
+            expect(
+              request.url,
+              Uri.parse('$baseUrl/v2/admin/users/user-3/password/reset'),
+            );
+            expect(request.headers['Authenticate'], 'Bearer $accessToken');
+            expect(request.headers['Authorization'], isNull);
+            expect(request.headers['Content-Type'], isNull);
+            expect(request.headers['deviceOS'], 'web');
+            expect(request.headers['timestamp'], isNotEmpty);
+
+            return http.Response(
+              jsonEncode({
+                'success': true,
+                'data': {'temporaryPassword': 'temp-pass'},
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }),
+        );
+
+        final password = await client.resetPassword(
+          accessToken: accessToken,
+          userId: 'user-3',
+        );
+
+        expect(password, 'temp-pass');
+      },
+    );
   });
 }
 
@@ -382,5 +448,23 @@ class _MockDioAdapter implements HttpClientAdapter {
     }
     final body = utf8.decode(bytes, allowMalformed: true);
     return _handler(options, body);
+  }
+}
+
+class _MockHttpClient extends http.BaseClient {
+  _MockHttpClient(this._handler);
+
+  final Future<http.Response> Function(http.BaseRequest request) _handler;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    final response = await _handler(request);
+    return http.StreamedResponse(
+      Stream.value(Uint8List.fromList(response.bodyBytes)),
+      response.statusCode,
+      headers: response.headers,
+      reasonPhrase: response.reasonPhrase,
+      request: request,
+    );
   }
 }
